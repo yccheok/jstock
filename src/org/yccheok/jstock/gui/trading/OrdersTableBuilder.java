@@ -12,13 +12,20 @@ import java.util.Map;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.util.Callback;
+import org.yccheok.jstock.trading.OpenPosModel;
 import org.yccheok.jstock.trading.OrderModel;
 import org.yccheok.jstock.trading.Utils;
 
@@ -46,77 +53,80 @@ public class OrdersTableBuilder {
         }
     }
     
-    private FormatNumberCell getNumberCell () {
-        final FormatNumberCell cell = new FormatNumberCell();
-        
-        cell.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                if (event.getButton() == MouseButton.SECONDARY) {
-                    System.out.println("Order Table UNITS col clicked...");
+    public void setRowContextMenu () {
+        this.ordTable.setRowFactory(
+            new Callback<TableView<OpenPosModel>, TableRow<OpenPosModel>>() {
+                @Override
+                public TableRow<OpenPosModel> call(TableView<OpenPosModel> tableView) {
+                    final TableRow<OpenPosModel> row = new TableRow<>();
+                    final ContextMenu rowMenu = new ContextMenu();
+                    
+                    final MenuItem cancelItem = new MenuItem("Cancel");
+                    cancelItem.setOnAction(new EventHandler<ActionEvent>() {
+                        @Override
+                        public void handle(ActionEvent event) {
+                            //posTable.getItems().remove(row.getItem());
+                        }
+                    });
+                    
+                    final MenuItem chartItem = new MenuItem("History Chart");
+                    chartItem.setOnAction(new EventHandler<ActionEvent>() {
+                        @Override
+                        public void handle(ActionEvent event) {
+                            //posTable.getItems().remove(row.getItem());
+                        }
+                    });
+                    
+                    rowMenu.getItems().addAll(cancelItem, new SeparatorMenuItem(), chartItem);
 
+                    // only display context menu for non-null items:
+                    row.contextMenuProperty().bind(
+                        Bindings.when(Bindings.isNotNull(row.itemProperty()))
+                        .then(rowMenu)
+                        .otherwise((ContextMenu)null));
+                    
+                    return row;
                 }
             }
-        });
-        return cell;
+        );
     }
 
-    private TableCell<OrderModel, String> getStringCell () {
-        final TableCell<OrderModel, String> cell = new TableCell<>();
-        cell.textProperty().bind(cell.itemProperty());
-        
-        cell.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                if (event.getButton() == MouseButton.SECONDARY) {
-                    System.out.println("Order Table UNITS col clicked...");
-
-                }
-            }
-        });
-        return cell;
-    }
-    
     public TableView build () {
         // Pending Orders table
         TableColumn<OrderModel, String> symbolCol = new TableColumn("Stock");
         symbolCol.setCellValueFactory(new PropertyValueFactory("symbol"));
-        symbolCol.setCellFactory((TableColumn<OrderModel, String> col) -> getStringCell());
         symbolCol.getStyleClass().add("left");
 
         TableColumn<OrderModel, String> nameCol = new TableColumn("Name");
         nameCol.setCellValueFactory(new PropertyValueFactory("name"));
-        nameCol.setCellFactory((TableColumn<OrderModel, String> col) -> getStringCell());
         nameCol.getStyleClass().add("left");
 
         TableColumn<OrderModel, Number> unitsCol = new TableColumn("Units");
         unitsCol.setCellValueFactory(cellData -> cellData.getValue().unitsProperty());
-        unitsCol.setCellFactory((TableColumn<OrderModel, Number> col) -> getNumberCell());
+        unitsCol.setCellFactory((TableColumn<OrderModel, Number> col) -> new FormatNumberCell());
         unitsCol.getStyleClass().add("right");
 
         TableColumn<OrderModel, Number> mktPriceCol = new TableColumn("Current Price");
         mktPriceCol.setCellValueFactory(cellData -> cellData.getValue().marketPriceProperty());
-        mktPriceCol.setCellFactory((TableColumn<OrderModel, Number> col) -> getNumberCell());
+        mktPriceCol.setCellFactory((TableColumn<OrderModel, Number> col) -> new FormatNumberCell());
         mktPriceCol.getStyleClass().add("right");
         
         TableColumn<OrderModel, String> typeCol = new TableColumn("Type");
         typeCol.setCellValueFactory(new PropertyValueFactory("type"));
-        typeCol.setCellFactory((TableColumn<OrderModel, String> col) -> getStringCell());
         typeCol.getStyleClass().add("left");
 
         TableColumn<OrderModel, String> sideCol = new TableColumn("Side");
         sideCol.setCellValueFactory(new PropertyValueFactory("side"));
-        sideCol.setCellFactory((TableColumn<OrderModel, String> col) -> getStringCell());
         sideCol.getStyleClass().add("left");
         
         TableColumn<OrderModel, Number> limitCol = new TableColumn("Limit Price");
         limitCol.setCellValueFactory(cellData -> cellData.getValue().limitPriceProperty());
-        limitCol.setCellFactory((TableColumn<OrderModel, Number> col) -> getNumberCell());
+        limitCol.setCellFactory((TableColumn<OrderModel, Number> col) -> new FormatNumberCell());
         limitCol.getStyleClass().add("right");
 
         TableColumn<OrderModel, Number> stopCol = new TableColumn("Stop Price");
         stopCol.setCellValueFactory(cellData -> cellData.getValue().stopPriceProperty());
-        stopCol.setCellFactory((TableColumn<OrderModel, Number> col) -> getNumberCell());
+        stopCol.setCellFactory((TableColumn<OrderModel, Number> col) -> new FormatNumberCell());
         stopCol.getStyleClass().add("right");
         
         symbolCol.setSortable(false);
@@ -138,6 +148,9 @@ public class OrdersTableBuilder {
 
         // set all columns having equal width
         this.ordTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        
+        // Right clicked on row, show menu
+        setRowContextMenu();
         
         return this.ordTable;
     }

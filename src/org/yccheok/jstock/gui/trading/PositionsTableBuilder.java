@@ -12,14 +12,18 @@ import java.util.Map;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
+import javafx.util.Callback;
 import org.yccheok.jstock.trading.OpenPosModel;
 import org.yccheok.jstock.trading.Utils;
 
@@ -60,77 +64,90 @@ public class PositionsTableBuilder {
         }
     }
     
-    private FormatNumberCell getNumberCell (boolean style) {
-        final FormatNumberCell cell = new FormatNumberCell(style);
-        
-        cell.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                if (event.getButton() == MouseButton.SECONDARY) {
-                    System.out.println("Pos Table UNITS col clicked...");
+    public void setRowContextMenu () {
+        this.posTable.setRowFactory(
+            new Callback<TableView<OpenPosModel>, TableRow<OpenPosModel>>() {
+                @Override
+                public TableRow<OpenPosModel> call(TableView<OpenPosModel> tableView) {
+                    final TableRow<OpenPosModel> row = new TableRow<>();
+                    final ContextMenu rowMenu = new ContextMenu();
+                    
+                    final MenuItem buyItem = new MenuItem("Buy");
+                    buyItem.setOnAction(new EventHandler<ActionEvent>() {
+                        @Override
+                        public void handle(ActionEvent event) {
+                            //posTable.getItems().remove(row.getItem());
+                        }
+                    });
+                    
+                    final MenuItem sellItem = new MenuItem("Sell");
+                    sellItem.setOnAction(new EventHandler<ActionEvent>() {
+                        @Override
+                        public void handle(ActionEvent event) {
+                            //posTable.getItems().remove(row.getItem());
+                        }
+                    });
+                    
+                    final MenuItem chartItem = new MenuItem("History Chart");
+                    chartItem.setOnAction(new EventHandler<ActionEvent>() {
+                        @Override
+                        public void handle(ActionEvent event) {
+                            //posTable.getItems().remove(row.getItem());
+                        }
+                    });
+                    
+                    rowMenu.getItems().addAll(buyItem, sellItem, new SeparatorMenuItem(), chartItem);
 
+                    // only display context menu for non-null items:
+                    row.contextMenuProperty().bind(
+                        Bindings.when(Bindings.isNotNull(row.itemProperty()))
+                        .then(rowMenu)
+                        .otherwise((ContextMenu)null));
+                    
+                    return row;
                 }
             }
-        });
-        return cell;
-    }
-
-    private TableCell<OpenPosModel, String> getStringCell () {
-        final TableCell<OpenPosModel, String> cell = new TableCell<>();
-        cell.textProperty().bind(cell.itemProperty());
-        
-        cell.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                if (event.getButton() == MouseButton.SECONDARY) {
-                    System.out.println("Pos Table UNITS col clicked...");
-
-                }
-            }
-        });
-        return cell;
+        );
     }
     
     public TableView build () {
         // Open Positions table
         TableColumn<OpenPosModel, String> symbolCol = new TableColumn<>("Stock");
         symbolCol.setCellValueFactory(new PropertyValueFactory("symbol"));
-        symbolCol.setCellFactory((TableColumn<OpenPosModel, String> col) -> getStringCell());
         symbolCol.getStyleClass().add("left");
 
         TableColumn<OpenPosModel, String> nameCol = new TableColumn<>("Name");
         nameCol.setCellValueFactory(new PropertyValueFactory("name"));
-        nameCol.setCellFactory((TableColumn<OpenPosModel, String> col) -> getStringCell());
         nameCol.getStyleClass().add("left");
 
         TableColumn<OpenPosModel, Number> unitsCol = new TableColumn<>("Units");
         unitsCol.setCellValueFactory(cellData -> cellData.getValue().unitsProperty());
-        unitsCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> getNumberCell(false));
+        unitsCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> new FormatNumberCell(false));
         unitsCol.getStyleClass().add("right");
 
         TableColumn<OpenPosModel, Number> avgPriceCol = new TableColumn<>("Average Purchase Price");
         avgPriceCol.setCellValueFactory(cellData -> cellData.getValue().averagePriceProperty());
-        avgPriceCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> getNumberCell(false));
+        avgPriceCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> new FormatNumberCell(false));
         avgPriceCol.getStyleClass().add("right");
 
         TableColumn<OpenPosModel, Number> mktPriceCol = new TableColumn<>("Current Price");
         mktPriceCol.setCellValueFactory(cellData -> cellData.getValue().marketPriceProperty());
-        mktPriceCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> getNumberCell(false));
+        mktPriceCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> new FormatNumberCell(false));
         mktPriceCol.getStyleClass().add("right");
 
         TableColumn<OpenPosModel, Number> costCol = new TableColumn<>("Purchase Value");
         costCol.setCellValueFactory(cellData -> cellData.getValue().costBasisProperty());
-        costCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> getNumberCell(false));
+        costCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> new FormatNumberCell(false));
         costCol.getStyleClass().add("right");
 
         TableColumn<OpenPosModel, Number> mktValueCol = new TableColumn<>("Current Value");
         mktValueCol.setCellValueFactory(cellData -> cellData.getValue().marketValueProperty());
-        mktValueCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> getNumberCell(false));
+        mktValueCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> new FormatNumberCell(false));
         mktValueCol.getStyleClass().add("right");
         
         TableColumn<OpenPosModel, Number> plCol = new TableColumn<>("Gain/Loss Value");
         plCol.setCellValueFactory(cellData -> cellData.getValue().unrealizedPLProperty());
-        plCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> getNumberCell(true));
+        plCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> new FormatNumberCell(true));
         plCol.getStyleClass().add("right");
 
         symbolCol.setSortable(false);
@@ -152,6 +169,9 @@ public class PositionsTableBuilder {
 
         // set all columns having equal width
         this.posTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        
+        // Right click on row, show Menu
+        setRowContextMenu();
         
         return this.posTable;
     }
@@ -200,6 +220,4 @@ public class PositionsTableBuilder {
             }
         }
     }
-
-    
 }
