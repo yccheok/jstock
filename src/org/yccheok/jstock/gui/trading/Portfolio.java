@@ -55,15 +55,18 @@ public class Portfolio {
                 if (result.containsKey("accBlotter")) {
                     accBlotter = (Map<String, Object>) result.get("accBlotter");
 
-                    posTableBuilder.initData(accBlotter);
-                    ordTableBuilder.initData(accBlotter, marketPrices);
+                    posTableBuilder.initData(accBlotter, instruments);
+                    ordTableBuilder.initData(accBlotter, instruments, marketPrices);
                     accSummaryBuilder.initData(accBlotter, posTableBuilder.getPosList());
                 } else {
                     if (result.containsKey("instruments")) {
                         instruments = (Map<String, Map>) result.get("instruments");
-
-                        posTableBuilder.updateStocksName(instruments);
-                        ordTableBuilder.updateStocksName(instruments);
+                        
+                        // new instruments added from last call
+                        if ((boolean) result.get("updated") == true) {
+                            posTableBuilder.updateStocksName(instruments);
+                            ordTableBuilder.updateStocksName(instruments);
+                        }
                     }
                     
                     posTableBuilder.updatePrices(marketPrices);

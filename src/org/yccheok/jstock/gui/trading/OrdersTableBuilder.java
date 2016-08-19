@@ -153,14 +153,19 @@ public class OrdersTableBuilder {
         return this.ordTable;
     }
     
-    public void initData (Map<String, Object> accBlotter, Map<String, Double> marketPrices) {
+    public void initData (Map<String, Object> accBlotter, Map<String, Map> instruments, Map<String, Double> marketPrices) {
         List<LinkedTreeMap<String, Object>> orders = (List) accBlotter.get("orders");
 
         for (LinkedTreeMap<String, Object> ord : orders) {
-            String symbol = ord.get("symbol").toString();
+            final String symbol = ord.get("symbol").toString();
+            
+            String name = "";
+            if (instruments != null && instruments.containsKey(symbol)) {
+                name = instruments.get(symbol).get("name").toString();
+            }
             
             Map<String, Object> data = new HashMap<>();
-            data.put("name",        "");
+            data.put("name",        name);
             data.put("marketPrice", marketPrices.get(symbol));
             data.put("symbol",      symbol);
             data.put("units",       ord.get("orderQty"));

@@ -61,11 +61,12 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
             System.out.println("calling account Blotter DONE...");
         }
         
-        public void getInstruments () {
+        public boolean getInstruments () {
             // LOOP: call "get instrument" to get stock name for open positions + pending orders
             LinkedTreeMap<String, Object> equity = (LinkedTreeMap) accBlotter.get("equity");
             List<LinkedTreeMap<String, Object>> posList = (List) equity.get("equityPositions");
 
+            boolean updated = false;
             for (LinkedTreeMap<String, Object> pos : posList) {
                 String symbol = pos.get("symbol").toString();
                 if (instruments.containsKey(symbol)) {
@@ -74,6 +75,7 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
 
                 Map<String, Object> ins = api.getInstrument(pos.get("instrumentID").toString());
                 instruments.put(symbol, ins);
+                updated = true;
             }
 
             List<LinkedTreeMap<String, Object>> orders = (List) accBlotter.get("orders");
@@ -91,8 +93,10 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
                 if (insList.size() > 0) {
                     Map<String, Object> ins = insList.get(0);
                     instruments.put(symbol, ins);
+                    updated = true;
                 }
             }
+            return updated;
         }
         
         private Map<String, Double> getMarketPrices () {
@@ -123,8 +127,9 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
                     
                     System.out.println("DONE calling accBlotter...");
                 } else if (taskState == TaskState.INSTRUMENTS) {
-                    getInstruments();
+                    final boolean updated = getInstruments();
                     result.put("instruments", instruments);
+                    result.put("updated", updated);
                     taskState = TaskState.PRICES;
 
                     System.out.println("DONE calling get instruments for positions & orders...");

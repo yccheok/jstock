@@ -176,14 +176,21 @@ public class PositionsTableBuilder {
         return this.posTable;
     }
     
-    public void initData (Map<String, Object> accBlotter) {
+    public void initData (Map<String, Object> accBlotter, Map<String, Map> instruments) {
         LinkedTreeMap<String, Object> equity = (LinkedTreeMap) accBlotter.get("equity");
         List<LinkedTreeMap<String, Object>> positions = (List) equity.get("equityPositions");
         
         for (LinkedTreeMap<String, Object> pos : positions) {
+            final String symbol = pos.get("symbol").toString();
+            
+            String name = "";
+            if (instruments != null && instruments.containsKey(symbol)) {
+                name = instruments.get(symbol).get("name").toString();
+            }
+
             Map<String, Object> data = new HashMap<>();
-            data.put("name",            "");
-            data.put("symbol",          pos.get("symbol"));
+            data.put("name",            name);
+            data.put("symbol",          symbol);
             data.put("instrumentID",    pos.get("instrumentID"));
             data.put("units",           pos.get("availableForTradingQty"));
             data.put("averagePrice",    pos.get("avgPrice"));
