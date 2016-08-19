@@ -22,8 +22,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
 import org.yccheok.jstock.trading.OpenPosModel;
 import org.yccheok.jstock.trading.OrderModel;
