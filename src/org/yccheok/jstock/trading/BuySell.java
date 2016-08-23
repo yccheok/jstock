@@ -113,6 +113,12 @@ public class BuySell {
                 updateMessage("Create Market Order Status FAILED !!");
                 
                 result.put("ordStatus", DriveWealthAPI.OrderStatus.ERROR);
+                
+                // validation error
+                if (order.containsKey("status") && Boolean.parseBoolean(order.get("status").toString()) == false) {
+                    result.put("error", order.get("error"));
+                }
+                
                 return result;
             }
             

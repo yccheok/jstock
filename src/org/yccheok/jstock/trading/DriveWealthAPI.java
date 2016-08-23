@@ -1167,8 +1167,132 @@ public class DriveWealthAPI {
      * API: Orders
      ********************/
 
-    public Map<String, Object> createOrder (String action, String OrderType, Map<String, Object> args) {
-        System.out.println("\n[create order]: " + action + ", " + OrderType);
+    public Map<String, Object> validateBuy (String orderType, Map<String, Object> args) {
+        System.out.println("\n validate Buy Order - " + orderType);
+        
+        String accountID  = args.get("accountID").toString();
+        String symbol     = args.get("symbol").toString();
+        double orderQty   = Double.parseDouble(args.get("orderQty").toString());
+        double commission = this.user.commissionRate;
+        
+        // get market price (use "Ask Price" for Buy)
+        ArrayList<String> symbols = new ArrayList<>(Arrays.asList(symbol));
+        List<Map<String, Object>> dataArray = this.getMarketData(symbols, false);
+        double askPrice = (double) dataArray.get(0).get("ask");
+
+        double price = 0;
+        Map<String, Object> status = new HashMap<>();
+        
+        if (orderType.equals("market")) {
+            price = askPrice;
+        } else if (orderType.equals("stop")) {
+            price = Double.parseDouble(args.get("price").toString());
+
+            // Check price >= ask price + 0.05
+            if (price < (askPrice + 0.05)) {
+                String error = "Stop price must be >= ask price + 0.05, Stop price: " + price + ", Ask Price: " + askPrice;
+                System.out.println(error);
+                
+                status.put("error", error);
+                status.put("status", false);
+                
+                return status;
+            }
+        } else if (orderType.equals("limit")) {
+            // BUY will execute in the market when the market ask price is at or below the order limit price
+            // If the price entered is above the current ask price, order will be immediately executed
+
+            // SELL will execute in the market when the market bid price is at or above the order limit price
+            // If the price entered is below the current ask price, order will be immediately executed
+            price = Double.parseDouble(args.get("limitPrice").toString());
+        }
+        
+        // get balance
+        Map<String, Object> account = this.accountBlotter(this.user.userID, accountID);
+
+        // check for insufficient balance
+        double amount = orderQty * price + commission;
+
+        LinkedTreeMap<String, Object> cashObj = (LinkedTreeMap) account.get("cash");
+        double balance = (double) cashObj.get("cashAvailableForTrade");
+
+        System.out.println("Check balance: amount: " + amount + ", balance: " + balance
+                + ", market price (Ask): " + price + ", Qty: " + orderQty
+                + ", commission: " + commission);
+
+        if (balance < amount) {
+            String error = "Insufficient balance";
+            System.out.println(error);
+
+            status.put("status", false);
+            status.put("error", error);
+        } else {
+            status.put("status", true);
+        }
+        
+        return status;
+    }
+
+    public Map<String, Object> validateSell (String orderType, Map<String, Object> args) {
+        System.out.println("\n validate Sell order - " + orderType);
+        
+        String accountID    = args.get("accountID").toString();
+        String symbol       = args.get("symbol").toString();
+        String instrumentID = args.get("instrumentID").toString();
+        double orderQty     = Double.parseDouble(args.get("orderQty").toString());
+        
+        Map<String, Object> status = new HashMap<>();
+        
+        if (orderType.equals("stop")) {
+            // get market price (use "Bid Price" for Sell)
+            ArrayList<String> symbols = new ArrayList<>(Arrays.asList(symbol));
+            List<Map<String, Object>> dataArray = this.getMarketData(symbols, false);
+            double bidPrice = (double) dataArray.get(0).get("bid");
+            
+            double price = Double.parseDouble(args.get("price").toString());
+
+            // Check Stop Price <= Bid Price - 0.05
+            if (price > (bidPrice - 0.05)) {
+                String error = "Stop price must be <= Bid Price - 0.05, Stop price: " + price + ", Bid Price: " + bidPrice;
+                System.out.println(error);
+                
+                status.put("error", error);
+                status.put("status", false);
+                
+                return status;
+            }
+        }
+        
+        // get positions
+        Map<String, Object> account = this.accountBlotter(this.user.userID, accountID);
+        List<LinkedTreeMap<String, Object>> positions = (List) ((LinkedTreeMap) account.get("equity")).get("equityPositions");
+
+        double availQty = 0;
+        for (LinkedTreeMap<String, Object> pos : positions) {
+            if (pos.get("instrumentID").toString().equals(instrumentID)) {
+                availQty = (double) pos.get("availableForTradingQty");
+                break;
+            }
+        }
+        System.out.println("availableForTradingQty: " + availQty + ", orderQty: " + orderQty);
+
+        // check insufficient Qty for sell
+        if (availQty < orderQty) {
+            String error = "Insufficient Qty for sell";
+            System.out.println(error);
+            
+            status.put("status", false);
+            status.put("error", error);
+            
+            return status;
+        }
+        
+        status.put("status", true);
+        return status;
+    }
+    
+    public Map<String, Object> createOrder (String action, String orderType, Map<String, Object> args) {
+        System.out.println("\n[create order]: " + action + ", " + orderType);
 
         Map<String, Object> params = new HashMap<>();
         for (String k: this.createOrderFields) {
@@ -1178,118 +1302,33 @@ public class DriveWealthAPI {
                 //System.out.println("key: " + k + ", value: " + v);
             }
         }
-
-        String instrumentID = args.get("instrumentID").toString();
-        double orderQty     = new Double(params.get("orderQty").toString()).doubleValue();
-        double commission   = this.user.commissionRate;
         
-        System.out.println("[create order] instrumentID: " + instrumentID + ", orderQty: " + orderQty + ", commission: " + commission);
-        
-        System.out.println("[create order] call accBlotter...");
-        
-        // get Account for: balance, commission
-        Map<String, Object> account = this.accountBlotter(this.user.userID, params.get("accountID").toString());
-        
-        // get Market Data for: bid, ask
-        ArrayList<String> symbols = new ArrayList<>( Arrays.asList(params.get("symbol").toString()) );
-        
-        System.out.println("[create order] call getMarketData for bid + ask");
-        
-        List<Map<String, Object>> dataArray = this.getMarketData(symbols, false);
-        Map<String, Object> marketData = dataArray.get(0);
-        
-        double rateAsk = (double) marketData.get("ask");
-        double rateBid = (double) marketData.get("bid");
-        double price = 0;
-
-        System.out.println("[create order]  symbol: " + params.get("symbol").toString() + ", bid: " + rateBid + ", ask: " + rateAsk);
-        
-        if (OrderType.equals("market")) {
-            params.put("ordType", 1);
-            
-            if (action.equals("buy")) {
-                price = rateAsk;
-            } else {
-                price = rateBid;
-            }
-        } else if (OrderType.equals("stop")) {
-            params.put("ordType", 3);
-            price = (double) params.get("price");
-            
-            if (action.equals("buy")) {
-                // Check price >= ask price + 0.05
-                if (price < (rateAsk + 0.05)) {
-                    System.out.println("price must be >= ask price + 0.05, price[" + price + "], ask[" + rateAsk + "]");
-                    return null;
-                }
-            } else {
-                // Check price <= bid price - 0.05
-                if (price > (rateBid - 0.05)) {
-                    System.out.println("price must be <= bid price - 0.05, price[" + price + "], bid[" + rateBid + "]");
-                    return null;
-                }
-            }
-        } else if (OrderType.equals("limit")) {
-            // BUY will execute in the market when the market ask price is at or below the order limit price
-            // If the price entered is above the current ask price, order will be immediately executed
-
-            // SELL will execute in the market when the market bid price is at or above the order limit price
-            // If the price entered is below the current ask price, order will be immediately executed
-            params.put("ordType", 2);
-            price = (double) params.get("limitPrice");
-        } else {
-            System.out.println("invalid order type: " + OrderType);
-            return null;
-        }
-        
+        Map <String, Object> validate;
         if (action.equals("buy")) {
-            params.put("side", "B");
-            
-            double amount = orderQty * price + commission;
-            
-            LinkedTreeMap<String, Object> cashObj = (LinkedTreeMap) account.get("cash");
-            double balance = (double) cashObj.get("cashAvailableForTrade");
-
-            System.out.println("cash: Balance: " + cashObj.get("cashBalance")
-                        + ", AvailableForTrade: " + cashObj.get("cashAvailableForTrade"));
-
-            // Check for insufficient balance
-            System.out.println("Check balance: amount: " + amount + ", balance: " + balance
-                    + ", price: " + price + ", Qty: " + params.get("orderQty")
-                    + ", ask: " + rateAsk + ", bid: " + rateBid
-                    + ", commission: " + commission);
-
-            if (balance < amount) {
-                System.out.println("Insufficient balance");
-                return null;
-            }
-        } else if (action.equals("sell")) {
-            params.put("side", "S");
-            
-            // check available Qty
-            List<LinkedTreeMap<String, Object>> positions = (List) ((LinkedTreeMap) account.get("equity")).get("equityPositions");
-
-            double availQty = 0;
-            for (LinkedTreeMap<String, Object> pos : positions) {
-                if (pos.get("instrumentID").toString().equals(instrumentID)) {
-                    availQty = (double) pos.get("availableForTradingQty");
-                    break;
-                }
-            }
-
-            System.out.println("price: " + price + ", ask: " + rateAsk
-                    + ", bid: " + rateBid + ", availableForTradingQty: " + availQty
-                    + ", orderQty: " + orderQty);
-
-            if (availQty < orderQty) {
-                System.out.println("Insufficient Qty to sell");
-                return null;
-            }
+            validate = this.validateBuy(orderType, params);
         } else {
-            System.out.println("invalid action: " + action);
-            return null;
+            validate = this.validateSell(orderType, params);
         }
         
+        // validation error
+        if ( Boolean.parseBoolean(validate.get("status").toString()) == false) {
+            return validate;
+        }
+        
+        // default to Market order
+        int ordType = orderType.equals("stop") ? 3 : orderType.equals("limit") ? 2 : 1;
+        params.put("ordType", ordType);
+        
+        // Note For LIMIT order:
+        //      BUY will execute in the market when the market ask price is at or below the order limit price
+        //      If the price entered is above the current ask price, order will be immediately executed
+
+        //      SELL will execute in the market when the market bid price is at or above the order limit price
+        //      If the price entered is below the current ask price, order will be immediately executed
+
+        String side = action.equals("buy") ? "B" : "S";
+        params.put("side", side);
+
         // create order
         Map<String, Object> respondMap = executePost("orders", params, this.getSessionKey());
         String respond = respondMap.get("respond").toString();
