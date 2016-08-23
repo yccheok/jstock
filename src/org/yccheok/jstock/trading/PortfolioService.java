@@ -37,17 +37,14 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
     }
     
     public synchronized void setRefresh () {
-    //public void setRefresh () {
         this.refresh = true;
     }
     
     public synchronized void resetRefresh() {
-    //public void resetRefresh() {    
         this.refresh = false;
     }
     
     public synchronized boolean needRefresh () {
-    //public boolean needRefresh () {
         return (this.refresh == true);
     }
     

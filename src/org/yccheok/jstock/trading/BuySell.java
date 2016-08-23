@@ -79,6 +79,9 @@ public class BuySell {
                     );
 
                     portfolioService.setRefresh();
+                    portfolioService.cancel();
+                    portfolioService.restart();
+                    
                 }
             }
         });

@@ -15,6 +15,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableCell;
@@ -87,7 +88,7 @@ public class PositionsTableBuilder {
         // 1: market order
         params.put("ordType", 1);
         params.put("side", "B");
-        params.put("orderQty", 1);
+        params.put("orderQty", 1.0);
         params.put("comment", "SY Testing");
 
         return params;
@@ -210,6 +211,9 @@ public class PositionsTableBuilder {
         
         // Right click on row, show Menu
         setRowContextMenu();
+
+        // display empty message when table is empty
+        this.posTable.setPlaceholder(new Label());
         
         return this.posTable;
     }
@@ -232,7 +236,7 @@ public class PositionsTableBuilder {
             data.put("name",            name);
             data.put("symbol",          symbol);
             data.put("instrumentID",    pos.get("instrumentID"));
-            data.put("units",           pos.get("availableForTradingQty"));
+            data.put("units",           pos.get("openQty"));
             data.put("averagePrice",    pos.get("avgPrice"));
             data.put("costBasis",       pos.get("costBasis"));
             data.put("marketPrice",     pos.get("mktPrice"));

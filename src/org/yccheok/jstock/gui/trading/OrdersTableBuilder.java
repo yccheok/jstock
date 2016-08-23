@@ -15,6 +15,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableCell;
@@ -149,6 +150,9 @@ public class OrdersTableBuilder {
         
         // Right clicked on row, show menu
         setRowContextMenu();
+        
+        // display empty message when table is empty
+        this.ordTable.setPlaceholder(new Label());
         
         return this.ordTable;
     }
