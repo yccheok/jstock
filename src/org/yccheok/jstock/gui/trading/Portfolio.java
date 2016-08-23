@@ -26,13 +26,14 @@ import org.yccheok.jstock.trading.DriveWealthAPI;
  * @author shuwnyuan
  */
 public class Portfolio {
+    
     public Portfolio (DriveWealthAPI api) {
-        this.api = api;
-        startBackgroundService(this.api);
+        Portfolio.api = api;
+        startPortfolioService();
     }
 
-    private void startBackgroundService (DriveWealthAPI api) {
-        portfolioService = new PortfolioService(api);
+    private void startPortfolioService () {
+        Portfolio.portfolioService = new PortfolioService(Portfolio.api);
         
         // start immediately
         portfolioService.setDelay(Duration.seconds(0));
@@ -119,20 +120,21 @@ public class Portfolio {
         vboxOrder.prefWidthProperty().bind(splitPane.widthProperty());
 
         // add Portfolio tab
-        this.accTab.setText("Portfolio (Practice Account)");
-        this.accTab.setClosable(false);
-        this.accTab.setContent(vBox);
+        this.PortfolioTab.setText("Portfolio (Practice Account)");
+        this.PortfolioTab.setClosable(false);
+        this.PortfolioTab.setContent(vBox);
 
-        return this.accTab;
+        return this.PortfolioTab;
     }
     
-    private final DriveWealthAPI api;
+        
+    public static DriveWealthAPI api;
     
     private Map<String, Object> accBlotter;
     private Map<String, Map> instruments;
     private Map<String, Double> marketPrices;
 
-    public  final Tab accTab  = new Tab();
+    public  final Tab PortfolioTab  = new Tab();
     
     private final PositionsTableBuilder posTableBuilder = new PositionsTableBuilder();
     private final OrdersTableBuilder ordTableBuilder = new OrdersTableBuilder();
@@ -140,6 +142,6 @@ public class Portfolio {
     
     public static final double tableCellSize = 25;
     
-    public PortfolioService portfolioService;
+    public static PortfolioService portfolioService;
 }
     

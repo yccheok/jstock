@@ -67,9 +67,11 @@ public class AccountSummaryBuilder {
     }
 
     public void initData (Map<String, Object> accBlotter, ObservableList<OpenPosModel> posList) {
-        this.acc = new AccountModel(accBlotter, posList);
+        resetData();
 
+        this.acc = new AccountModel(accBlotter, posList);
         Locale locale  = new Locale("en", "US");
+        
         this.shareAmount.textProperty().bind(Bindings.format(locale, "$%,.2f", this.acc.equity));
         this.profitAmount.textProperty().bind(Bindings.format(locale, "$%,.2f (%,.2f%%)", this.acc.totalUnrealizedPL, this.acc.totalUnrealizedPLPercent));
         this.cashAmount.textProperty().bind(Bindings.format(locale, "$%,.2f", this.acc.cashForTrade));
@@ -81,6 +83,19 @@ public class AccountSummaryBuilder {
         this.shareAmount.getStyleClass().add(this.acc.equityValueCss());
     }
 
+    public void resetData () {
+        // remove all binding & css
+        this.shareAmount.textProperty().unbind();
+        this.profitAmount.textProperty().unbind();
+        this.cashAmount.textProperty().unbind();
+        this.totalAmount.textProperty().unbind();
+        
+        this.profitAmount.getStyleClass().clear();
+        this.cashAmount.getStyleClass().clear();
+        this.totalAmount.getStyleClass().clear();
+        this.shareAmount.getStyleClass().clear();
+    }
+    
     public void update (ObservableList<OpenPosModel> posList) {
         this.acc.update(posList);
 

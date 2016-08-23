@@ -17,6 +17,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 public class OpenPosModel {
     private final SimpleStringProperty symbol;
     private final SimpleStringProperty name;
+    private final SimpleStringProperty instrumentID;
     
     private final SimpleDoubleProperty units;
     private final SimpleDoubleProperty averagePrice;
@@ -29,6 +30,7 @@ public class OpenPosModel {
     public OpenPosModel(Map<String, Object> pos) {
         this.symbol         = new SimpleStringProperty(pos.get("symbol").toString());
         this.name           = new SimpleStringProperty(pos.get("name").toString());
+        this.instrumentID   = new SimpleStringProperty(pos.get("instrumentID").toString());
         
         this.costBasis      = new SimpleDoubleProperty((Double) pos.get("costBasis"));
         this.units          = new SimpleDoubleProperty((Double) pos.get("units"));
@@ -71,6 +73,16 @@ public class OpenPosModel {
         return name;
     }
 
+    public final String getInstrumentID() {
+        return instrumentID.get();
+    }
+    public final void setInstrumentID(String v) {
+        instrumentID.set(v);
+    }
+    public SimpleStringProperty instrumentIDProperty() {
+        return instrumentID;
+    }
+    
     public final Double getUnits() {
         return units.get();
     }

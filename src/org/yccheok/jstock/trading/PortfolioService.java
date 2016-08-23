@@ -9,6 +9,7 @@ import com.google.gson.internal.LinkedTreeMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,7 +23,7 @@ import javafx.concurrent.Task;
 
 public class PortfolioService extends ScheduledService<Map<String, Object>> {
     
-    private DriveWealthAPI api;
+    private final DriveWealthAPI api;
     private Map<String, Object> accBlotter = new HashMap<>();
     private final Map<String, Map> instruments = new HashMap<>();
     private Set symbolsSet;
@@ -35,8 +36,19 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
         PRICES;
     }
     
-    public void setRefresh () {
+    public synchronized void setRefresh () {
+    //public void setRefresh () {
         this.refresh = true;
+    }
+    
+    public synchronized void resetRefresh() {
+    //public void resetRefresh() {    
+        this.refresh = false;
+    }
+    
+    public synchronized boolean needRefresh () {
+    //public boolean needRefresh () {
+        return (this.refresh == true);
     }
     
     public PortfolioService (DriveWealthAPI api) {
@@ -58,33 +70,27 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
                 symbolsSet.add(symbol);
             }
             
+            List<LinkedTreeMap<String, Object>> orders = (List) accBlotter.get("orders");
+            for (LinkedTreeMap<String, Object> ord : orders) {
+                String symbol = ord.get("symbol").toString();
+                symbolsSet.add(symbol);
+            }
+            
             System.out.println("calling account Blotter DONE...");
         }
         
         public boolean getInstruments () {
-            // LOOP: call "get instrument" to get stock name for open positions + pending orders
-            LinkedTreeMap<String, Object> equity = (LinkedTreeMap) accBlotter.get("equity");
-            List<LinkedTreeMap<String, Object>> posList = (List) equity.get("equityPositions");
-
+            // call "search instrument" to get stocks' name for all symbols
             boolean updated = false;
-            for (LinkedTreeMap<String, Object> pos : posList) {
-                String symbol = pos.get("symbol").toString();
+            Iterator<String> itr = symbolsSet.iterator();
+
+            while (itr.hasNext()) {
+                String symbol = itr.next();
+                
                 if (instruments.containsKey(symbol)) {
                     continue;
                 }
-
-                Map<String, Object> ins = api.getInstrument(pos.get("instrumentID").toString());
-                instruments.put(symbol, ins);
-                updated = true;
-            }
-
-            List<LinkedTreeMap<String, Object>> orders = (List) accBlotter.get("orders");
-            for (LinkedTreeMap<String, Object> ord : orders) {
-                String symbol = ord.get("symbol").toString();
-                if (instruments.containsKey(symbol)) {
-                    continue;
-                }
-
+                
                 Map<String, String> param = new HashMap<>();
                 // only search for exact symbol match
                 param.put("symbols", symbol);
@@ -96,6 +102,7 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
                     updated = true;
                 }
             }
+            
             return updated;
         }
         
@@ -142,8 +149,9 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
                 System.out.println("DONE calling get market data for positions / orders...");
                 
                 // This is set to TRUE after Create Order
-                if (refresh == true) {
+                if (needRefresh()) {
                     taskState = TaskState.ACCBLOTTER;
+                    resetRefresh();
                 }
             }
             return result;

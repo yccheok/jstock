@@ -70,15 +70,15 @@ public class DriveWealthAPI {
 
         this.user.sessionKey = session.get("sessionKey").toString();
         this.user.userID = session.get("userID").toString();
-        this.user.commissionRate = (Double) session.get("commissionRate");
-
+        this.user.commissionRate = (double) session.get("commissionRate");
+        
         List<Map<String, Object>> accounts = (ArrayList) session.get("accounts");
 
         for (Map<String, Object> a : accounts) {
             String accountID   = a.get("accountID").toString();
             String accountNo   = a.get("accountNo").toString();
-            Double accountType = (Double) a.get("accountType");
-            Double cash        = (Double) a.get("cash");
+            double accountType = (double) a.get("accountType");
+            double cash        = (double) a.get("cash");
 
             final Account account = new Account(a);
 
@@ -681,8 +681,8 @@ public class DriveWealthAPI {
             
             String accountID = account.get("accountID").toString();
             String accountNo = account.get("accountNo").toString();
-            Double accountTypeID = (Double) account.get("accountType");
-            Double cash = (Double) account.get("cash");
+            double accountTypeID = (double) account.get("accountType");
+            double cash = (double) account.get("cash");
 
             // accountTypeID: 1 => Practice a/c, 2 => Live a/c
             String accountType = (accountTypeID == 1) ? "Practice" : "Live";
@@ -851,7 +851,7 @@ public class DriveWealthAPI {
         Map<String, Object> respondMap = executePost("signups/live", params, null);
         String respond = respondMap.get("respond").toString();
         Map<String, Object> result  = gson.fromJson(respond, HashMap.class);
-        Double code = (Double) result.get("code");
+        int code = (int) result.get("code");
         
         Map<String, Object> user = new HashMap<>();
         
@@ -909,10 +909,10 @@ public class DriveWealthAPI {
         }
 
         // approved: accountStatus, addressProofStatus, idStatus, kycStatus = 2
-        Double accountStatus        = (Double) result.get("accountStatus");
-        Double addressProofStatus   = (Double) result.get("addressProofStatus");
-        Double idStatus             = (Double) result.get("idStatus");
-        Double kycStatus            = (Double) result.get("kycStatus");
+        double accountStatus        = (double) result.get("accountStatus");
+        double addressProofStatus   = (double) result.get("addressProofStatus");
+        double idStatus             = (double) result.get("idStatus");
+        double kycStatus            = (double) result.get("kycStatus");
 
         boolean approved = false;
         if (accountStatus == 2 && addressProofStatus == 2 && idStatus == 2 && kycStatus == 2) {
@@ -1002,7 +1002,7 @@ public class DriveWealthAPI {
         Map<String, Object> respondMap = executeGet("userSessions/" + sessionKey, this.getSessionKey());
         Map<String, Object> result  = gson.fromJson(respondMap.get("respond").toString(), HashMap.class);
         
-        Double loginState = (Double) result.get("loginState");
+        double loginState = (double) result.get("loginState");
         boolean login = false;
         if (loginState == 1) {
             login = true;
@@ -1179,21 +1179,30 @@ public class DriveWealthAPI {
             }
         }
 
-        final String instrumentID = args.get("instrumentID").toString();
-        final Double orderQty = (Double) params.get("orderQty");
-        final Double commission = this.user.commissionRate;
+        String instrumentID = args.get("instrumentID").toString();
+        double orderQty     = new Double(params.get("orderQty").toString()).doubleValue();
+        double commission   = this.user.commissionRate;
+        
+        System.out.println("[create order] instrumentID: " + instrumentID + ", orderQty: " + orderQty + ", commission: " + commission);
+        
+        System.out.println("[create order] call accBlotter...");
         
         // get Account for: balance, commission
         Map<String, Object> account = this.accountBlotter(this.user.userID, params.get("accountID").toString());
         
         // get Market Data for: bid, ask
         ArrayList<String> symbols = new ArrayList<>( Arrays.asList(params.get("symbol").toString()) );
+        
+        System.out.println("[create order] call getMarketData for bid + ask");
+        
         List<Map<String, Object>> dataArray = this.getMarketData(symbols, false);
         Map<String, Object> marketData = dataArray.get(0);
         
-        Double rateAsk = (Double) marketData.get("ask");
-        Double rateBid = (Double) marketData.get("bid");
-        Double price = null;
+        double rateAsk = (double) marketData.get("ask");
+        double rateBid = (double) marketData.get("bid");
+        double price = 0;
+
+        System.out.println("[create order]  symbol: " + params.get("symbol").toString() + ", bid: " + rateBid + ", ask: " + rateAsk);
         
         if (OrderType.equals("market")) {
             params.put("ordType", 1);
@@ -1205,17 +1214,17 @@ public class DriveWealthAPI {
             }
         } else if (OrderType.equals("stop")) {
             params.put("ordType", 3);
-            price = (Double) params.get("price");
+            price = (double) params.get("price");
             
             if (action.equals("buy")) {
                 // Check price >= ask price + 0.05
-                if (price.compareTo(rateAsk + 0.05) < 0) {
+                if (price < (rateAsk + 0.05)) {
                     System.out.println("price must be >= ask price + 0.05, price[" + price + "], ask[" + rateAsk + "]");
                     return null;
                 }
             } else {
                 // Check price <= bid price - 0.05
-                if (price.compareTo(rateBid - 0.05) > 0) {
+                if (price > (rateBid - 0.05)) {
                     System.out.println("price must be <= bid price - 0.05, price[" + price + "], bid[" + rateBid + "]");
                     return null;
                 }
@@ -1227,7 +1236,7 @@ public class DriveWealthAPI {
             // SELL will execute in the market when the market bid price is at or above the order limit price
             // If the price entered is below the current ask price, order will be immediately executed
             params.put("ordType", 2);
-            price = (Double) params.get("limitPrice");
+            price = (double) params.get("limitPrice");
         } else {
             System.out.println("invalid order type: " + OrderType);
             return null;
@@ -1236,10 +1245,10 @@ public class DriveWealthAPI {
         if (action.equals("buy")) {
             params.put("side", "B");
             
-            Double amount = orderQty * price + commission;
+            double amount = orderQty * price + commission;
             
             LinkedTreeMap<String, Object> cashObj = (LinkedTreeMap) account.get("cash");
-            Double balance = (Double) cashObj.get("cashAvailableForTrade");
+            double balance = (double) cashObj.get("cashAvailableForTrade");
 
             System.out.println("cash: Balance: " + cashObj.get("cashBalance")
                         + ", AvailableForTrade: " + cashObj.get("cashAvailableForTrade"));
@@ -1250,7 +1259,7 @@ public class DriveWealthAPI {
                     + ", ask: " + rateAsk + ", bid: " + rateBid
                     + ", commission: " + commission);
 
-            if (balance.compareTo(amount) < 0) {
+            if (balance < amount) {
                 System.out.println("Insufficient balance");
                 return null;
             }
@@ -1260,10 +1269,10 @@ public class DriveWealthAPI {
             // check available Qty
             List<LinkedTreeMap<String, Object>> positions = (List) ((LinkedTreeMap) account.get("equity")).get("equityPositions");
 
-            Double availQty = null;
-            for (LinkedTreeMap<String, Object> i : positions) {
-                if (i.get("instrumentID").toString().equals(instrumentID)) {
-                    availQty = (Double) i.get("availableForTradingQty");
+            double availQty = 0;
+            for (LinkedTreeMap<String, Object> pos : positions) {
+                if (pos.get("instrumentID").toString().equals(instrumentID)) {
+                    availQty = (double) pos.get("availableForTradingQty");
                     break;
                 }
             }
@@ -1272,7 +1281,7 @@ public class DriveWealthAPI {
                     + ", bid: " + rateBid + ", availableForTradingQty: " + availQty
                     + ", orderQty: " + orderQty);
 
-            if (availQty.compareTo(orderQty) < 0) {
+            if (availQty < orderQty) {
                 System.out.println("Insufficient Qty to sell");
                 return null;
             }
@@ -1332,54 +1341,55 @@ public class DriveWealthAPI {
             }
         }
         
-        final Double cumQty     = (Double) status.get("cumQty");
-        final Double leavesQty  = (Double) status.get("leavesQty");
-        final Double orderQty   = (Double) status.get("orderQty");
-
-        OrderStatus ordStatus = OrderStatus.ERROR;
+        double cumQty      = (double) status.get("cumQty");
+        double leavesQty   = (double) status.get("leavesQty");
+        double orderQty    = (double) status.get("orderQty");
+        String execType    = status.get("execType").toString();
+        String ordStatus   = status.get("ordStatus").toString();
+        
+        OrderStatus orderStatus = OrderStatus.ERROR;
         // accepted
-        if (    orderQty.compareTo(leavesQty) == 0
-                && status.get("execType").equals("0")
-                && status.get("ordStatus").toString().equals("0")
+        if (    orderQty == leavesQty
+                && execType.equals("0")
+                && ordStatus.equals("0")
         ) {
-            ordStatus = OrderStatus.ACCEPTED;
+            orderStatus = OrderStatus.ACCEPTED;
             System.out.println("Order accepted: " + orderID);
         }
         // filled
-        else if (  orderQty.compareTo(cumQty) == 0
-                && status.get("execType").equals("2")
-                && status.get("ordStatus").toString().equals("2")
+        else if (  orderQty == cumQty
+                && execType.equals("2")
+                && ordStatus.equals("2")
         ) {
-            ordStatus = OrderStatus.FILLED;
+            orderStatus = OrderStatus.FILLED;
             System.out.println("Order filled: " + orderID);
         }
         // partially filled
-        else if (  orderQty.compareTo(cumQty) > 0
-                && status.get("execType").equals("1")
-                && status.get("ordStatus").toString().equals("1")
+        else if (  orderQty > cumQty
+                && execType.equals("1")
+                && ordStatus.equals("1")
         ) {
-            ordStatus = OrderStatus.PARTIALFILLED;
+            orderStatus = OrderStatus.PARTIALFILLED;
             System.out.println("Order partially filled: " + orderID);
         }
         // Cancelled
-        else if (  orderQty.compareTo(leavesQty) == 0
-                && status.get("execType").equals("4")
-                && status.get("ordStatus").toString().equals("4")
-                
+        else if (  orderQty == leavesQty
+                && execType.equals("4")
+                && ordStatus.equals("4")
         ) {
-            ordStatus = OrderStatus.CANCELLED;
+            orderStatus = OrderStatus.CANCELLED;
             System.out.println("Order cancelled: " + orderID);
         }
         // Rejected
-        else if (  leavesQty.compareTo(0.0) == 0
-                && status.get("execType").equals("8")
-                && status.get("ordStatus").toString().equals("8")
+        else if (  leavesQty == 0
+                && execType.equals("8")
+                && ordStatus.equals("8")
         ) {
-            ordStatus = OrderStatus.REJECTED;
+            orderStatus = OrderStatus.REJECTED;
             System.out.println("Order cancelled: " + orderID + ", reason: "
                     + status.get("ordRejReason").toString());
         }
-        status.put("ordStatus", ordStatus);
+        status.put("ordStatus", orderStatus);
         
         return status;
     }
@@ -1560,7 +1570,7 @@ public class DriveWealthAPI {
         List<String[]> data = new ArrayList<String[]>();
         
         if (   result.get("instrumentID").toString().equals(instrumentID)
-            && (Double) result.get("compression") == compression)
+            && (int) result.get("compression") == compression)
         {
             // Format: date_time, open, high, low, close, volume
             // 2016-01-11T14:49:00Z,7.34,7.34,7.34,7.34,100|2016-01-11T15:05:00Z,7.33,7.33,7.33,7.33,100
@@ -2009,7 +2019,7 @@ public class DriveWealthAPI {
         public String password;
         public String sessionKey;
         public String userID;
-        public Double commissionRate;
+        public double commissionRate;
         
         public Account practiceAccount;
         public Account liveAccount;
@@ -2018,23 +2028,17 @@ public class DriveWealthAPI {
     
     public class Account {
         public Account (Map<String, Object> account) {
-            String accountID = account.get("accountID").toString();
-            String accountNo = account.get("accountNo").toString();
-            Double accountTypeID = (Double) account.get("accountType");
-            Double cash = (Double) account.get("cash");
-            String nickname = account.get("nickname").toString();
-            
-            this.accountID = accountID;
-            this.accountNo = accountNo;
-            this.accountType = accountTypeID;
-            this.cash = cash;
-            this.nickname = nickname;
+            this.accountID      = account.get("accountID").toString();
+            this.accountNo      = account.get("accountNo").toString();
+            this.accountType    = (double) account.get("accountType");
+            this.cash           = (double) account.get("cash");
+            this.nickname       = account.get("nickname").toString();
         }
 
         public String accountID;
         public String accountNo;
-        public Double accountType;
-        public Double cash;
+        public double accountType;
+        public double cash;
         public String nickname;
     }
     

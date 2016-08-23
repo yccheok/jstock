@@ -154,6 +154,8 @@ public class OrdersTableBuilder {
     }
     
     public void initData (Map<String, Object> accBlotter, Map<String, Map> instruments, Map<String, Double> marketPrices) {
+        resetData();
+        
         List<LinkedTreeMap<String, Object>> orders = (List) accBlotter.get("orders");
 
         for (LinkedTreeMap<String, Object> ord : orders) {
@@ -184,6 +186,11 @@ public class OrdersTableBuilder {
         
         this.ordTable.setItems(this.ordList);
         this.ordTable.prefHeightProperty().bind(Bindings.size(this.ordTable.getItems()).multiply(this.ordTable.getFixedCellSize()).add(30));
+    }
+    
+    public void resetData () {
+        // clear data model for Table
+        this.ordList.clear();
     }
     
     public void updateStocksName (Map<String, Map> instruments) {

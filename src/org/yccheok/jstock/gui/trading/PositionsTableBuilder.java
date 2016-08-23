@@ -26,6 +26,8 @@ import javafx.scene.paint.Color;
 import javafx.util.Callback;
 import org.yccheok.jstock.trading.OpenPosModel;
 import org.yccheok.jstock.trading.Utils;
+import org.yccheok.jstock.trading.BuySell;
+import org.yccheok.jstock.trading.DriveWealthAPI;
 
 /**
  *
@@ -64,6 +66,33 @@ public class PositionsTableBuilder {
         }
     }
     
+    public Map<String, Object> buildBuyParam (String symbol, String instrumentID) {
+        Map<String, Object> params = new HashMap<>();
+
+        DriveWealthAPI api = Portfolio.api;
+
+        String userID = api.user.userID;
+        String accountID = api.user.practiceAccount.accountID;
+        String accountNo = api.user.practiceAccount.accountNo;
+
+        // get instrumentID
+        params.put("symbol", symbol);
+        params.put("instrumentID", instrumentID);
+        params.put("accountID", accountID);
+        params.put("accountNo", accountNo);
+        params.put("userID", userID);
+        
+        // 1: practice a/c, 2: live a/c
+        params.put("accountType", 1);
+        // 1: market order
+        params.put("ordType", 1);
+        params.put("side", "B");
+        params.put("orderQty", 1);
+        params.put("comment", "SY Testing");
+
+        return params;
+    }
+    
     public void setRowContextMenu () {
         this.posTable.setRowFactory(
             new Callback<TableView<OpenPosModel>, TableRow<OpenPosModel>>() {
@@ -76,7 +105,16 @@ public class PositionsTableBuilder {
                     buyItem.setOnAction(new EventHandler<ActionEvent>() {
                         @Override
                         public void handle(ActionEvent event) {
-                            //posTable.getItems().remove(row.getItem());
+                            String symbol = row.getItem().getSymbol();
+                            String instrumentID = row.getItem().getInstrumentID();
+
+                            
+                            System.out.println("Buy button pressed, symbol: " + symbol + "instrumentID: " + instrumentID);
+
+                            
+                            BuySell buySell = new BuySell(Portfolio.api, Portfolio.portfolioService);
+                            Map<String, Object> params = buildBuyParam(symbol, instrumentID);
+                            buySell.buy(params);
                         }
                     });
                     
@@ -177,6 +215,8 @@ public class PositionsTableBuilder {
     }
     
     public void initData (Map<String, Object> accBlotter, Map<String, Map> instruments) {
+        resetData();
+        
         LinkedTreeMap<String, Object> equity = (LinkedTreeMap) accBlotter.get("equity");
         List<LinkedTreeMap<String, Object>> positions = (List) equity.get("equityPositions");
         
@@ -206,6 +246,11 @@ public class PositionsTableBuilder {
         this.posTable.prefHeightProperty().bind(Bindings.size(this.posTable.getItems()).multiply(this.posTable.getFixedCellSize()).add(30));
     }
 
+    public void resetData () {
+        // clear data model for Table
+        this.posList.clear();
+    }
+    
     public void updateStocksName (Map<String, Map> instruments) {
         for (OpenPosModel pos : this.posList) {
             final String symbol = pos.getSymbol();

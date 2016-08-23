@@ -157,7 +157,6 @@ public class SignIn {
 
                         final DriveWealthAPI _api = new DriveWealthAPI();
                         final Map<String, Object> login = _api.login(username, pwd);
-
                         final Map<String, Object> result = new HashMap<>();
                         
                         if (login.containsKey("code") && login.containsKey("message")) {
