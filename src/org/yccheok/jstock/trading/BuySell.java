@@ -7,7 +7,6 @@ package org.yccheok.jstock.trading;
 
 import java.util.HashMap;
 import java.util.Map;
-import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
@@ -84,12 +83,17 @@ public class BuySell {
 
                     // resume service, reset to AccBlotter state to refresh Portfolio, as new position / order has been added
                     portfolioService.setRefresh();
-                    // service restart must be called in FX application thread
-                    Platform.runLater(new Runnable() {
-                        @Override public void run() {
-                            portfolioService.restart();
-                        }
-                    });
+
+                    // service restart must be called in FX application thread. Since task event handler occurs in JavaFX application thread
+                    // so no need to wrap in Platfrom.runLater()
+                    
+                    // http://stackoverflow.com/questions/39100941/javafx-task-eventhandler-handled-in-which-thread/39101113#39101113
+                    
+                    // Because the Task is designed for use with JavaFX GUI applications, it ensures that every change
+                    // to its public properties, as well as change notifications for state, errors, and for event handlers,
+                    // all occur on the main JavaFX application thread
+                    
+                    portfolioService.restart();
                 }
             }
         });
