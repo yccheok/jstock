@@ -1167,7 +1167,7 @@ public class DriveWealthAPI {
      * API: Orders
      ********************/
 
-    public Map<String, Object> validateBuy (String orderType, Map<String, Object> args) {
+    public Map<String, Object> validateBuy (OrderType orderType, Map<String, Object> args) {
         System.out.println("\n validate Buy Order - " + orderType);
         
         String accountID  = args.get("accountID").toString();
@@ -1183,9 +1183,9 @@ public class DriveWealthAPI {
         double price = 0;
         Map<String, Object> status = new HashMap<>();
         
-        if (orderType.equals("market")) {
+        if (orderType == OrderType.MARKET) {
             price = askPrice;
-        } else if (orderType.equals("stop")) {
+        } else if (orderType == OrderType.STOP) {
             price = Double.parseDouble(args.get("price").toString());
 
             // Check price >= ask price + 0.05
@@ -1198,7 +1198,7 @@ public class DriveWealthAPI {
                 
                 return status;
             }
-        } else if (orderType.equals("limit")) {
+        } else if (orderType == OrderType.LIMIT) {
             // BUY will execute in the market when the market ask price is at or below the order limit price
             // If the price entered is above the current ask price, order will be immediately executed
 
@@ -1233,7 +1233,7 @@ public class DriveWealthAPI {
         return status;
     }
 
-    public Map<String, Object> validateSell (String orderType, Map<String, Object> args) {
+    public Map<String, Object> validateSell (OrderType orderType, Map<String, Object> args) {
         System.out.println("\n validate Sell order - " + orderType);
         
         String accountID    = args.get("accountID").toString();
@@ -1243,7 +1243,7 @@ public class DriveWealthAPI {
         
         Map<String, Object> status = new HashMap<>();
         
-        if (orderType.equals("stop")) {
+        if (orderType == OrderType.STOP) {
             // get market price (use "Bid Price" for Sell)
             ArrayList<String> symbols = new ArrayList<>(Arrays.asList(symbol));
             List<Map<String, Object>> dataArray = this.getMarketData(symbols, false);
@@ -1291,8 +1291,39 @@ public class DriveWealthAPI {
         return status;
     }
     
-    public Map<String, Object> createOrder (String action, String orderType, Map<String, Object> args) {
-        System.out.println("\n[create order]: " + action + ", " + orderType);
+    public static enum OrderSide {
+        BUY("B"),
+        SELL("S");
+        
+        private final String value;
+
+        private OrderSide(String value) {
+           this.value = value;
+        }
+        
+        public String getValue () {
+            return this.value;
+        }
+    }
+    
+    public static enum OrderType {
+        MARKET(1),
+        LIMIT(2),
+        STOP(3);
+        
+        private final int value;
+
+        private OrderType(int value) {
+           this.value = value;
+        }
+        
+        public int getValue () {
+            return this.value;
+        }
+    }
+    
+    public Map<String, Object> createOrder (OrderSide orderSide, OrderType orderType, Map<String, Object> args) {
+        System.out.println("\n[create order]: " + orderSide + ", " + orderType);
 
         Map<String, Object> params = new HashMap<>();
         for (String k: this.createOrderFields) {
@@ -1304,7 +1335,7 @@ public class DriveWealthAPI {
         }
         
         Map <String, Object> validate;
-        if (action.equals("buy")) {
+        if (orderSide == OrderSide.BUY) {
             validate = this.validateBuy(orderType, params);
         } else {
             validate = this.validateSell(orderType, params);
@@ -1314,20 +1345,16 @@ public class DriveWealthAPI {
         if ( Boolean.parseBoolean(validate.get("status").toString()) == false) {
             return validate;
         }
-        
-        // default to Market order
-        int ordType = orderType.equals("stop") ? 3 : orderType.equals("limit") ? 2 : 1;
-        params.put("ordType", ordType);
-        
+
         // Note For LIMIT order:
         //      BUY will execute in the market when the market ask price is at or below the order limit price
         //      If the price entered is above the current ask price, order will be immediately executed
 
         //      SELL will execute in the market when the market bid price is at or above the order limit price
         //      If the price entered is below the current ask price, order will be immediately executed
-
-        String side = action.equals("buy") ? "B" : "S";
-        params.put("side", side);
+        
+        params.put("ordType", orderType.getValue());
+        params.put("side", orderSide.getValue());
 
         // create order
         Map<String, Object> respondMap = executePost("orders", params, this.getSessionKey());
@@ -1361,7 +1388,7 @@ public class DriveWealthAPI {
         PARTIALFILLED,
         CANCELLED,
         REJECTED,
-        // something went wrong, eg: failed to call create order
+        // something went wrong, eg: failed to call create order, validation error, etc
         ERROR;
     }
     
@@ -1560,38 +1587,43 @@ public class DriveWealthAPI {
      ********************/
 
     public static enum ChartCompression {
-        Daily(0),
-        OneMinute(1),
-        TwoMinute(2),
-        ThreeMinute(3),
-        FiveMinute(4),
-        TenMinute(5),
-        FifteenMinute(6),
-        TwentyMinute(7),
-        ThirtyMinute(8),
-        OneHour(9),
-        TwoHour(102),
-        FourHour(14),
-        EightHour(108),
-        Weekly(10),
-        Monthly(11),
-        Yearly(12);
+        DAILY(0),
+        ONE_MINUTE(1),
+        TWO_MINUTE(2),
+        THREE_MINUTE(3),
+        FIVE_MINUTE(4),
+        TEN_MINUTE(5),
+        FIFTEEN_MINUTE(6),
+        TWENTY_MINUTE(7),
+        THIRTY_MINUTE(8),
+        ONE_HOUR(9),
+        TWO_HOUR(102),
+        FOUR_HOUR(14),
+        EIGHT_HOUR(108),
+        WEEKLY(10),
+        MONTHLY(11),
+        YEARLY(12);
         
-        public final int value;
+        private final int value;
 
         private ChartCompression(int value) {
            this.value = value;
         }
+        
+        public int getValue() {
+            return this.value;
+        }
     }
 
-    public List<String[]> getCharts (Map<String, Object> args) {
+    public List<String[]> getCharts (ChartCompression chartCompression, Map<String, Object> args) {
         System.out.println("\n[get Charts]");
 
         // required fields: instrumentID, compression
         // if tradingDays set, dateStart & dateEnd are ignored
         
+        int compression = chartCompression.getValue();
         String instrumentID = args.get("instrumentID").toString();
-        int compression = ( (ChartCompression) args.get("compression") ).value;
+        
         String url = "bars?instrumentID=" + instrumentID + "&compression=" + compression;
 
         if (args.containsKey("dateStart") && args.containsKey("dateEnd")) {
@@ -1633,16 +1665,20 @@ public class DriveWealthAPI {
     // Reports TODO: Referral Summary
     
     public static enum ReportName {
-        FinTrans("FinTrans"),
-        OrderTrans("OrderTrans"),
-        PositionRestingOrder("PositionRestingOrder"),
-        Instrument("Instrument"),
-        ReferralSummaryPerformance("ReferralSummaryPerformance");
+        FIN_TRANS("FinTrans"),
+        ORDER_TRANS("OrderTrans"),
+        POSITION_RESTING_ORDER("PositionRestingOrder"),
+        INSTRUMENT("Instrument"),
+        REFERRAL_SUMMARY_PERFORMANCE("ReferralSummaryPerformance");
 
-        public final String name;
+        private final String value;
 
-        private ReportName(String name) {
-           this.name = name;
+        private ReportName(String value) {
+           this.value = value;
+        }
+        
+        public String getValue () {
+            return this.value;
         }
     }
 
@@ -1658,26 +1694,23 @@ public class DriveWealthAPI {
             Provides the user their current open positions and resting orders.
     */
     
-    public List<Map<String, Object>> transactionReport (String reportType, Map<String, String> args) {
-        System.out.println("\n[Transaction Report] - " + reportType);
+    public List<Map<String, Object>> transactionReport (ReportName reportName, Map<String, String> args) {
+        System.out.println("\n[Transaction Report] - " + reportName);
 
         String AccountNumber = args.get("AccountNumber");
-        String reportName = null;
         String DateStart = "";
         String DateEnd = "";
         String symbol = "";
         List<String> txnFields;
 
-        switch (reportType) {
-            case "financial":
-                reportName = ReportName.FinTrans.name;
+        switch (reportName) {
+            case FIN_TRANS:
                 DateStart = "&DateStart=" + args.get("DateStart");
                 DateEnd = "&DateEnd=" + args.get("DateEnd");
 
                 txnFields = this.financialTxnFields;
                 break;
-            case "order":
-                reportName = ReportName.OrderTrans.name;
+            case ORDER_TRANS:
                 DateStart = "&DateStart=" + args.get("DateStart");
                 DateEnd = "&DateEnd=" + args.get("DateEnd");
 
@@ -1688,17 +1721,16 @@ public class DriveWealthAPI {
 
                 txnFields = this.orderTxnFields;
                 break;
-            case "openPos":
-                reportName = ReportName.PositionRestingOrder.name;
+            case POSITION_RESTING_ORDER:
                 txnFields = this.openPosFields;
                 break;
             default:
-                System.out.println("unknown reportType: " + reportType);
+                System.out.println("Unsupported reportType: " + reportName.getValue());
                 return null;
         }
         
         String url = "DriveWealth?ReportFormat=JSON&wlpID=DW&LanguageID=en_US"
-                + "&ReportName="    + reportName
+                + "&ReportName="    + reportName.getValue()
                 + "&sessionKey="    + this.getSessionKey()
                 + "&AccountNumber=" + AccountNumber
                 + DateStart
@@ -1742,7 +1774,7 @@ public class DriveWealthAPI {
 
 
         List<Map<String, Object>> resultTxn;
-        if (reportType.equals("openPos")) {
+        if (reportName == ReportName.POSITION_RESTING_ORDER) {
             resultTxn = (ArrayList) result.get("positions");
         } else {
             resultTxn = (ArrayList) result.get("transaction");
@@ -1772,7 +1804,7 @@ public class DriveWealthAPI {
         System.out.println("\n[Stocks, ETFs and ADRs Report]");
 
         String url = "DriveWealth?ReportFormat=JSON&wlpID=DW&LanguageID=en_US"
-                + "&ReportName="    + ReportName.Instrument.name
+                + "&ReportName="    + ReportName.INSTRUMENT.getValue()
                 + "&sessionKey="    + this.getSessionKey()
                 + "&AccountNumber=" + args.get("AccountNumber")
                 + "&DateStart="     + args.get("DateStart")
