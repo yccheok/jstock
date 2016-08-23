@@ -118,6 +118,12 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
         
         @Override
         protected Map<String, Object> call() throws Exception {
+            // Trigger Portfolio Refresh, by calling AccBlotter. Set to true after create order
+            if (needRefresh()) {
+                taskState = TaskState.ACCBLOTTER;
+                resetRefresh();
+            }
+
             Map<String, Object> result = new HashMap<>();
 
             String userID = api.user.userID;
@@ -144,12 +150,6 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
                 result.put("marketPrices", prices);
 
                 System.out.println("DONE calling get market data for positions / orders...");
-                
-                // This is set to TRUE after Create Order
-                if (needRefresh()) {
-                    taskState = TaskState.ACCBLOTTER;
-                    resetRefresh();
-                }
             }
             return result;
         }
