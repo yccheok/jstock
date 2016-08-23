@@ -7,6 +7,7 @@ package org.yccheok.jstock.trading;
 
 import java.util.HashMap;
 import java.util.Map;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
@@ -29,6 +30,9 @@ public class BuySell {
     public void buy (Map<String, Object> params) {
         System.out.println("Calling buy...");
 
+        // temporary stop Portfolio Scheduled Service
+        portfolioService.cancel();
+        
         BuyTask buyTask = new BuyTask(this.api, params);
         Thread buyThread = new Thread(buyTask);
         buyThread.start();
@@ -78,10 +82,14 @@ public class BuySell {
                         " status: " + status
                     );
 
+                    // resume service, reset to AccBlotter state to refresh Portfolio, as new position / order has been added
                     portfolioService.setRefresh();
-                    portfolioService.cancel();
-                    portfolioService.restart();
-                    
+                    // service restart must be called in FX application thread
+                    Platform.runLater(new Runnable() {
+                        @Override public void run() {
+                            portfolioService.restart();
+                        }
+                    });
                 }
             }
         });
