@@ -30,20 +30,17 @@ public class OrderModel {
         
         Double _stopPrice = 0.0;
         Double _limitPrice = 0.0;
-        String typeStr = ord.get("orderType").toString();
-        
-        if (typeStr.equals("1")) {
-            typeStr = "Market";
-        } else if (typeStr.equals("2")) {
-            typeStr = "Limit";
+
+        DriveWealthAPI.OrderType ordType = (DriveWealthAPI.OrderType) ord.get("orderType");
+        if (ordType == DriveWealthAPI.OrderType.LIMIT) {
             _limitPrice = (Double) ord.get("limitPrice");
-        } else if (typeStr.equals("3")) {
-            typeStr = "Stop";
+        } else if (ordType == DriveWealthAPI.OrderType.STOP) {
             _stopPrice = (Double) ord.get("stopPrice");
         }
-        
-        this.type = new SimpleStringProperty(typeStr);
-        this.side = new SimpleStringProperty( ord.get("side").toString().equals("B") ? "buy" : "sell" ) ;
+        this.type = new SimpleStringProperty(ordType.getName());
+
+        DriveWealthAPI.OrderSide ordSide = (DriveWealthAPI.OrderSide) ord.get("side");
+        this.side = new SimpleStringProperty(ordSide.getName());
 
         this.units       = new SimpleDoubleProperty((Double) ord.get("units"));
         this.marketPrice = new SimpleDoubleProperty((Double) ord.get("marketPrice"));

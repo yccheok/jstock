@@ -1238,33 +1238,45 @@ public class DriveWealthAPI {
     }
     
     public static enum OrderSide {
-        BUY("B"),
-        SELL("S");
+        BUY("B", "buy"),
+        SELL("S", "sell");
         
         private final String value;
+        private final String name;
 
-        private OrderSide(String value) {
+        private OrderSide(String value, String name) {
            this.value = value;
+           this.name = name;
         }
         
         public String getValue () {
             return this.value;
         }
+        
+        public String getName () {
+            return this.name;
+        }
     }
     
     public static enum OrderType {
-        MARKET(1),
-        LIMIT(2),
-        STOP(3);
+        MARKET(1, "market"),
+        LIMIT(2, "limit"),
+        STOP(3, "stop");
         
         private final int value;
+        private final String name;
 
-        private OrderType(int value) {
+        private OrderType(int value, String name) {
            this.value = value;
+           this.name = name;
         }
         
         public int getValue () {
             return this.value;
+        }
+        
+        public String getName () {
+            return this.name;
         }
     }
     

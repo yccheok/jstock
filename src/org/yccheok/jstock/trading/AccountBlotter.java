@@ -115,16 +115,33 @@ public class AccountBlotter {
             
             data.put("symbol",      symbol);
             data.put("units",       ord.get("orderQty"));
-            data.put("side",        ord.get("side"));
-            data.put("orderType",   ord.get("orderType"));
-
-            if (ord.containsKey("limitPrice")) {
-                data.put("limitPrice", ord.get("limitPrice"));
-            }
-            if (ord.containsKey("stopPrice")) {
-                data.put("stopPrice", ord.get("stopPrice"));
-            }
             
+            // side: BUY, SELL
+            final DriveWealthAPI.OrderSide ordSide;
+            String side = ord.get("side").toString();
+
+            if (side.equals("B")) {
+                ordSide = DriveWealthAPI.OrderSide.BUY;
+            } else {
+                ordSide = DriveWealthAPI.OrderSide.SELL;
+            }
+            data.put("side", ordSide);
+            
+            // Order Type: Market, Limit, Stop
+            final DriveWealthAPI.OrderType ordType;
+            String type = ord.get("orderType").toString();
+
+            if (type.equals("2")) {
+                ordType = DriveWealthAPI.OrderType.LIMIT;
+                data.put("limitPrice", ord.get("limitPrice"));
+            } else if (type.equals("3")) {
+                ordType = DriveWealthAPI.OrderType.STOP;
+                data.put("stopPrice", ord.get("stopPrice"));
+            } else {
+                ordType = DriveWealthAPI.OrderType.MARKET;
+            }
+            data.put("orderType", ordType);
+
             this.ordList.add(new OrderModel(data));
         }
         
@@ -132,24 +149,15 @@ public class AccountBlotter {
     }
     
     public AccountModel getAccount () {
-        
-        System.out.println("[AccountBlotter - getAccount] ....");
-        
         LinkedTreeMap<String, Object> equity  = (LinkedTreeMap) this.resultMap.get("equity");
         LinkedTreeMap<String, Object> balance = (LinkedTreeMap) this.resultMap.get("cash");
 
         Map<String, Object> params = new HashMap<>();
-
-        System.out.println("[AccountBlotter - getAccount]  Build params ....");
-        
         
         params.put("equity",            equity.get("equityValue"));
         params.put("cashBalance",       balance.get("cashBalance"));
         params.put("cashForTrade",      balance.get("cashAvailableForTrade"));
         params.put("cashForWithdraw",   balance.get("cashAvailableForWithdrawal"));
-
-        System.out.println("[AccountBlotter - getAccount]  Build totalUnrealizedPL ....");
-        
         
         double totalUnrealizedPL = 0.0;
         for (OpenPosModel pos : getPositions()) {
@@ -157,13 +165,7 @@ public class AccountBlotter {
         }
         params.put("totalUnrealizedPL", totalUnrealizedPL);
         
-        System.out.println("[AccountBlotter - getAccount]  Build params DONE ....");
-        
-        
         this.accModel = new AccountModel(params);
-        
-        System.out.println("[AccountBlotter - getAccount]  instantiate AccountModel DONE ....");
-        
         return this.accModel;
     }
     
