@@ -27,7 +27,7 @@ import javafx.util.Callback;
 import org.yccheok.jstock.trading.OpenPosModel;
 import org.yccheok.jstock.trading.Utils;
 import org.yccheok.jstock.trading.BuySell;
-import org.yccheok.jstock.trading.DriveWealthAPI;
+import org.yccheok.jstock.trading.API.DriveWealth;
 
 /**
  *
@@ -69,7 +69,7 @@ public class PositionsTableBuilder {
     public Map<String, Object> buildBuyParam (String symbol, String instrumentID) {
         Map<String, Object> params = new HashMap<>();
 
-        DriveWealthAPI api = Portfolio.api;
+        DriveWealth api = Portfolio.api;
 
         String userID = api.user.userID;
         String accountID = api.user.practiceAccount.accountID;

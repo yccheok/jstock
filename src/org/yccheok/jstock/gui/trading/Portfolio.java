@@ -21,7 +21,7 @@ import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import org.yccheok.jstock.trading.AccountModel;
 import org.yccheok.jstock.trading.PortfolioService;
-import org.yccheok.jstock.trading.DriveWealthAPI;
+import org.yccheok.jstock.trading.API.DriveWealth;
 import org.yccheok.jstock.trading.OpenPosModel;
 import org.yccheok.jstock.trading.OrderModel;
 
@@ -32,7 +32,7 @@ import org.yccheok.jstock.trading.OrderModel;
  */
 public class Portfolio {
     
-    public Portfolio (DriveWealthAPI api) {
+    public Portfolio (DriveWealth api) {
         Portfolio.api = api;
         startPortfolioService();
     }
@@ -137,7 +137,7 @@ public class Portfolio {
     }
     
         
-    public static DriveWealthAPI api;
+    public static DriveWealth api;
     
     private Map<String, Map> instruments = new HashMap<>();
     private Map<String, Double> marketPrices;

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.yccheok.jstock.trading;
+package org.yccheok.jstock.trading.API;
 
 
 import java.util.HashMap;
@@ -15,6 +15,10 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.yccheok.jstock.trading.OpenPosModel;
+import org.yccheok.jstock.trading.OrderModel;
+import org.yccheok.jstock.trading.AccountModel;
+
 
 /**
  *
@@ -22,7 +26,7 @@ import java.util.Set;
  */
 public class AccountBlotter {
     
-    private final DriveWealthAPI api;
+    private final DriveWealth api;
     private final String userID;
     private final String accountID;
     private final String url;
@@ -44,13 +48,13 @@ public class AccountBlotter {
     ));
     
     
-    public AccountBlotter (DriveWealthAPI api, String userID, String accountID) {
+    public AccountBlotter (DriveWealth api, String userID, String accountID) {
         this.api = api;
         this.userID = userID;
         this.accountID = accountID;
         this.url = "users/" + this.userID + "/accountSummary/" + this.accountID;
         
-        Map<String, Object> respondMap = DriveWealthAPI.executeGet(this.url, this.api.getSessionKey());
+        Map<String, Object> respondMap = DriveWealth.executeGet(this.url, this.api.getSessionKey());
         Map<String, Object> result = new Gson().fromJson(respondMap.get("respond").toString(), HashMap.class);
 
         for (String k: resultFields) {

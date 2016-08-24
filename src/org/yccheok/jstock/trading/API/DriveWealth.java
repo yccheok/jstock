@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.yccheok.jstock.trading;
+package org.yccheok.jstock.trading.API;
 
 
 import com.google.gson.Gson;
@@ -38,9 +38,9 @@ import org.apache.commons.httpclient.methods.multipart.StringPart;
  *
  * @author shuwnyuan
  */
-public class DriveWealthAPI {
+public class DriveWealth {
 
-    public DriveWealthAPI() {
+    public DriveWealth() {
         this.user = new User();
     }
 
@@ -773,7 +773,7 @@ public class DriveWealthAPI {
         try {
             parts[2] = new FilePart("documentImage", file, fileFormat, null);
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(DriveWealthAPI.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(DriveWealth.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         PostMethod postMethod = new PostMethod(hostURL + "documents");
@@ -1729,7 +1729,7 @@ public class DriveWealthAPI {
             statusCode = httpClient.executeMethod(httpMethod);
             System.out.println("status code: " + statusCode);
         } catch (IOException ex) {
-            Logger.getLogger(DriveWealthAPI.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(DriveWealth.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         String respond = null;
@@ -1744,7 +1744,7 @@ public class DriveWealthAPI {
             respond = resultStr.toString();
             httpMethod.releaseConnection();
         } catch (IOException ex) {
-            Logger.getLogger(DriveWealthAPI.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(DriveWealth.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         Map<String, Object> result = new HashMap<>();
@@ -1773,7 +1773,7 @@ public class DriveWealthAPI {
                     "application/json",
                     "UTF-8");
         } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(DriveWealthAPI.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(DriveWealth.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         String host = null;
@@ -1808,7 +1808,7 @@ public class DriveWealthAPI {
                     "application/json",
                     "UTF-8");
         } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(DriveWealthAPI.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(DriveWealth.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         PutMethod putMethod = new PutMethod(hostURL + url);

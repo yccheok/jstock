@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.yccheok.jstock.trading;
+package org.yccheok.jstock.trading.API;
 
 import com.google.gson.Gson;
 import java.util.ArrayList;
@@ -18,7 +18,7 @@ import java.util.Map;
  */
 public class CreateOrder {
     
-    private final DriveWealthAPI api;
+    private final DriveWealth api;
     private final OrderSide orderSide;
     private final OrderType orderType;
     private final Map<String, Object> params = new HashMap<>();
@@ -106,7 +106,7 @@ public class CreateOrder {
         "statusPath"
     ));
     
-    public CreateOrder (DriveWealthAPI api, OrderSide side, OrderType type, Map<String, Object> params) {
+    public CreateOrder (DriveWealth api, OrderSide side, OrderType type, Map<String, Object> params) {
         this.api = api;
         this.orderSide = side;
         this.orderType = type;
@@ -262,7 +262,7 @@ public class CreateOrder {
         this.params.put("side", this.orderSide.getValue());
 
         // create order
-        Map<String, Object> respondMap = DriveWealthAPI.executePost("orders", this.params, this.api.getSessionKey());
+        Map<String, Object> respondMap = DriveWealth.executePost("orders", this.params, this.api.getSessionKey());
         String respond = respondMap.get("respond").toString();
         Map<String, Object> result = new Gson().fromJson(respond, HashMap.class);
 

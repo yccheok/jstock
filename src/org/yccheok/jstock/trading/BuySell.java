@@ -10,16 +10,20 @@ import java.util.Map;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
+import org.yccheok.jstock.trading.API.CreateOrder;
+import org.yccheok.jstock.trading.API.DriveWealth;
+
+
 
 /**
  *
  * @author shuwnyuan
  */
 public class BuySell {
-    private final DriveWealthAPI api;
+    private final DriveWealth api;
     private final PortfolioService portfolioService;
     
-    public BuySell (DriveWealthAPI api, PortfolioService portfolioService) {
+    public BuySell (DriveWealth api, PortfolioService portfolioService) {
         System.out.println("BuySell construtor...");
         
         this.api = api;
@@ -41,13 +45,13 @@ public class BuySell {
             public void handle(final WorkerStateEvent workerStateEvent) {
                 Map<String, Object> result = (Map) workerStateEvent.getSource().getValue();
 
-                DriveWealthAPI.OrderStatus ordStatus = (DriveWealthAPI.OrderStatus) result.get("ordStatus");
+                DriveWealth.OrderStatus ordStatus = (DriveWealth.OrderStatus) result.get("ordStatus");
                 
                 System.out.println("buy Task succeeded....  ordStatus: " + ordStatus);
                 
-                if (ordStatus == DriveWealthAPI.OrderStatus.ERROR) {
+                if (ordStatus == DriveWealth.OrderStatus.ERROR) {
                     System.out.println("BUY market order ERROR....");
-                } else if (ordStatus == DriveWealthAPI.OrderStatus.REJECTED) {
+                } else if (ordStatus == DriveWealth.OrderStatus.REJECTED) {
                     System.out.println("BUY market order REJECTED....");
                 } else {
                     // status: ACCEPTED, FILLED, PARTIALFILLED, CANCELLED
@@ -100,12 +104,12 @@ public class BuySell {
     }
     
     public class BuyTask extends Task<Map<String, Object>> {
-        private final DriveWealthAPI api;
+        private final DriveWealth api;
         private final Map<String, Object> params;
         private Map<String, Object> order;
 
         
-        public BuyTask (DriveWealthAPI api, Map<String, Object> params) {
+        public BuyTask (DriveWealth api, Map<String, Object> params) {
             System.out.println("BuyTask constructor.....");
             
             this.api = api;
@@ -124,7 +128,7 @@ public class BuySell {
                 System.out.println("BUY market order failed....");
                 updateMessage("Create Market Order Status FAILED !!");
                 
-                result.put("ordStatus", DriveWealthAPI.OrderStatus.ERROR);
+                result.put("ordStatus", DriveWealth.OrderStatus.ERROR);
                 
                 // validation error
                 if (order.containsKey("status") && Boolean.parseBoolean(order.get("status").toString()) == false) {
@@ -139,7 +143,7 @@ public class BuySell {
             System.out.println("BuyTask call get order status, orderID: " + orderID);
             
             order = api.orderStatus(orderID);
-            DriveWealthAPI.OrderStatus ordStatus = (DriveWealthAPI.OrderStatus) order.get("ordStatus");
+            DriveWealth.OrderStatus ordStatus = (DriveWealth.OrderStatus) order.get("ordStatus");
 
             
             System.out.println("BuyTask call get order status DONE, order status: " + ordStatus);

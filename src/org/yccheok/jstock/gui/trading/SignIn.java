@@ -40,7 +40,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
-import org.yccheok.jstock.trading.DriveWealthAPI;
+import org.yccheok.jstock.trading.API.DriveWealth;
 
 /**
  *
@@ -155,7 +155,7 @@ public class SignIn {
                     @Override protected Map<String, Object> call() throws Exception {
                         System.out.println("Drive Wealth User Sign In....\n\n ");
 
-                        final DriveWealthAPI _api = new DriveWealthAPI();
+                        final DriveWealth _api = new DriveWealth();
                         final Map<String, Object> login = _api.login(username, pwd);
                         final Map<String, Object> result = new HashMap<>();
                         
@@ -164,7 +164,7 @@ public class SignIn {
                             return result;
                         }
 
-                        DriveWealthAPI.User user = _api.user;
+                        DriveWealth.User user = _api.user;
 
                         System.out.println("DriveWealth: username: " + username
                                             + ", pwd: " + pwd
@@ -186,12 +186,12 @@ public class SignIn {
                             System.out.println("Sign In failed, code: " + result.get("error"));
                             successText.setText("Sign In failed: " + result.get("error"));
                         } else {
-                            api = (DriveWealthAPI) result.get("api");
+                            api = (DriveWealth) result.get("api");
 
                             if (api.user != null && api.getSessionKey() != null) {
                                 System.out.println("Successfully Sign In, userID: " + api.user.userID);
 
-                                DriveWealthAPI.Account acc = api.user.practiceAccount;
+                                DriveWealth.Account acc = api.user.practiceAccount;
                                 String welcomeStr;
 
                                 if (acc == null) {
@@ -292,7 +292,7 @@ public class SignIn {
         );
     }
 
-    public DriveWealthAPI api;
+    public DriveWealth api;
     public TabPane tabPane;
 
     public final Tab signInTab  = new Tab();

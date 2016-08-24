@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;
+import org.yccheok.jstock.trading.API.*;
 
 /**
  *
@@ -21,7 +22,7 @@ import javafx.concurrent.Task;
 
 public class PortfolioService extends ScheduledService<Map<String, Object>> {
     
-    private final DriveWealthAPI api;
+    private final DriveWealth api;
     
     private List<OpenPosModel> posList = new ArrayList<>();
     private List<OrderModel> ordList = new ArrayList<>();
@@ -57,7 +58,7 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
         this.refresh = false;
     }
     
-    public PortfolioService (DriveWealthAPI api) {
+    public PortfolioService (DriveWealth api) {
         this.api = api;
     }
 
