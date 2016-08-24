@@ -8,7 +8,7 @@ package org.yccheok.jstock.trading;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import java.util.Map;
-import org.yccheok.jstock.trading.API.*;
+import org.yccheok.jstock.trading.API.CreateOrder;
 
 /**
  *
