@@ -116,7 +116,7 @@ public class BuySell {
             
             System.out.println("BuyTask call create order .....");
             
-            order = api.createOrder(DriveWealthAPI.OrderSide.BUY, DriveWealthAPI.OrderType.MARKET, params);
+            order = api.createOrder(CreateOrder.OrderSide.BUY, CreateOrder.OrderType.MARKET, params);
 
             Map<String, Object> result = new HashMap<>();
             

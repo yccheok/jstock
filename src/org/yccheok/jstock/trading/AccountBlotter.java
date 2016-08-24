@@ -117,28 +117,28 @@ public class AccountBlotter {
             data.put("units",       ord.get("orderQty"));
             
             // side: BUY, SELL
-            final DriveWealthAPI.OrderSide ordSide;
+            final CreateOrder.OrderSide ordSide;
             String side = ord.get("side").toString();
 
             if (side.equals("B")) {
-                ordSide = DriveWealthAPI.OrderSide.BUY;
+                ordSide = CreateOrder.OrderSide.BUY;
             } else {
-                ordSide = DriveWealthAPI.OrderSide.SELL;
+                ordSide = CreateOrder.OrderSide.SELL;
             }
             data.put("side", ordSide);
             
             // Order Type: Market, Limit, Stop
-            final DriveWealthAPI.OrderType ordType;
+            final CreateOrder.OrderType ordType;
             String type = ord.get("orderType").toString();
 
             if (type.equals("2")) {
-                ordType = DriveWealthAPI.OrderType.LIMIT;
+                ordType = CreateOrder.OrderType.LIMIT;
                 data.put("limitPrice", ord.get("limitPrice"));
             } else if (type.equals("3")) {
-                ordType = DriveWealthAPI.OrderType.STOP;
+                ordType = CreateOrder.OrderType.STOP;
                 data.put("stopPrice", ord.get("stopPrice"));
             } else {
-                ordType = DriveWealthAPI.OrderType.MARKET;
+                ordType = CreateOrder.OrderType.MARKET;
             }
             data.put("orderType", ordType);
 

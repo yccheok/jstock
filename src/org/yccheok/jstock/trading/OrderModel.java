@@ -31,15 +31,15 @@ public class OrderModel {
         Double _stopPrice = 0.0;
         Double _limitPrice = 0.0;
 
-        DriveWealthAPI.OrderType ordType = (DriveWealthAPI.OrderType) ord.get("orderType");
-        if (ordType == DriveWealthAPI.OrderType.LIMIT) {
+        CreateOrder.OrderType ordType = (CreateOrder.OrderType) ord.get("orderType");
+        if (ordType == CreateOrder.OrderType.LIMIT) {
             _limitPrice = (Double) ord.get("limitPrice");
-        } else if (ordType == DriveWealthAPI.OrderType.STOP) {
+        } else if (ordType == CreateOrder.OrderType.STOP) {
             _stopPrice = (Double) ord.get("stopPrice");
         }
         this.type = new SimpleStringProperty(ordType.getName());
 
-        DriveWealthAPI.OrderSide ordSide = (DriveWealthAPI.OrderSide) ord.get("side");
+        CreateOrder.OrderSide ordSide = (CreateOrder.OrderSide) ord.get("side");
         this.side = new SimpleStringProperty(ordSide.getName());
 
         this.units       = new SimpleDoubleProperty((Double) ord.get("units"));
