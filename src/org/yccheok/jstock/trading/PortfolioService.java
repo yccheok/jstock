@@ -13,7 +13,8 @@ import java.util.Map;
 import java.util.Set;
 import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;
-import org.yccheok.jstock.trading.API.*;
+import org.yccheok.jstock.trading.API.AccountBlotter;
+import org.yccheok.jstock.trading.API.DriveWealth;
 
 /**
  *
