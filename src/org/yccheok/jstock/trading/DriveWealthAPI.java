@@ -99,15 +99,6 @@ public class DriveWealthAPI {
      * API Functions
      ********************/
 
-    static final List<String> accountBlotterFields = new ArrayList<>(Arrays.asList(
-        "accountID",
-        "accountNo",
-        "equity",
-        "cash",
-        "orders",
-        "transactions"
-    ));
-    
     static final List<String> accountFields = new ArrayList<>(Arrays.asList(
         "accountID",
         "accountNo",
@@ -605,43 +596,9 @@ public class DriveWealthAPI {
      * API: Accounts
      ********************/
 
-    public Map<String, Object> accountBlotter(String userID, String accountID) {
+    public AccountBlotter accountBlotter(String userID, String accountID) {
         System.out.println("\n[Account Blotter] userID:" + userID + ", accountID:" + accountID);
-        
-        Map<String, Object> respondMap = executeGet("users/" + userID + "/accountSummary/" + accountID, this.getSessionKey());
-        Map<String, Object> result = gson.fromJson(respondMap.get("respond").toString(), HashMap.class);
-
-        Map<String, Object> account = new HashMap<>();
-        for (String k: this.accountBlotterFields) {
-            if (result.containsKey(k)) {
-                Object v = result.get(k);
-                account.put(k, v);
-                //System.out.println("key: " + k + ", value: " + v);
-            }
-        }
-        
-/*
-        LinkedTreeMap<String, Object> equity = (LinkedTreeMap) account.get("equity");
-        
-        System.out.println("Equity: equityValue: " + equity.get("equityValue")
-                    + ", equityPositions: " + equity.get("equityPositions"));
-        
-        List<LinkedTreeMap<String, Object>> positions = (List) equity.get("equityPositions");
-        int cnt = 0;
-        for (LinkedTreeMap<String, Object> a : positions) {
-            System.out.println("[" + cnt + "] Position: symbol: " + a.get("symbol")
-                    + ", instrumentID: " + a.get("instrumentID")
-                    + ", openQty: " + a.get("openQty")
-                    + ", costBasis: " + a.get("costBasis"));
-            cnt++;
-        }
-
-        LinkedTreeMap<String, Object> balance = (LinkedTreeMap) account.get("balance");
-        System.out.println("balance: cashBalance: " + balance.get("cashBalance")
-                    + ", cashAvailableForTrade: " + balance.get("cashAvailableForTrade"));
-*/
-        
-        return account;
+        return new AccountBlotter(this, userID, accountID);
     }
             
     public Map<String, Object> getAccount(String userID, String accountID) {
@@ -1208,13 +1165,10 @@ public class DriveWealthAPI {
         }
         
         // get balance
-        Map<String, Object> account = this.accountBlotter(this.user.userID, accountID);
+        double balance = this.accountBlotter(this.user.userID, accountID).getTradingBalance();
 
         // check for insufficient balance
         double amount = orderQty * price + commission;
-
-        LinkedTreeMap<String, Object> cashObj = (LinkedTreeMap) account.get("cash");
-        double balance = (double) cashObj.get("cashAvailableForTrade");
 
         System.out.println("Check balance: amount: " + amount + ", balance: " + balance
                 + ", market price (Ask): " + price + ", Qty: " + orderQty
@@ -1263,17 +1217,9 @@ public class DriveWealthAPI {
             }
         }
         
-        // get positions
-        Map<String, Object> account = this.accountBlotter(this.user.userID, accountID);
-        List<LinkedTreeMap<String, Object>> positions = (List) ((LinkedTreeMap) account.get("equity")).get("equityPositions");
+        // get available trading Qty
+        double availQty = this.accountBlotter(this.user.userID, accountID).getAvailableTradingQty(instrumentID);
 
-        double availQty = 0;
-        for (LinkedTreeMap<String, Object> pos : positions) {
-            if (pos.get("instrumentID").toString().equals(instrumentID)) {
-                availQty = (double) pos.get("availableForTradingQty");
-                break;
-            }
-        }
         System.out.println("availableForTradingQty: " + availQty + ", orderQty: " + orderQty);
 
         // check insufficient Qty for sell
@@ -1999,13 +1945,13 @@ public class DriveWealthAPI {
         return result;
     }
 
-    private static Map<String, Object> executeGet(String url, String sessionKey) {
+    public static Map<String, Object> executeGet(String url, String sessionKey) {
         GetMethod getMethod = new GetMethod(hostURL + url);
         getMethod = (GetMethod) setJsonHeader(getMethod, sessionKey);
         return executeHttpCall(getMethod);
     }
 
-    private static Map<String, Object> executePost(String url, Map<String, Object> params, String sessionKey, String server) {
+    public static Map<String, Object> executePost(String url, Map<String, Object> params, String sessionKey, String server) {
         Gson gson = new Gson();
         String paramsJson = gson.toJson(params);
 

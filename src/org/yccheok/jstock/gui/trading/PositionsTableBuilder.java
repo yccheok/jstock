@@ -5,7 +5,6 @@
  */
 package org.yccheok.jstock.gui.trading;
 
-import com.google.gson.internal.LinkedTreeMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -160,7 +159,7 @@ public class PositionsTableBuilder {
         nameCol.getStyleClass().add("left");
 
         TableColumn<OpenPosModel, Number> unitsCol = new TableColumn<>("Units");
-        unitsCol.setCellValueFactory(cellData -> cellData.getValue().unitsProperty());
+        unitsCol.setCellValueFactory(cellData -> cellData.getValue().openQtyProperty());
         unitsCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> new FormatNumberCell(false));
         unitsCol.getStyleClass().add("right");
 
@@ -218,50 +217,25 @@ public class PositionsTableBuilder {
         return this.posTable;
     }
     
-    public void initData (Map<String, Object> accBlotter, Map<String, Map> instruments) {
-        resetData();
-        
-        LinkedTreeMap<String, Object> equity = (LinkedTreeMap) accBlotter.get("equity");
-        List<LinkedTreeMap<String, Object>> positions = (List) equity.get("equityPositions");
-        
-        for (LinkedTreeMap<String, Object> pos : positions) {
-            final String symbol = pos.get("symbol").toString();
-            
-            String name = "";
-            if (instruments != null && instruments.containsKey(symbol)) {
-                name = instruments.get(symbol).get("name").toString();
-            }
+    public void initData (List<OpenPosModel> positions, Map<String, Map> instruments) {
+        this.posList.clear();
+        this.posList.addAll(positions);
 
-            Map<String, Object> data = new HashMap<>();
-            data.put("name",            name);
-            data.put("symbol",          symbol);
-            data.put("instrumentID",    pos.get("instrumentID"));
-            data.put("units",           pos.get("openQty"));
-            data.put("averagePrice",    pos.get("avgPrice"));
-            data.put("costBasis",       pos.get("costBasis"));
-            data.put("marketPrice",     pos.get("mktPrice"));
-            data.put("marketValue",     pos.get("marketValue"));
-            data.put("unrealizedPL",    pos.get("unrealizedPL"));
-            
-            this.posList.add(new OpenPosModel(data));
+        if (! instruments.isEmpty()) {
+            updateStocksName(instruments);
         }
-
+        
         this.posTable.setItems(this.posList);
         this.posTable.prefHeightProperty().bind(Bindings.size(this.posTable.getItems()).multiply(this.posTable.getFixedCellSize()).add(30));
     }
 
-    public void resetData () {
-        // clear data model for Table
-        this.posList.clear();
-    }
-    
     public void updateStocksName (Map<String, Map> instruments) {
         for (OpenPosModel pos : this.posList) {
             final String symbol = pos.getSymbol();
             
             if (instruments.containsKey(symbol)) {
                 Map<String, Object> ins = instruments.get(symbol);
-                pos.updateStockName(ins.get("name").toString());
+                pos.setName(ins.get("name").toString());
             }
         }
     }
@@ -272,7 +246,7 @@ public class PositionsTableBuilder {
             
             if (marketPrices.containsKey(symbol)) {
                 Double price = marketPrices.get(symbol);
-                pos.updateMarketPrice(price);
+                pos.setMarketPrice(price);
             }
         }
     }

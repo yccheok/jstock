@@ -5,10 +5,8 @@
  */
 package org.yccheok.jstock.trading;
 
-import com.google.gson.internal.LinkedTreeMap;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -24,17 +22,32 @@ import javafx.concurrent.Task;
 public class PortfolioService extends ScheduledService<Map<String, Object>> {
     
     private final DriveWealthAPI api;
-    private Map<String, Object> accBlotter = new HashMap<>();
+    
+    private List<OpenPosModel> posList = new ArrayList<>();
+    private List<OrderModel> ordList = new ArrayList<>();
+    private AccountModel accModel;
+    
     private final Map<String, Map> instruments = new HashMap<>();
     private Set symbolsSet;
-    private TaskState taskState = TaskState.ACCBLOTTER;
+    private TaskState taskState = TaskState.ACC_BLOTTER;
     private boolean refresh = false;
 
-    private static enum TaskState {
-        ACCBLOTTER,
+    public static enum TaskState {
+        ACC_BLOTTER,
         INSTRUMENTS,
         PRICES;
     }
+    
+    // Check for condition to trigger accBlotter => Refresh Portfolio - positions + order table + acc summary
+    // should be done by another task? Timer task?
+    // should this class keep a list of pending orders? Check periodically for order Status change
+    // Class OrdersBuilder (accBlotter) => HashMap <orderID, order>
+    // order status => HashMap <orderID, status>
+    // a boolean flag => changed
+    // collection of Orders
+    // rebuild on each accBlotter call
+
+    
     
     public synchronized void setRefresh () {
         this.refresh = true;
@@ -42,10 +55,6 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
     
     public synchronized void resetRefresh() {
         this.refresh = false;
-    }
-    
-    public synchronized boolean needRefresh () {
-        return (this.refresh == true);
     }
     
     public PortfolioService (DriveWealthAPI api) {
@@ -57,27 +66,19 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
         public PortfolioTask() {}
 
         private void getAccBlotter (String userID, String accountID) {
-            accBlotter = api.accountBlotter(userID, accountID);              
-            LinkedTreeMap<String, Object> equity = (LinkedTreeMap) accBlotter.get("equity");
-            List<LinkedTreeMap<String, Object>> posList = (List) equity.get("equityPositions");
-
-            symbolsSet = new HashSet();
-            for (LinkedTreeMap<String, Object> pos : posList) {
-                String symbol = pos.get("symbol").toString();
-                symbolsSet.add(symbol);
-            }
+            AccountBlotter accBlot = api.accountBlotter(userID, accountID);
             
-            List<LinkedTreeMap<String, Object>> orders = (List) accBlotter.get("orders");
-            for (LinkedTreeMap<String, Object> ord : orders) {
-                String symbol = ord.get("symbol").toString();
-                symbolsSet.add(symbol);
-            }
+            // List of positions (OpenPosModel) & pending oders (OrderModel)
+            posList = accBlot.getPositions();
+            ordList = accBlot.getOrders();
+            accModel = accBlot.getAccount();
+            symbolsSet = accBlot.getSymbols();
             
             System.out.println("calling account Blotter DONE...");
         }
         
         public boolean getInstruments () {
-            // call "search instrument" to get stocks' name for all symbols
+            // call "search instrument" to get stocks name for all symbols
             boolean updated = false;
             Iterator<String> itr = symbolsSet.iterator();
 
@@ -116,40 +117,63 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
             return prices;
         }
         
-        @Override
-        protected Map<String, Object> call() throws Exception {
-            // Trigger Portfolio Refresh, by calling AccBlotter. Set to true after create order
-            if (needRefresh()) {
-                taskState = TaskState.ACCBLOTTER;
-                resetRefresh();
+        private void updateTaskState () {
+            if (taskState == TaskState.PRICES) {
+                return;
             }
 
+            if (taskState == TaskState.ACC_BLOTTER) {
+                taskState = TaskState.INSTRUMENTS;
+            } else if (taskState == TaskState.INSTRUMENTS) {
+                taskState = TaskState.PRICES;
+            }
+        }
+        
+        private void checkResetState () {
+            // Force Portfolio Refresh, by changing state => AccBlotter. Eg: After create order successfully
+            if (refresh == true) {
+                taskState = TaskState.ACC_BLOTTER;
+                resetRefresh();
+            }
+        }
+        
+        @Override
+        protected Map<String, Object> call() throws Exception {
+            checkResetState();
+            
             Map<String, Object> result = new HashMap<>();
 
             String userID = api.user.userID;
             String accountID = api.user.practiceAccount.accountID;
+            
             if (userID != null && accountID != null) {
-                // only call account Blotter & get instruments during first run
-                if (taskState == TaskState.ACCBLOTTER) {
+                result.put("state", taskState);
+                
+                // Not calling Account Blotter & get instruments on every iteration
+                if (taskState == TaskState.ACC_BLOTTER) {
                     getAccBlotter(userID, accountID);
-                    result.put("accBlotter", accBlotter);
-                    taskState = TaskState.INSTRUMENTS;
-                    
+
+                    result.put("posList", posList);
+                    result.put("ordList", ordList);
+                    result.put("accModel", accModel);
+
                     System.out.println("DONE calling accBlotter...");
                 } else if (taskState == TaskState.INSTRUMENTS) {
                     final boolean updated = getInstruments();
+                    
                     result.put("instruments", instruments);
                     result.put("updated", updated);
-                    taskState = TaskState.PRICES;
 
-                    System.out.println("DONE calling get instruments for positions & orders...");
+                    System.out.println("DONE calling get instruments...");
                 }
                 
                 // always get latest prices
                 Map<String, Double> prices = getMarketPrices();
                 result.put("marketPrices", prices);
 
-                System.out.println("DONE calling get market data for positions / orders...");
+                updateTaskState();
+                
+                System.out.println("DONE calling get market prices...");
             }
             return result;
         }

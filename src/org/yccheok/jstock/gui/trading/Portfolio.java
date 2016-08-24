@@ -5,6 +5,8 @@
  */
 package org.yccheok.jstock.gui.trading;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
@@ -17,8 +19,11 @@ import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
+import org.yccheok.jstock.trading.AccountModel;
 import org.yccheok.jstock.trading.PortfolioService;
 import org.yccheok.jstock.trading.DriveWealthAPI;
+import org.yccheok.jstock.trading.OpenPosModel;
+import org.yccheok.jstock.trading.OrderModel;
 
 
 /**
@@ -49,18 +54,22 @@ public class Portfolio {
                 // 2nd run calls get instruments & get quotes
                 // Following run just call get quotes
 
+                PortfolioService.TaskState state = (PortfolioService.TaskState) result.get("state");
+                
                 if (result.containsKey("marketPrices")) {
                     marketPrices = (Map) result.get("marketPrices");
                 }
 
-                if (result.containsKey("accBlotter")) {
-                    accBlotter = (Map<String, Object>) result.get("accBlotter");
-
-                    posTableBuilder.initData(accBlotter, instruments);
-                    ordTableBuilder.initData(accBlotter, instruments, marketPrices);
-                    accSummaryBuilder.initData(accBlotter, posTableBuilder.getPosList());
+                if (state == PortfolioService.TaskState.ACC_BLOTTER) {
+                    List<OpenPosModel> posList = (List) result.get("posList");
+                    List<OrderModel> ordList = (List) result.get("ordList");
+                    AccountModel accModel = (AccountModel) result.get("accModel");
+                    
+                    posTableBuilder.initData(posList, instruments);
+                    ordTableBuilder.initData(ordList, instruments, marketPrices);
+                    accSummaryBuilder.initData(accModel);
                 } else {
-                    if (result.containsKey("instruments")) {
+                    if (state == PortfolioService.TaskState.INSTRUMENTS) {
                         instruments = (Map<String, Map>) result.get("instruments");
                         
                         // new instruments added from last call
@@ -130,8 +139,7 @@ public class Portfolio {
         
     public static DriveWealthAPI api;
     
-    private Map<String, Object> accBlotter;
-    private Map<String, Map> instruments;
+    private Map<String, Map> instruments = new HashMap<>();
     private Map<String, Double> marketPrices;
 
     public  final Tab PortfolioTab  = new Tab();

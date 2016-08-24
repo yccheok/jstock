@@ -5,12 +5,11 @@
  */
 package org.yccheok.jstock.trading;
 
-import com.google.gson.internal.LinkedTreeMap;
 import java.util.Map;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.DoubleProperty;
-import javafx.collections.ObservableList;
 import javafx.beans.binding.Bindings;
+import javafx.collections.ObservableList;
 
 /**
  *
@@ -26,21 +25,13 @@ public class AccountModel {
     public final SimpleDoubleProperty totalUnrealizedPLPercent;
 
     
-    public AccountModel (Map<String, Object> accBlotter, ObservableList<OpenPosModel> posList) {
-        LinkedTreeMap<String, Object> _equity  = (LinkedTreeMap) accBlotter.get("equity");
-        LinkedTreeMap<String, Object> balance = (LinkedTreeMap) accBlotter.get("cash");
+    public AccountModel (Map<String, Object> acc) {
+        this.equity             = new SimpleDoubleProperty((Double) acc.get("equity"));
+        this.cashBalance        = new SimpleDoubleProperty((Double) acc.get("cashBalance"));
+        this.cashForTrade       = new SimpleDoubleProperty((Double) acc.get("cashForTrade"));
+        this.cashForWithdraw    = new SimpleDoubleProperty((Double) acc.get("cashForWithdraw"));
+        this.totalUnrealizedPL  = new SimpleDoubleProperty((Double) acc.get("totalUnrealizedPL"));
 
-        this.equity          = new SimpleDoubleProperty((Double) _equity.get("equityValue"));
-        this.cashBalance     = new SimpleDoubleProperty((Double) balance.get("cashBalance"));
-        this.cashForTrade    = new SimpleDoubleProperty((Double) balance.get("cashAvailableForTrade"));
-        this.cashForWithdraw = new SimpleDoubleProperty((Double) balance.get("cashAvailableForWithdrawal"));
-
-        Double totalUnrealizedPLD = 0.0;
-        for (OpenPosModel pos : posList) {
-            totalUnrealizedPLD += pos.getUnrealizedPL();
-        }
-        this.totalUnrealizedPL = new SimpleDoubleProperty(totalUnrealizedPLD);
-        
         this.accountTotal = new SimpleDoubleProperty();
         this.accountTotal.bind(Bindings.add(this.cashBalance, this.equity));
         

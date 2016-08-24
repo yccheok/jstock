@@ -19,7 +19,8 @@ public class OpenPosModel {
     private final SimpleStringProperty name;
     private final SimpleStringProperty instrumentID;
     
-    private final SimpleDoubleProperty units;
+    private final SimpleDoubleProperty openQty;
+    private final SimpleDoubleProperty tradingQty;
     private final SimpleDoubleProperty averagePrice;
     private final SimpleDoubleProperty costBasis;
     private final SimpleDoubleProperty marketPrice;
@@ -33,26 +34,19 @@ public class OpenPosModel {
         this.instrumentID   = new SimpleStringProperty(pos.get("instrumentID").toString());
         
         this.costBasis      = new SimpleDoubleProperty((Double) pos.get("costBasis"));
-        this.units          = new SimpleDoubleProperty((Double) pos.get("units"));
+        this.openQty        = new SimpleDoubleProperty((Double) pos.get("openQty"));
+        this.tradingQty     = new SimpleDoubleProperty((Double) pos.get("tradingQty"));
+
         this.averagePrice   = new SimpleDoubleProperty((Double) pos.get("averagePrice"));
         this.marketPrice    = new SimpleDoubleProperty((Double) pos.get("marketPrice"));
         
         this.marketValue    = new SimpleDoubleProperty();
-        this.marketValue.bind(this.units.multiply(this.marketPrice));
+        this.marketValue.bind(this.openQty.multiply(this.marketPrice));
         
         this.unrealizedPL   = new SimpleDoubleProperty();
-        this.unrealizedPL.bind(this.units.multiply(this.marketPrice.subtract(this.averagePrice)));
-        
+        this.unrealizedPL.bind(this.openQty.multiply(this.marketPrice.subtract(this.averagePrice)));
     }
 
-    public void updateMarketPrice (Double price) {
-        this.setMarketPrice(price);
-    }
-    
-    public void updateStockName (String name) {
-        this.setName(name);
-    }
-    
     public final String getSymbol() {
         return symbol.get();
     }
@@ -83,14 +77,24 @@ public class OpenPosModel {
         return instrumentID;
     }
     
-    public final Double getUnits() {
-        return units.get();
+    public final Double getOpenQty() {
+        return openQty.get();
     }
-    public final void setUnits(Double v) {
-        units.set(v);
+    public final void setOpenQty(Double v) {
+        openQty.set(v);
     }
-    public SimpleDoubleProperty unitsProperty() {
-        return units;
+    public SimpleDoubleProperty openQtyProperty() {
+        return openQty;
+    }
+
+    public final Double getTradingQty() {
+        return tradingQty.get();
+    }
+    public final void setTradingQty(Double v) {
+        tradingQty.set(v);
+    }
+    public SimpleDoubleProperty tradingQtyProperty() {
+        return tradingQty;
     }
 
     public final Double getAveragePrice() {

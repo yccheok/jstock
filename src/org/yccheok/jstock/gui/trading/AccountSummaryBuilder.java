@@ -5,8 +5,8 @@
  */
 package org.yccheok.jstock.gui.trading;
 
+import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -66,10 +66,10 @@ public class AccountSummaryBuilder {
         return this.accBorderPane;
     }
 
-    public void initData (Map<String, Object> accBlotter, ObservableList<OpenPosModel> posList) {
+    public void initData (AccountModel accModel) {
         resetData();
 
-        this.acc = new AccountModel(accBlotter, posList);
+        this.acc = accModel;
         Locale locale  = new Locale("en", "US");
         
         this.shareAmount.textProperty().bind(Bindings.format(locale, "$%,.2f", this.acc.equity));

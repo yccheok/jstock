@@ -5,8 +5,6 @@
  */
 package org.yccheok.jstock.gui.trading;
 
-import com.google.gson.internal.LinkedTreeMap;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javafx.beans.binding.Bindings;
@@ -157,44 +155,18 @@ public class OrdersTableBuilder {
         return this.ordTable;
     }
     
-    public void initData (Map<String, Object> accBlotter, Map<String, Map> instruments, Map<String, Double> marketPrices) {
-        resetData();
+    public void initData (List<OrderModel> orders, Map<String, Map> instruments, Map<String, Double> marketPrices) {
+        this.ordList.clear();
+        this.ordList.addAll(orders);
         
-        List<LinkedTreeMap<String, Object>> orders = (List) accBlotter.get("orders");
-
-        for (LinkedTreeMap<String, Object> ord : orders) {
-            final String symbol = ord.get("symbol").toString();
-            
-            String name = "";
-            if (instruments != null && instruments.containsKey(symbol)) {
-                name = instruments.get(symbol).get("name").toString();
-            }
-            
-            Map<String, Object> data = new HashMap<>();
-            data.put("name",        name);
-            data.put("marketPrice", marketPrices.get(symbol));
-            data.put("symbol",      symbol);
-            data.put("units",       ord.get("orderQty"));
-            data.put("side",        ord.get("side"));
-            data.put("orderType",   ord.get("orderType"));
-
-            if (ord.containsKey("limitPrice")) {
-                data.put("limitPrice", ord.get("limitPrice"));
-            }
-            if (ord.containsKey("stopPrice")) {
-                data.put("stopPrice", ord.get("stopPrice"));
-            }
-            
-            this.ordList.add(new OrderModel(data));
+        if (! instruments.isEmpty()) {
+            updateStocksName(instruments);
         }
+        
+        updatePrices(marketPrices);
         
         this.ordTable.setItems(this.ordList);
         this.ordTable.prefHeightProperty().bind(Bindings.size(this.ordTable.getItems()).multiply(this.ordTable.getFixedCellSize()).add(30));
-    }
-    
-    public void resetData () {
-        // clear data model for Table
-        this.ordList.clear();
     }
     
     public void updateStocksName (Map<String, Map> instruments) {
@@ -203,7 +175,7 @@ public class OrdersTableBuilder {
             
             if (instruments.containsKey(symbol)) {
                 Map<String, Object> ins = instruments.get(symbol);
-                ord.updateStockName(ins.get("name").toString());
+                ord.setName(ins.get("name").toString());
             }
         }
     }
@@ -214,7 +186,7 @@ public class OrdersTableBuilder {
             
             if (marketPrices.containsKey(symbol)) {
                 Double price = marketPrices.get(symbol);
-                ord.updateMarketPrice(price);
+                ord.setMarketPrice(price);
             }
         }
     }
