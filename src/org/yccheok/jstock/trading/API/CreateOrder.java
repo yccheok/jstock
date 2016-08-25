@@ -18,10 +18,13 @@ import java.util.Map;
  */
 public class CreateOrder {
     
+    private final String url = "orders";
     private final DriveWealth api;
     private final OrderSide orderSide;
     private final OrderType orderType;
     private final Map<String, Object> params = new HashMap<>();
+    private final Map<String, Object> orderMap = new HashMap<>();
+    private ValidationStatus validationStatus;
     
     public static enum OrderSide {
         BUY("B", "buy"),
@@ -118,10 +121,31 @@ public class CreateOrder {
                 //System.out.println("key: " + k + ", value: " + v);
             }
         }
+
+        this.params.put("ordType", this.orderType.getValue());
+        this.params.put("side", this.orderSide.getValue());
     }
     
-    private Map<String, Object> validateBuy () {
-        System.out.println("\n validate Buy Order - " + orderType);
+    private class ValidationStatus {
+        private final boolean status;
+        private final String error;
+
+        public ValidationStatus (boolean status, String error) {
+            this.status = status;
+            this.error = error;
+        }
+
+        public boolean getStatus () {
+            return this.status;
+        }
+        
+        public String getError () {
+            return this.error;
+        }
+    }
+    
+    private ValidationStatus validateBuy () {
+        System.out.println("\n validate Buy Order - " + this.orderType);
         
         String accountID  = this.params.get("accountID").toString();
         String symbol     = this.params.get("symbol").toString();
@@ -130,15 +154,15 @@ public class CreateOrder {
         
         // get market price (use "Ask Price" for Buy)
         ArrayList<String> symbols = new ArrayList<>(Arrays.asList(symbol));
-        List<Map<String, Object>> dataArray = api.getMarketData(symbols, false);
+        List<Map<String, Object>> dataArray = this.api.getMarketData(symbols, false);
         double askPrice = (double) dataArray.get(0).get("ask");
 
         double price = 0;
         Map<String, Object> status = new HashMap<>();
 
-        if (orderType == OrderType.MARKET) {
+        if (this.orderType == OrderType.MARKET) {
             price = askPrice;
-        } else if (orderType == OrderType.STOP) {
+        } else if (this.orderType == OrderType.STOP) {
             price = Double.parseDouble(this.params.get("price").toString());
 
             // Check price >= ask price + 0.05
@@ -146,12 +170,9 @@ public class CreateOrder {
                 String error = "Stop price must be >= ask price + 0.05, Stop price: " + price + ", Ask Price: " + askPrice;
                 System.out.println(error);
                 
-                status.put("error", error);
-                status.put("status", false);
-                
-                return status;
+                return new ValidationStatus(false, error);
             }
-        } else if (orderType == OrderType.LIMIT) {
+        } else if (this.orderType == OrderType.LIMIT) {
             // BUY will execute in the market when the market ask price is at or below the order limit price
             // If the price entered is above the current ask price, order will be immediately executed
 
@@ -161,7 +182,7 @@ public class CreateOrder {
         }
 
         // get balance
-        double balance = api.accountBlotter(api.getUser().getUserID(), accountID).getTradingBalance();
+        double balance = this.api.accountBlotter(this.api.getUser().getUserID(), accountID).getTradingBalance();
 
         // check for insufficient balance
         double amount = orderQty * price + commission;
@@ -174,26 +195,21 @@ public class CreateOrder {
             String error = "Insufficient balance";
             System.out.println(error);
 
-            status.put("status", false);
-            status.put("error", error);
-        } else {
-            status.put("status", true);
+            return new ValidationStatus(false, error);
         }
-        
-        return status;
+
+        return new ValidationStatus(true, null);
     }
 
-    private Map<String, Object> validateSell () {
-        System.out.println("\n validate Sell order - " + orderType);
+    private ValidationStatus validateSell () {
+        System.out.println("\n validate Sell order - " + this.orderType);
         
         String accountID    = this.params.get("accountID").toString();
         String symbol       = this.params.get("symbol").toString();
         String instrumentID = this.params.get("instrumentID").toString();
         double orderQty     = Double.parseDouble(this.params.get("orderQty").toString());
 
-        Map<String, Object> status = new HashMap<>();
-        
-        if (orderType == OrderType.STOP) {
+        if (this.orderType == OrderType.STOP) {
             // get market price (use "Bid Price" for Sell)
             ArrayList<String> symbols = new ArrayList<>(Arrays.asList(symbol));
             List<Map<String, Object>> dataArray = this.api.getMarketData(symbols, false);
@@ -206,10 +222,7 @@ public class CreateOrder {
                 String error = "Stop price must be <= Bid Price - 0.05, Stop price: " + price + ", Bid Price: " + bidPrice;
                 System.out.println(error);
                 
-                status.put("error", error);
-                status.put("status", false);
-                
-                return status;
+                return new ValidationStatus(false, error);
             }
         }
         
@@ -222,59 +235,55 @@ public class CreateOrder {
         if (availQty < orderQty) {
             String error = "Insufficient Qty for sell";
             System.out.println(error);
-            
-            status.put("status", false);
-            status.put("error", error);
-            
-            return status;
+
+            return new ValidationStatus(false, error);
         }
-        
-        status.put("status", true);
-        return status;
+
+        return new ValidationStatus(true, null);
     }
     
-    private Map <String, Object> validate () {
-        final Map <String, Object> validate;
-        if (this.orderSide == OrderSide.BUY) {
-            validate = validateBuy();
-        } else {
-            validate = validateSell();
-        }
-        
-        return validate;
-    }
-
     public Map<String, Object> execute () {
-        final Map <String, Object> validate = validate();
-        // validation error
-        if ((Boolean) validate.get("status") == false) {
-            return validate;
+
+        this.orderMap.clear();
+        ValidationStatus validation;
+        
+        if (this.orderSide == OrderSide.BUY) {
+            validation = validateBuy();
+        } else {
+            validation = validateSell();
         }
 
-        // For LIMIT order:
+        if (validation.getStatus() == false) {
+            this.orderMap.put("validationError", validation.getError());
+            return this.orderMap;
+        }
+
+        // NOTE For LIMIT order:
         //  BUY will execute in the market when the market ask price is at or below the order limit price
         //  If the price entered is above the current ask price, order will be immediately executed
 
         //  SELL will execute in the market when the market bid price is at or above the order limit price
         //  If the price entered is below the current ask price, order will be immediately executed
         
-        this.params.put("ordType", this.orderType.getValue());
-        this.params.put("side", this.orderSide.getValue());
 
         // create order
-        Map<String, Object> respondMap = DriveWealth.executePost("orders", this.params, this.api.getSessionKey());
+        Map<String, Object> respondMap = DriveWealth.executePost(this.url, this.params, this.api.getSessionKey());
         String respond = respondMap.get("respond").toString();
         Map<String, Object> result = new Gson().fromJson(respond, HashMap.class);
 
-        Map<String, Object> order = new HashMap<>();
         for (String k: RESULT_FIELDS) {
             if (result.containsKey(k)) {
                 Object v = result.get(k);
-                order.put(k, v);
+                this.orderMap.put(k, v);
                 System.out.println("key: " + k + ", value: " + v);
             }
         }
 
-        return order;
+        return this.orderMap;
     }
+    
+    public Map<String, Object> getOrderMap () {
+        return this.orderMap;
+    }
+    
 }

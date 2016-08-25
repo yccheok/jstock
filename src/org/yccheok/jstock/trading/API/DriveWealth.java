@@ -402,44 +402,6 @@ public class DriveWealth {
         "lastTrade"
     ));
     
-    static final List<String> orderStatusFields = new ArrayList<>(Arrays.asList(
-        "orderID",
-        "accountID",
-        "userID",
-        "cumQty",
-        "accountNo",
-        "comment",
-        "commission",
-        "createdByID",
-        "createdWhen",
-        "executedWhen",
-        "execType",
-        "grossTradeAmt",
-        "instrumentID",
-        "leavesQty",
-        "orderNo",
-        "orderQty",
-        "ordStatus",
-        "ordType",
-        "side",
-        "accountType",
-        "autoStop",
-        "ordRejReason",
-
-        // for Stop Order only
-        "price",
-
-        // for Limit Order only
-        "limitPrice",
-            
-        // a) Market & Limit order are DAY order, not persist and are cancelled if not filled at end of exchange trading day.
-        //      => timeInForce = 0 / null
-        //
-        // b) Stop order persists across trading days, are GOOD UNTIL CANCEL.
-        //      => timeInforce = 1
-        "timeInForce"
-    ));
-    
     static final List<String> marketDataFields = new ArrayList<>(Arrays.asList(
         "symbol",
         "bid",
@@ -1087,82 +1049,11 @@ public class DriveWealth {
         return statusCode == 200;
     }
 
-    public static enum OrderStatus {
-        ACCEPTED,
-        FILLED,
-        PARTIALFILLED,
-        CANCELLED,
-        REJECTED,
-        // something went wrong, eg: failed to call create order, validation error, etc
-        ERROR;
-    }
-    
     public Map<String, Object> orderStatus (String orderID) {
         System.out.println("\n[Order Status]");
 
-        Map<String, Object> respondMap = executeGet("orders/" + orderID, this.getSessionKey());
-        Map<String, Object> result = gson.fromJson(respondMap.get("respond").toString(), HashMap.class);
-        Map<String, Object> status = new HashMap<>();
-
-        for (String k: this.orderStatusFields) {
-            if (result.containsKey(k)) {
-                Object v = result.get(k);
-                status.put(k, v);
-                System.out.println("key: " + k + ", value: " + v);
-            }
-        }
-        
-        double cumQty      = (double) status.get("cumQty");
-        double leavesQty   = (double) status.get("leavesQty");
-        double orderQty    = (double) status.get("orderQty");
-        String execType    = status.get("execType").toString();
-        String ordStatus   = status.get("ordStatus").toString();
-        
-        OrderStatus orderStatus = OrderStatus.ERROR;
-        // accepted
-        if (    orderQty == leavesQty
-                && execType.equals("0")
-                && ordStatus.equals("0")
-        ) {
-            orderStatus = OrderStatus.ACCEPTED;
-            System.out.println("Order accepted: " + orderID);
-        }
-        // filled
-        else if (  orderQty == cumQty
-                && execType.equals("2")
-                && ordStatus.equals("2")
-        ) {
-            orderStatus = OrderStatus.FILLED;
-            System.out.println("Order filled: " + orderID);
-        }
-        // partially filled
-        else if (  orderQty > cumQty
-                && execType.equals("1")
-                && ordStatus.equals("1")
-        ) {
-            orderStatus = OrderStatus.PARTIALFILLED;
-            System.out.println("Order partially filled: " + orderID);
-        }
-        // Cancelled
-        else if (  orderQty == leavesQty
-                && execType.equals("4")
-                && ordStatus.equals("4")
-        ) {
-            orderStatus = OrderStatus.CANCELLED;
-            System.out.println("Order cancelled: " + orderID);
-        }
-        // Rejected
-        else if (  leavesQty == 0
-                && execType.equals("8")
-                && ordStatus.equals("8")
-        ) {
-            orderStatus = OrderStatus.REJECTED;
-            System.out.println("Order cancelled: " + orderID + ", reason: "
-                    + status.get("ordRejReason").toString());
-        }
-        status.put("ordStatus", orderStatus);
-        
-        return status;
+        OrderStatus orderStatus = new OrderStatus(this, orderID);
+        return orderStatus.getStatusMap();
     }
     
     /************************

@@ -10,8 +10,9 @@ import java.util.Map;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
-import org.yccheok.jstock.trading.API.CreateOrder;
 import org.yccheok.jstock.trading.API.DriveWealth;
+import org.yccheok.jstock.trading.API.CreateOrder;
+import org.yccheok.jstock.trading.API.OrderStatus;
 
 
 
@@ -45,16 +46,19 @@ public class BuySell {
             public void handle(final WorkerStateEvent workerStateEvent) {
                 Map<String, Object> result = (Map) workerStateEvent.getSource().getValue();
 
-                DriveWealth.OrderStatus ordStatus = (DriveWealth.OrderStatus) result.get("ordStatus");
+                OrderStatus.OrdStatus ordStatus = (OrderStatus.OrdStatus) result.get("ordStatus");
                 
                 System.out.println("buy Task succeeded....  ordStatus: " + ordStatus);
                 
-                if (ordStatus == DriveWealth.OrderStatus.ERROR) {
-                    System.out.println("BUY market order ERROR....");
-                } else if (ordStatus == DriveWealth.OrderStatus.REJECTED) {
+                if (ordStatus == OrderStatus.OrdStatus.VALIDATION_ERROR) {
+                    String error = result.get("error").toString();
+                    System.out.println("BUY market order VALIDATION ERROR: " + error);
+                } else if (ordStatus == OrderStatus.OrdStatus.ERROR) {
+                    System.out.println("BUY market order ERROR: UNKNOWN");
+                } else if (ordStatus == OrderStatus.OrdStatus.REJECTED) {
                     System.out.println("BUY market order REJECTED....");
                 } else {
-                    // status: ACCEPTED, FILLED, PARTIALFILLED, CANCELLED
+                    // status: ACCEPTED, FILLED, PARTIAL_FILLED, CANCELLED
                     // trigger PortfolioService to refresh => call accBlotter
 
                     Map<String, Object> order = (Map) result.get("order");
@@ -106,9 +110,7 @@ public class BuySell {
     private class BuyTask extends Task<Map<String, Object>> {
         private final DriveWealth api;
         private final Map<String, Object> params;
-        private Map<String, Object> order;
 
-        
         public BuyTask (DriveWealth api, Map<String, Object> params) {
             System.out.println("BuyTask constructor.....");
             
@@ -117,38 +119,47 @@ public class BuySell {
         }
         
         @Override protected Map<String, Object> call() throws Exception {
-            
             System.out.println("BuyTask call create order .....");
-            
-            order = api.createOrder(CreateOrder.OrderSide.BUY, CreateOrder.OrderType.MARKET, params);
+
+            // Create Order
+            Map<String, Object> order = api.createOrder(CreateOrder.OrderSide.BUY, CreateOrder.OrderType.MARKET, params);
 
             Map<String, Object> result = new HashMap<>();
+            OrderStatus.OrdStatus ordStatus;
             
-            if (!order.containsKey("orderID")) {
+            if (! order.containsKey("orderID")) {
                 System.out.println("BUY market order failed....");
                 updateMessage("Create Market Order Status FAILED !!");
-                
-                result.put("ordStatus", DriveWealth.OrderStatus.ERROR);
-                
-                // validation error
-                if (order.containsKey("status") && Boolean.parseBoolean(order.get("status").toString()) == false) {
-                    result.put("error", order.get("error"));
+
+                String error = null;
+                if (order.containsKey("validationError")) {
+                    // validation error
+                    ordStatus = OrderStatus.OrdStatus.VALIDATION_ERROR;
+                    error = order.get("validationError").toString();
+                } else {
+                    // Unknown error, failed to create order
+                    ordStatus = OrderStatus.OrdStatus.ERROR;
                 }
+
+                result.put("ordStatus", ordStatus);
+                result.put("error", error);
                 
                 return result;
             }
-            
-            String orderID = order.get("orderID").toString();
-            
-            System.out.println("BuyTask call get order status, orderID: " + orderID);
-            
-            order = api.orderStatus(orderID);
-            DriveWealth.OrderStatus ordStatus = (DriveWealth.OrderStatus) order.get("ordStatus");
 
+            String orderID = order.get("orderID").toString();
+
+            System.out.println("BuyTask call get order status, orderID: " + orderID);
+
+            
+            // Get Order Status
+            order = api.orderStatus(orderID);
+            ordStatus = (OrderStatus.OrdStatus) order.get("ordStatus");
+            
             
             System.out.println("BuyTask call get order status DONE, order status: " + ordStatus);
-            
 
+            
             updateMessage("Market Order Status: " + ordStatus);
             result.put("order", order);
             result.put("ordStatus", ordStatus);
