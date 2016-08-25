@@ -16,13 +16,13 @@ import javafx.collections.ObservableList;
  * @author shuwnyuan
  */
 public class AccountModel {
-    public final SimpleDoubleProperty equity;
-    public final SimpleDoubleProperty cashBalance;
-    public final SimpleDoubleProperty cashForTrade;
-    public final SimpleDoubleProperty cashForWithdraw;
-    public final SimpleDoubleProperty accountTotal;
-    public final SimpleDoubleProperty totalUnrealizedPL;
-    public final SimpleDoubleProperty totalUnrealizedPLPercent;
+    private final SimpleDoubleProperty equity;
+    private final SimpleDoubleProperty cashBalance;
+    private final SimpleDoubleProperty cashForTrade;
+    private final SimpleDoubleProperty cashForWithdraw;
+    private final SimpleDoubleProperty accountTotal;
+    private final SimpleDoubleProperty totalUnrealizedPL;
+    private final SimpleDoubleProperty totalUnrealizedPLPercent;
 
     
     public AccountModel (Map<String, Object> acc) {

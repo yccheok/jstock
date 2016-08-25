@@ -24,7 +24,7 @@ import org.yccheok.jstock.trading.AccountModel;
  *
  * @author shuwnyuan
  */
-public class AccountBlotter {
+public final class AccountBlotter {
     
     private final DriveWealth api;
     private final String userID;
@@ -38,7 +38,7 @@ public class AccountBlotter {
     
     private final Set symbolsSet = new HashSet();
 
-    private static final List<String> resultFields = new ArrayList<>(Arrays.asList(
+    private static final List<String> RESULT_FIELDS = new ArrayList<>(Arrays.asList(
         "accountID",
         "accountNo",
         "equity",
@@ -57,7 +57,7 @@ public class AccountBlotter {
         Map<String, Object> respondMap = DriveWealth.executeGet(this.url, this.api.getSessionKey());
         Map<String, Object> result = new Gson().fromJson(respondMap.get("respond").toString(), HashMap.class);
 
-        for (String k: resultFields) {
+        for (String k: RESULT_FIELDS) {
             if (result.containsKey(k)) {
                 Object v = result.get(k);
                 this.resultMap.put(k, v);
@@ -65,11 +65,7 @@ public class AccountBlotter {
             }
         }
     }
-    
-    public Map<String, Object> getResultMap () {
-        return this.resultMap;
-    }
-    
+
     public List<OpenPosModel> getPositions () {
         if (! this.posList.isEmpty()) {
             return this.posList;

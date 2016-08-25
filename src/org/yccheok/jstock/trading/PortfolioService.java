@@ -50,20 +50,19 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
     // rebuild on each accBlotter call
 
     
+    public PortfolioService (DriveWealth api) {
+        this.api = api;
+    }
     
     public synchronized void setRefresh () {
         this.refresh = true;
     }
     
-    public synchronized void resetRefresh() {
+    private synchronized void resetRefresh() {
         this.refresh = false;
     }
     
-    public PortfolioService (DriveWealth api) {
-        this.api = api;
-    }
-
-    public class PortfolioTask extends Task<Map<String, Object>> {
+    private class PortfolioTask extends Task<Map<String, Object>> {
         
         public PortfolioTask() {}
 
@@ -79,7 +78,7 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
             System.out.println("calling account Blotter DONE...");
         }
         
-        public boolean getInstruments () {
+        private boolean getInstruments () {
             // call "search instrument" to get stocks name for all symbols
             boolean updated = false;
             Iterator<String> itr = symbolsSet.iterator();

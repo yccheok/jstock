@@ -31,7 +31,7 @@ import org.yccheok.jstock.trading.Utils;
  * @author shuwnyuan
  */
 public class OrdersTableBuilder {
-    public final TableView ordTable = new TableView();
+    private final TableView ordTable = new TableView();
     private final ObservableList<OrderModel> ordList = FXCollections.observableArrayList();
     
     public OrdersTableBuilder () {}
@@ -50,7 +50,7 @@ public class OrdersTableBuilder {
         }
     }
     
-    public void setRowContextMenu () {
+    private void setRowContextMenu () {
         this.ordTable.setRowFactory(
             new Callback<TableView<OpenPosModel>, TableRow<OpenPosModel>>() {
                 @Override
@@ -140,7 +140,7 @@ public class OrdersTableBuilder {
         this.ordTable.setEditable(false);
         
         // limit Table height, based on row number
-        this.ordTable.setFixedCellSize(Portfolio.tableCellSize);
+        this.ordTable.setFixedCellSize(Portfolio.TABLE_CELL_SIZE);
         this.ordTable.prefHeightProperty().bind(Bindings.size(this.ordTable.getItems()).multiply(this.ordTable.getFixedCellSize()).add(30));
 
         // set all columns having equal width

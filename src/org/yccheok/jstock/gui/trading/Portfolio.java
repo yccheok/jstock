@@ -37,6 +37,10 @@ public class Portfolio {
         startPortfolioService();
     }
 
+    public static DriveWealth getAPI () {
+        return Portfolio.api;
+    }
+    
     private void startPortfolioService () {
         Portfolio.portfolioService = new PortfolioService(Portfolio.api);
         
@@ -136,20 +140,19 @@ public class Portfolio {
         return this.PortfolioTab;
     }
     
-        
-    public static DriveWealth api;
+
+    private static DriveWealth api;
     
     private Map<String, Map> instruments = new HashMap<>();
     private Map<String, Double> marketPrices;
 
-    public  final Tab PortfolioTab  = new Tab();
-    
     private final PositionsTableBuilder posTableBuilder = new PositionsTableBuilder();
     private final OrdersTableBuilder ordTableBuilder = new OrdersTableBuilder();
     private final AccountSummaryBuilder accSummaryBuilder = new AccountSummaryBuilder();
+
+    private final Tab PortfolioTab = new Tab();
     
-    public static final double tableCellSize = 25;
-    
+    public static final double TABLE_CELL_SIZE = 25;
     public static PortfolioService portfolioService;
 }
     

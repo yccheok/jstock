@@ -34,7 +34,7 @@ import org.yccheok.jstock.trading.API.DriveWealth;
  * @author shuwnyuan
  */
 public class PositionsTableBuilder {
-    public final TableView posTable = new TableView();
+    private final TableView posTable = new TableView();
     private final ObservableList<OpenPosModel> posList = FXCollections.observableArrayList();
 
     
@@ -69,7 +69,7 @@ public class PositionsTableBuilder {
     public Map<String, Object> buildBuyParam (String symbol, String instrumentID) {
         Map<String, Object> params = new HashMap<>();
 
-        DriveWealth api = Portfolio.api;
+        DriveWealth api = Portfolio.getAPI();
 
         String userID = api.user.userID;
         String accountID = api.user.practiceAccount.accountID;
@@ -93,7 +93,7 @@ public class PositionsTableBuilder {
         return params;
     }
     
-    public void setRowContextMenu () {
+    private void setRowContextMenu () {
         this.posTable.setRowFactory(
             new Callback<TableView<OpenPosModel>, TableRow<OpenPosModel>>() {
                 @Override
@@ -112,7 +112,7 @@ public class PositionsTableBuilder {
                             System.out.println("Buy button pressed, symbol: " + symbol + "instrumentID: " + instrumentID);
 
                             
-                            BuySell buySell = new BuySell(Portfolio.api, Portfolio.portfolioService);
+                            BuySell buySell = new BuySell(Portfolio.getAPI(), Portfolio.portfolioService);
                             Map<String, Object> params = buildBuyParam(symbol, instrumentID);
                             buySell.buy(params);
                         }
@@ -202,7 +202,7 @@ public class PositionsTableBuilder {
         this.posTable.setEditable(false);
 
         // limit Table height, based on row number
-        this.posTable.setFixedCellSize(Portfolio.tableCellSize);
+        this.posTable.setFixedCellSize(Portfolio.TABLE_CELL_SIZE);
         this.posTable.prefHeightProperty().bind(Bindings.size(this.posTable.getItems()).multiply(this.posTable.getFixedCellSize()).add(30));
 
         // set all columns having equal width

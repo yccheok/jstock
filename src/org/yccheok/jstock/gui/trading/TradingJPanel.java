@@ -37,7 +37,7 @@ public class TradingJPanel extends javax.swing.JPanel {
         initComponents();
     }
     
-    public void initComponents() {
+    private void initComponents() {
         // Javafx login form example: 
         // http://docs.oracle.com/javafx/2/get_started/form.htm
         

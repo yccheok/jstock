@@ -103,7 +103,7 @@ public class BuySell {
         });
     }
     
-    public class BuyTask extends Task<Map<String, Object>> {
+    private class BuyTask extends Task<Map<String, Object>> {
         private final DriveWealth api;
         private final Map<String, Object> params;
         private Map<String, Object> order;

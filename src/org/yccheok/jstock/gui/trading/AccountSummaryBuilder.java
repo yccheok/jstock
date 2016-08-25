@@ -5,7 +5,6 @@
  */
 package org.yccheok.jstock.gui.trading;
 
-import java.util.List;
 import java.util.Locale;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
@@ -72,10 +71,14 @@ public class AccountSummaryBuilder {
         this.acc = accModel;
         Locale locale  = new Locale("en", "US");
         
-        this.shareAmount.textProperty().bind(Bindings.format(locale, "$%,.2f", this.acc.equity));
-        this.profitAmount.textProperty().bind(Bindings.format(locale, "$%,.2f (%,.2f%%)", this.acc.totalUnrealizedPL, this.acc.totalUnrealizedPLPercent));
-        this.cashAmount.textProperty().bind(Bindings.format(locale, "$%,.2f", this.acc.cashForTrade));
-        this.totalAmount.textProperty().bind(Bindings.format(locale, "$%,.2f", this.acc.accountTotal));
+        this.shareAmount.textProperty().bind(Bindings.format(locale, "$%,.2f", this.acc.equityProperty()));
+        
+        this.profitAmount.textProperty().bind(Bindings.format(locale, "$%,.2f (%,.2f%%)",
+                this.acc.totalUnrealizedPLProperty(),
+                this.acc.totalUnrealizedPLPercentProperty()));
+        
+        this.cashAmount.textProperty().bind(Bindings.format(locale, "$%,.2f", this.acc.cashForTradeProperty()));
+        this.totalAmount.textProperty().bind(Bindings.format(locale, "$%,.2f", this.acc.accountTotalProperty()));
 
         this.profitAmount.getStyleClass().add(this.acc.unrealizedPLCss());
         this.cashAmount.getStyleClass().add(this.acc.cashForTradeCss());

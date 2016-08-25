@@ -51,7 +51,7 @@ public class SignIn {
         this.tabPane = tabPane;
     }
     
-    void createTab () {
+    public void createTab () {
         initUI();
         initEventHandler();
         
@@ -59,7 +59,7 @@ public class SignIn {
         initLicenceTab();
     }
 
-    void initUI () {
+    private void initUI () {
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
         grid.setHgap(10);
@@ -76,17 +76,14 @@ public class SignIn {
         GridPane.setHalignment(titleLabel, HPos.CENTER);
 
         // username field
-        userField = new TextField();
         userField.setPromptText("Username");
         grid.add(userField, 0, 1);
 
         // password field
-        pwdField = new PasswordField();
         pwdField.setPromptText("Password");
         grid.add(pwdField, 0, 2);
 
         // Sign In button
-        signInBtn = new Button("Sign in");
         signInBtn.setId("green");
         signInBtn.setMaxWidth(Double.MAX_VALUE);
         signInBtn.setMaxHeight(Double.MAX_VALUE);
@@ -111,7 +108,6 @@ public class SignIn {
         GridPane.setHalignment(licenceHBox, HPos.CENTER);
 
         // Sign In successful msg
-        successText = new Label();
         successText.setWrapText(true);
         grid.add(successText, 0, 7);
 
@@ -132,7 +128,7 @@ public class SignIn {
         tabPane.getTabs().add(this.signInTab);
     }
     
-    void initEventHandler () {
+    private void initEventHandler () {
         // Sign In Button action
         signInBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -242,7 +238,7 @@ public class SignIn {
         });
     }
     
-    void initLicenceTab () {
+    private void initLicenceTab () {
         // Load Drive Wealth's licence in new Tab with browser
         final WebView browser = new WebView();
         final WebEngine webEngine = browser.getEngine();
@@ -292,15 +288,16 @@ public class SignIn {
         );
     }
 
-    public DriveWealth api;
-    public TabPane tabPane;
+    private DriveWealth api;
+    private final TabPane tabPane;
 
-    public final Tab signInTab  = new Tab();
-    public final Tab licenceTab = new Tab();
     private final Hyperlink licenceLink = new Hyperlink("Drive Wealth's Terms of Use");
     
-    Button signInBtn;
-    TextField userField;
-    PasswordField pwdField;
-    Label successText;
+    private final Button signInBtn = new Button("Sign in");;
+    private final TextField userField = new TextField();;
+    private final PasswordField pwdField = new PasswordField();
+    private final Label successText = new Label();
+    
+    private final Tab signInTab  = new Tab();
+    private final Tab licenceTab = new Tab();
 }

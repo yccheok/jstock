@@ -66,7 +66,7 @@ public class CreateOrder {
         }
     }
 
-    static final List<String> inputFields = new ArrayList<>(Arrays.asList(
+    private static final List<String> INPUT_FIELDS = new ArrayList<>(Arrays.asList(
         "symbol",
         "instrumentID",
         "accountID",
@@ -89,7 +89,7 @@ public class CreateOrder {
         "limitPrice"
     ));
 
-    static final List<String> resultFields = new ArrayList<>(Arrays.asList(
+    private static final List<String> RESULT_FIELDS = new ArrayList<>(Arrays.asList(
         "execID",
         "orderID",
         "cumQty",
@@ -111,7 +111,7 @@ public class CreateOrder {
         this.orderSide = side;
         this.orderType = type;
         
-        for (String k: inputFields) {
+        for (String k: INPUT_FIELDS) {
             if (params.containsKey(k)) {
                 Object v = params.get(k);
                 this.params.put(k, v);
@@ -120,7 +120,7 @@ public class CreateOrder {
         }
     }
     
-    public Map<String, Object> validateBuy () {
+    private Map<String, Object> validateBuy () {
         System.out.println("\n validate Buy Order - " + orderType);
         
         String accountID  = this.params.get("accountID").toString();
@@ -183,7 +183,7 @@ public class CreateOrder {
         return status;
     }
 
-    public Map<String, Object> validateSell () {
+    private Map<String, Object> validateSell () {
         System.out.println("\n validate Sell order - " + orderType);
         
         String accountID    = this.params.get("accountID").toString();
@@ -233,7 +233,7 @@ public class CreateOrder {
         return status;
     }
     
-    public Map <String, Object> validate () {
+    private Map <String, Object> validate () {
         final Map <String, Object> validate;
         if (this.orderSide == OrderSide.BUY) {
             validate = validateBuy();
@@ -267,7 +267,7 @@ public class CreateOrder {
         Map<String, Object> result = new Gson().fromJson(respond, HashMap.class);
 
         Map<String, Object> order = new HashMap<>();
-        for (String k: resultFields) {
+        for (String k: RESULT_FIELDS) {
             if (result.containsKey(k)) {
                 Object v = result.get(k);
                 order.put(k, v);
