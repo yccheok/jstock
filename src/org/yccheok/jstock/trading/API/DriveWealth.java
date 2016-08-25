@@ -33,7 +33,6 @@ import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
 
-
 /**
  *
  * @author shuwnyuan
@@ -403,46 +402,6 @@ public class DriveWealth {
         "lastTrade"
     ));
     
-    static final List<String> createOrderFields = new ArrayList<>(Arrays.asList(
-        "symbol",
-        "instrumentID",
-        "accountID",
-        "accountNo",
-        "userID",
-        "accountType",
-        "ordType",
-        "side",
-        "orderQty",
-        "comment",
-
-        // for Market Order only
-        "amountCash",
-        "autoStop",
-
-        // for Stop Order only
-        "price",
-
-        // for Limit Order only
-        "limitPrice"
-    ));
-    
-    static final List<String> orderFields = new ArrayList<>(Arrays.asList(
-        "execID",
-        "orderID",
-        "cumQty",
-        "instrumentID",
-        "execType",
-        "grossTradeAmt",
-        "leavesQty",
-        "ordType",
-        "side",
-        "ordStatus",
-        "limitPrice",
-        "timeInForce",
-        "expireTimestamp",
-        "statusPath"
-    ));
-    
     static final List<String> orderStatusFields = new ArrayList<>(Arrays.asList(
         "orderID",
         "accountID",
@@ -808,7 +767,9 @@ public class DriveWealth {
         return user;
     }
     
-    public Map<String, Object> getUser(String userID) {
+    // NOTE:
+    // temporary rename to "getUserAPI" as method name clash with "getUser" which return API.User Object
+    public Map<String, Object> getUserAPI(String userID) {
         System.out.println("\n[getUser]");
         
         Map<String, Object> respondMap = executeGet("users/" + userID, this.getSessionKey());
