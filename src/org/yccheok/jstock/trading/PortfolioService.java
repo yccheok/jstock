@@ -35,9 +35,19 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
     private boolean refresh = false;
 
     public static enum TaskState {
-        ACC_BLOTTER,
-        INSTRUMENTS,
-        PRICES;
+        ACC_BLOTTER("ACC_BLOTTER"),
+        INSTRUMENTS("INSTRUMENTS"),
+        PRICES("PRICES");
+        
+        private final String value;
+        
+        private TaskState (String value) {
+            this.value = value;
+        }
+        
+        public String getValue () {
+            return this.value;
+        }
     }
     
     // Check for condition to trigger accBlotter => Refresh Portfolio - positions + order table + acc summary
@@ -148,7 +158,7 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
             String accountID = api.user.practiceAccount.accountID;
             
             if (userID != null && accountID != null) {
-                result.put("state", taskState);
+                result.put("state", taskState.getValue());
                 
                 // Not calling Account Blotter & get instruments on every iteration
                 if (taskState == TaskState.ACC_BLOTTER) {

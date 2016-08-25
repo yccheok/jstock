@@ -44,10 +44,13 @@ public class Portfolio {
     private void startPortfolioService () {
         Portfolio.portfolioService = new PortfolioService(Portfolio.api);
         
-        // start immediately
-        portfolioService.setDelay(Duration.seconds(0));
-        // run every 10 sec
-        portfolioService.setPeriod(Duration.seconds(10));
+        // The initial delay between when the ScheduledService is first started, and when it will begin operation.
+        // This is the amount of time the ScheduledService will remain in the SCHEDULED state, before entering the RUNNING state,
+        // following a fresh invocation of Service.start() or Service.restart().
+        portfolioService.setDelay(this.delay);
+        
+        // The minimum amount of time to allow between the start of the last run and the start of the next run.
+        portfolioService.setPeriod(this.period);
         
         portfolioService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
@@ -58,13 +61,13 @@ public class Portfolio {
                 // 2nd run calls get instruments & get quotes
                 // Following run just call get quotes
 
-                PortfolioService.TaskState state = (PortfolioService.TaskState) result.get("state");
+                String state = result.get("state").toString();
                 
                 if (result.containsKey("marketPrices")) {
                     marketPrices = (Map) result.get("marketPrices");
                 }
 
-                if (state == PortfolioService.TaskState.ACC_BLOTTER) {
+                if (state.equals("ACC_BLOTTER")) {
                     List<OpenPosModel> posList = (List) result.get("posList");
                     List<OrderModel> ordList = (List) result.get("ordList");
                     AccountModel accModel = (AccountModel) result.get("accModel");
@@ -73,7 +76,7 @@ public class Portfolio {
                     ordTableBuilder.initData(ordList, instruments, marketPrices);
                     accSummaryBuilder.initData(accModel);
                 } else {
-                    if (state == PortfolioService.TaskState.INSTRUMENTS) {
+                    if (state.equals("INSTRUMENTS")) {
                         instruments = (Map<String, Map>) result.get("instruments");
                         
                         // new instruments added from last call
@@ -151,6 +154,9 @@ public class Portfolio {
     private final AccountSummaryBuilder accSummaryBuilder = new AccountSummaryBuilder();
 
     private final Tab PortfolioTab = new Tab();
+    
+    private final Duration delay = new Duration(0);
+    private final Duration period = Duration.seconds(10);
     
     public static final double TABLE_CELL_SIZE = 25;
     public static PortfolioService portfolioService;
