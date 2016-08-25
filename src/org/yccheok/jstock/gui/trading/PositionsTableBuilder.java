@@ -71,9 +71,8 @@ public class PositionsTableBuilder {
     public Map<String, Object> buildBuyParam (String symbol, String instrumentID) {
         Map<String, Object> params = new HashMap<>();
 
-        DriveWealth api = Portfolio.getAPI();
-        User user = api.user;
-        Account acc = api.user.getPracticeAccount();
+        User user = Portfolio.getAPI().getUser();
+        Account acc = user.getPracticeAccount();
         
         String userID = user.getUserID();
         String accountID = acc.getAccountID();

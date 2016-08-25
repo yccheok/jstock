@@ -1814,6 +1814,10 @@ public class DriveWealth {
         return error;
     }
     
+    public User getUser () {
+        return this.user;
+    }
+    
     /*****************
      * Variables
      *****************/
@@ -1822,5 +1826,5 @@ public class DriveWealth {
     public static String hostURL = "https://api.drivewealth.io/v1/";
     public static String reportURL = "http://reports.drivewealth.io/";
     
-    public User user;
+    private User user;
 }

@@ -15,6 +15,7 @@ import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;
 import org.yccheok.jstock.trading.API.AccountBlotter;
 import org.yccheok.jstock.trading.API.DriveWealth;
+import org.yccheok.jstock.trading.API.User;
 
 /**
  *
@@ -154,8 +155,9 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
             
             Map<String, Object> result = new HashMap<>();
 
-            String userID = api.user.getUserID();
-            String accountID = api.user.getPracticeAccount().getAccountID();
+            User user = api.getUser();
+            String userID = user.getUserID();
+            String accountID = user.getPracticeAccount().getAccountID();
             
             if (userID != null && accountID != null) {
                 result.put("state", taskState.getValue());

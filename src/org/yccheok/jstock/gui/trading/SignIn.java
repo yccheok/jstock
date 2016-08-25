@@ -162,7 +162,7 @@ public class SignIn {
                             return result;
                         }
 
-                        User user = _api.user;
+                        User user = _api.getUser();
 
                         System.out.println("DriveWealth: username: " + username
                                             + ", pwd: " + pwd
@@ -186,10 +186,11 @@ public class SignIn {
                         } else {
                             api = (DriveWealth) result.get("api");
 
-                            if (api.user != null && api.getSessionKey() != null) {
-                                System.out.println("Successfully Sign In, userID: " + api.user.getUserID());
+                            User user = api.getUser();
+                            if (user != null && api.getSessionKey() != null) {
+                                System.out.println("Successfully Sign In, userID: " + user.getUserID());
 
-                                Account acc = api.user.getPracticeAccount();
+                                Account acc = user.getPracticeAccount();
                                 String welcomeStr;
 
                                 if (acc == null) {
@@ -198,7 +199,7 @@ public class SignIn {
 
                                     /*
                                     Map<String, Object> params = new HashMap<>();
-                                    params.put("userID", api.user.userID);
+                                    params.put("userID", user.getUserID());
                                     acc = api.createPracticeAccount(params);
                                     */
                                 } else {
