@@ -154,8 +154,8 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
             
             Map<String, Object> result = new HashMap<>();
 
-            String userID = api.user.userID;
-            String accountID = api.user.practiceAccount.accountID;
+            String userID = api.user.getUserID();
+            String accountID = api.user.getPracticeAccount().getAccountID();
             
             if (userID != null && accountID != null) {
                 result.put("state", taskState.getValue());

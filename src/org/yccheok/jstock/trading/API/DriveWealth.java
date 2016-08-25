@@ -40,17 +40,12 @@ import org.apache.commons.httpclient.methods.multipart.StringPart;
  */
 public class DriveWealth {
 
-    public DriveWealth() {
-        this.user = new User();
-    }
+    public DriveWealth() {}
 
     public Map<String, Object> login(String username, String password) {
-        this.user.username = username;
-        this.user.password = password;
-
         Map<String, String> args = new HashMap<>();
-        args.put("username",    this.user.username);
-        args.put("password",    this.user.password);
+        args.put("username",    username);
+        args.put("password",    password);
         args.put("appTypeID",   "26");
         args.put("appVersion",  "0.1");
         args.put("languageID",  "en_US");
@@ -67,28 +62,25 @@ public class DriveWealth {
             return session;
         }
 
-        this.user.sessionKey = session.get("sessionKey").toString();
-        this.user.userID = session.get("userID").toString();
-        this.user.commissionRate = (double) session.get("commissionRate");
-        
+        Map<String, Object> params = new HashMap<>();
+        params.put("username", username);
+        params.put("password", password);
+        params.put("sessionKey", session.get("sessionKey").toString());
+        params.put("userID", session.get("userID").toString());
+        params.put("commissionRate", session.get("commissionRate"));
+
+        this.user = new User(params);
+
         List<Map<String, Object>> accounts = (ArrayList) session.get("accounts");
 
         for (Map<String, Object> a : accounts) {
-            String accountID   = a.get("accountID").toString();
-            String accountNo   = a.get("accountNo").toString();
             double accountType = (double) a.get("accountType");
-            double cash        = (double) a.get("cash");
-
-            final Account account = new Account(a);
+            Account account = new Account(a);
 
             if (accountType == 1) {
-                this.user.practiceAccount = account;
+                this.user.setPracticeAccount(account);
             } else if (accountType == 2) {
-                this.user.liveAccount = account;
-            }
-
-            if (!this.user.accountsMap.containsKey(accountID)) {
-                this.user.accountsMap.put(accountID, account);
+                this.user.setLiveAccount(account);
             }
         }
         return session;
@@ -625,35 +617,30 @@ public class DriveWealth {
         List<Map<String, Object>> accounts = new ArrayList<>();
         
         for (Map<String, Object> a : result) {
-            Map<String, Object> account = new HashMap<>();
+            Map<String, Object> accMap = new HashMap<>();
             for (String k: this.accountFields) {
                 if (a.containsKey(k)) {
                     Object v = a.get(k);
-                    account.put(k, v);
+                    accMap.put(k, v);
                     //System.out.println("key: " + k + ", value: " + v);
                 }
             }
-            accounts.add(account);
+            accounts.add(accMap);
             
-            String accountID = account.get("accountID").toString();
-            String accountNo = account.get("accountNo").toString();
-            double accountTypeID = (double) account.get("accountType");
-            double cash = (double) account.get("cash");
+            String accountID = accMap.get("accountID").toString();
+            String accountNo = accMap.get("accountNo").toString();
+            double accountTypeID = (double) accMap.get("accountType");
+            double cash = (double) accMap.get("cash");
 
             // accountTypeID: 1 => Practice a/c, 2 => Live a/c
             String accountType = (accountTypeID == 1) ? "Practice" : "Live";
 
-            Account acc = this.new Account(account);
+            Account acc = new Account(accMap);
             if (accountTypeID == 1) {
-                this.user.practiceAccount = acc;
+                this.user.setPracticeAccount(acc);
             } else if (accountTypeID == 2) {
-                this.user.liveAccount = acc;
+                this.user.setLiveAccount(acc);
             }
-            
-            if (!this.user.accountsMap.containsKey(accountID)) {
-                this.user.accountsMap.put(accountID, acc);
-            }
-
             
             System.out.println("accountID: " + accountID + ", accountNo: " + accountNo + ", accountType: " + accountType + ", cash" + cash);
         }
@@ -663,7 +650,7 @@ public class DriveWealth {
     /* API endpoint: "signups/practice"
         if user not exists, POST creates user + practice a/c
         if user exist but no practice a/c, POST with userID creates practice a/c
-        if user & practice account exist, POST with userID returns existing accountID
+        if user & practice accMap exist, POST with userID returns existing accountID
     */
 
     public Account createPracticeAccount(Map<String, Object> args) {
@@ -675,19 +662,19 @@ public class DriveWealth {
             String userID = args.get("userID").toString();
             
             // existing user requires SignIn: to create SessionKey
-            if (this.user == null || !this.user.userID.equals(userID)) {
+            if (this.user == null || !this.user.getUserID().equals(userID)) {
                 System.out.println("Please Sign In, userID: " + userID);
                 return null;
             }
 
             // practice acc exists
-            if (this.user.practiceAccount != null) {
-                Account acc = this.user.practiceAccount;
-                System.out.println("Practice a/c exists: accountID: " + acc.accountID + ", accountNo: " + acc.accountNo);
+            Account acc = this.user.getPracticeAccount();
+            if (acc != null) {
+                System.out.println("Practice a/c exists: accountID: " + acc.getAccountID() + ", accountNo: " + acc.getAccountNo());
                 return acc;
             }
 
-            // create practice account
+            // create practice accMap
             Map<String, Object> params = new HashMap<>();
             params.put("userID", userID);
 
@@ -698,9 +685,9 @@ public class DriveWealth {
             String accountID = result.get("accountID").toString();
             System.out.println("user already exist, created practice accountID: " + accountID);
 
-            this.login(this.user.username, this.user.password);
+            this.login(this.user.getUserName(), this.user.getPassword());
             
-            return this.user.practiceAccount;
+            return this.user.getPracticeAccount();
         } else {
             // create new user + practice a/c
             System.out.println("create User + Practice a/c + funded");
@@ -723,7 +710,7 @@ public class DriveWealth {
             // status code: 400 => duplicate username, 200 => OK
             if (statusCode == 200) {
                 this.login(result.get("username").toString(), result.get("password").toString());
-                acc = this.user.practiceAccount;
+                acc = this.user.getPracticeAccount();
                 
                 System.out.println("New user + practice a/c created");
             } else if (statusCode == 400) {
@@ -735,7 +722,7 @@ public class DriveWealth {
     }
 
     public Map<String, Object> createLiveAccount(Map<String, Object> args) {
-        // user already exist, create live account
+        // user already exist, create live accMap
         System.out.println("\n[Create Live Account]");
 
         Map<String, Object> params = new HashMap<>();
@@ -1014,7 +1001,7 @@ public class DriveWealth {
         int statusCode = (int) result.get("code");
 
         if (statusCode == 200) {
-            this.user.sessionKey = null;
+            this.user.setSessionKey(null);
             return true;
         }
         return false;
@@ -1271,7 +1258,7 @@ public class DriveWealth {
     public Map<String, Object> getSetting (String key) {
         System.out.println("\n[Get Setting]");
 
-        Map<String, Object> respondMap = executeGet("users/" + this.user.userID + "/settings/" + key, this.getSessionKey());
+        Map<String, Object> respondMap = executeGet("users/" + this.user.getUserID() + "/settings/" + key, this.getSessionKey());
         Map<String, Object> result = gson.fromJson(respondMap.get("respond").toString(), HashMap.class);
         Map<String, Object> setting = new HashMap<>();
 
@@ -1288,7 +1275,7 @@ public class DriveWealth {
     public List<Map<String, Object>> listAllSettings () {
         System.out.println("\n[List all Settings]");
 
-        Map<String, Object> respondMap = executeGet("users/" + this.user.userID + "/settings", this.getSessionKey());
+        Map<String, Object> respondMap = executeGet("users/" + this.user.getUserID() + "/settings", this.getSessionKey());
         List<Map<String, Object>> result = gson.fromJson(respondMap.get("respond").toString(), ArrayList.class);
         List<Map<String, Object>> settings = new ArrayList<>();
         
@@ -1310,11 +1297,11 @@ public class DriveWealth {
         System.out.println("\n[Create Setting]");
 
         Map<String, Object> params = new HashMap<>();
-        params.put("userID", this.user.userID);
+        params.put("userID", this.user.getUserID());
         params.put("key", args.get("key"));
         params.put("value", args.get("value"));
         
-        Map<String, Object> respondMap = executePost("users/" + this.user.userID + "/settings", params, this.getSessionKey());
+        Map<String, Object> respondMap = executePost("users/" + this.user.getUserID() + "/settings", params, this.getSessionKey());
         String respond = respondMap.get("respond").toString();
         Map<String, Object> result = gson.fromJson(respond, HashMap.class);
 
@@ -1333,7 +1320,7 @@ public class DriveWealth {
     public boolean deleteSetting (String key) {
         System.out.println("\n[Delete Setting]");
 
-        Map<String, Object> result = executeDelete("users/" + this.user.userID + "/settings/" + key, this.getSessionKey());
+        Map<String, Object> result = executeDelete("users/" + this.user.getUserID() + "/settings/" + key, this.getSessionKey());
         int statusCode = (int) result.get("code");
 
         return statusCode == 200;
@@ -1443,9 +1430,9 @@ public class DriveWealth {
         "transactionReport" covers 3 types:
 
         1) Financial Transaction
-            This report allows users to generate all of their financial transactions for their specified account.
+            This report allows users to generate all of their financial transactions for their specified accMap.
         2) Order Transaction
-            This report allows users to generate order related transactions for the specified account number
+            This report allows users to generate order related transactions for the specified accMap number
             over the specified date interval. These transactions can be also filtered by symbol if desired.
         3) Open Positions and Resting Orders
             Provides the user their current open positions and resting orders.
@@ -1695,17 +1682,13 @@ public class DriveWealth {
      ************************/
     
     public String getSessionKey() {
-        if (this.user.sessionKey == null) {
-            Map<String, Object> result = login(this.user.username, this.user.password);
+        if (this.user.getSessionKey() == null) {
+            Map<String, Object> result = login(this.user.getUserName(), this.user.getPassword());
             if (result.containsKey("code") && result.containsKey("message")) {
                 return null;
             }
         }
-        return this.user.sessionKey;
-    }
-    
-    public void setUser (Map<String, Object> params) {
-        this.user = new User(params.get("username").toString(), params.get("password").toString());
+        return this.user.getSessionKey();
     }
     
     /************************
@@ -1831,45 +1814,10 @@ public class DriveWealth {
         return error;
     }
     
-    /************************
-     * inner class, Variables
-     ************************/
+    /*****************
+     * Variables
+     *****************/
 
-    public class User {
-        public User () {}
-
-        public User (String username, String password) {
-            this.username = username;
-            this.password = password;
-        }
-        
-        public String username;
-        public String password;
-        public String sessionKey;
-        public String userID;
-        public double commissionRate;
-        
-        public Account practiceAccount;
-        public Account liveAccount;
-        public Map<String, Account> accountsMap = new HashMap<>();
-    }
-    
-    public class Account {
-        public Account (Map<String, Object> account) {
-            this.accountID      = account.get("accountID").toString();
-            this.accountNo      = account.get("accountNo").toString();
-            this.accountType    = (double) account.get("accountType");
-            this.cash           = (double) account.get("cash");
-            this.nickname       = account.get("nickname").toString();
-        }
-
-        public String accountID;
-        public String accountNo;
-        public double accountType;
-        public double cash;
-        public String nickname;
-    }
-    
     private final Gson gson = new Gson();
     public static String hostURL = "https://api.drivewealth.io/v1/";
     public static String reportURL = "http://reports.drivewealth.io/";

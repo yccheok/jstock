@@ -41,6 +41,8 @@ import javafx.scene.text.TextAlignment;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import org.yccheok.jstock.trading.API.DriveWealth;
+import org.yccheok.jstock.trading.API.User;
+import org.yccheok.jstock.trading.API.Account;
 
 /**
  *
@@ -160,13 +162,13 @@ public class SignIn {
                             return result;
                         }
 
-                        DriveWealth.User user = _api.user;
+                        User user = _api.user;
 
                         System.out.println("DriveWealth: username: " + username
                                             + ", pwd: " + pwd
-                                            + ", sessionKey: " + user.sessionKey
-                                            + ", userID: " + user.userID
-                                            + ", commission: " + user.commissionRate);
+                                            + ", sessionKey: " + user.getSessionKey()
+                                            + ", userID: " + user.getUserID()
+                                            + ", commission: " + user.getCommissionRate());
 
                         result.put("api", _api);
                         return result;
@@ -185,9 +187,9 @@ public class SignIn {
                             api = (DriveWealth) result.get("api");
 
                             if (api.user != null && api.getSessionKey() != null) {
-                                System.out.println("Successfully Sign In, userID: " + api.user.userID);
+                                System.out.println("Successfully Sign In, userID: " + api.user.getUserID());
 
-                                DriveWealth.Account acc = api.user.practiceAccount;
+                                Account acc = api.user.getPracticeAccount();
                                 String welcomeStr;
 
                                 if (acc == null) {
@@ -200,8 +202,10 @@ public class SignIn {
                                     acc = api.createPracticeAccount(params);
                                     */
                                 } else {
-                                    welcomeStr = "Start trading now with " + acc.nickname + ".\n AccountNo: " + acc.accountNo
-                                        + "\n AccountID: " + acc.accountID + "\n Balance: " + acc.cash;
+                                    welcomeStr = "Start trading now with " + acc.getNickName()
+                                        + ".\n AccountNo: " + acc.getAccountNo()
+                                        + "\n AccountID: " + acc.getAccountID()
+                                        + "\n Balance: " + acc.getCash();
                                 }
                                 successText.setText(welcomeStr);
                                 

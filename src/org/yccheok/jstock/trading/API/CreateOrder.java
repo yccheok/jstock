@@ -126,7 +126,7 @@ public class CreateOrder {
         String accountID  = this.params.get("accountID").toString();
         String symbol     = this.params.get("symbol").toString();
         double orderQty   = Double.parseDouble(this.params.get("orderQty").toString());
-        double commission = this.api.user.commissionRate;
+        double commission = this.api.user.getCommissionRate();
         
         // get market price (use "Ask Price" for Buy)
         ArrayList<String> symbols = new ArrayList<>(Arrays.asList(symbol));
@@ -159,9 +159,9 @@ public class CreateOrder {
             // If the price entered is below the current ask price, order will be immediately executed
             price = Double.parseDouble(this.params.get("limitPrice").toString());
         }
-        
+
         // get balance
-        double balance = api.accountBlotter(api.user.userID, accountID).getTradingBalance();
+        double balance = api.accountBlotter(api.user.getUserID(), accountID).getTradingBalance();
 
         // check for insufficient balance
         double amount = orderQty * price + commission;
@@ -214,7 +214,7 @@ public class CreateOrder {
         }
         
         // get available trading Qty
-        double availQty = this.api.accountBlotter(this.api.user.userID, accountID).getAvailableTradingQty(instrumentID);
+        double availQty = this.api.accountBlotter(this.api.user.getUserID(), accountID).getAvailableTradingQty(instrumentID);
 
         System.out.println("availableForTradingQty: " + availQty + ", orderQty: " + orderQty);
 

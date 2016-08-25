@@ -28,6 +28,8 @@ import org.yccheok.jstock.trading.OpenPosModel;
 import org.yccheok.jstock.trading.Utils;
 import org.yccheok.jstock.trading.BuySell;
 import org.yccheok.jstock.trading.API.DriveWealth;
+import org.yccheok.jstock.trading.API.User;
+import org.yccheok.jstock.trading.API.Account;
 
 /**
  *
@@ -70,10 +72,12 @@ public class PositionsTableBuilder {
         Map<String, Object> params = new HashMap<>();
 
         DriveWealth api = Portfolio.getAPI();
-
-        String userID = api.user.userID;
-        String accountID = api.user.practiceAccount.accountID;
-        String accountNo = api.user.practiceAccount.accountNo;
+        User user = api.user;
+        Account acc = api.user.getPracticeAccount();
+        
+        String userID = user.getUserID();
+        String accountID = acc.getAccountID();
+        String accountNo = acc.getAccountNo();
 
         // get instrumentID
         params.put("symbol", symbol);
