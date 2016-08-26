@@ -305,30 +305,6 @@ public class DriveWealth {
         "instruments"
     ));
 
-    static final List<String> createSessionFields = new ArrayList<>(Arrays.asList(
-        "username",
-        "password",
-	"appTypeID",
-        "appVersion",
-        "languageID",
-        "osType",
-        "osVersion",
-        "scrRes",
-	"ipAddress"
-    ));
-
-    static final List<String> sessionFields = new ArrayList<>(Arrays.asList(
-        "appTypeID",
-        "commissionRate",
-        "loginState",
-        "referralCode",
-        "sessionKey",
-        "userID",
-        "wlpID",
-        "accounts",
-        "instruments"
-    ));
-
     static final List<String> instrumentFields = new ArrayList<>(Arrays.asList(
         "name",
         "instrumentID",
@@ -882,32 +858,9 @@ public class DriveWealth {
     public Map<String, Object> createSession(Map<String, String> args) {
         System.out.println("\n[Create Session]");
  
-        Map<String, Object> params = new HashMap<>();
-        for (String k: this.createSessionFields) {
-            if (args.containsKey(k)) {
-                String v = args.get(k);
-                params.put(k, v);
-                //System.out.println("key: " + k + ", value: " + v);
-            }
-        }
-
-        Map<String, Object> respondMap = executePost("userSessions", params, null);
-        String respond = respondMap.get("respond").toString();
-        Map<String, Object> result  = gson.fromJson(respond, HashMap.class);
-
-        Map<String, Object> session = new HashMap<>();
-        if ((int) respondMap.get("code") == 200) {
-            for (String k: this.sessionFields) {
-                if (result.containsKey(k)) {
-                    Object v = result.get(k);
-                    session.put(k, v);
-                    //System.out.println("key: " + k + ", value: " + v);
-                }
-            }
-        } else {
-            session = this.getError(result);
-        }
-        return session;
+        CreateSession createSession = new CreateSession(args);
+        return createSession.getResultMap();
+        
     }
 
     public boolean cancelSession(String sessionKey) {
@@ -1616,7 +1569,7 @@ public class DriveWealth {
         return executeHttpCall(deleteMethod);
     }
     
-    private static Map<String, Object> getError (Map<String, Object> result) {
+    public static Map<String, Object> getError (Map<String, Object> result) {
         Map<String, Object> error = new HashMap<>();
         error.put("code", result.get("code"));
         error.put("message", result.get("message"));
