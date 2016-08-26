@@ -350,34 +350,6 @@ public class DriveWealth {
         "lastTrade"
     ));
 
-    static final List<String> searchInstrumentFields = new ArrayList<>(Arrays.asList(
-        "instrumentID",
-        "name",
-        "category",
-        "currencyID",
-        "exchangeID",
-        "limitStatus",
-        "instrumentTypeID",
-        "isLongOnly",
-        "marginCurrencyID",
-        "orderSizeMax",
-        "orderSizeMin",
-        "orderSizeStep",
-        "rateAsk",
-        "rateBid",
-        "ratePrecision",
-        "symbol",
-        "tags",
-        "tradeStatus",
-        "tradingHours",
-        "uom",
-        "urlImage",
-        "urlInvestor",
-        "sector",
-        "longOnly",
-        "lastTrade"
-    ));
-    
     static final List<String> settingFields = new ArrayList<>(Arrays.asList(
         "userID",
         "key",
@@ -927,52 +899,8 @@ public class DriveWealth {
     public List<Map<String, Object>> searchInstruments (Map<String, String> args) {
         System.out.println("\n[searchInstruments]");
 
-        // 1) For exact symbol match (only return 1 symbol)
-        //      https://api.drivewealth.io/v1/instruments?symbols=SCS
-        // 2) search by symbol pattern (return >= 1 symbols)
-        //      https://api.drivewealth.io/v1/instruments?symbol=SCS
-        
-        String params = null;
-        final List<String> searchFields = new ArrayList<>(Arrays.asList(
-            "symbol",
-            "symbols",
-            "name",
-            "tag"
-        ));
-
-        for (String k: searchFields) {
-            if (args.containsKey(k)) {
-                String kv = k + "=" + args.get(k);
-                if (params == null) {
-                    params = kv;
-                } else {
-                    params += "&" + kv;
-                }
-            }
-        }
-        //System.out.println(params);
-
-        Map<String, Object> respondMap = executeGet("instruments?" + params, this.getSessionKey());
-        List<Map<String, Object>> instruments = new ArrayList<>();
-        
-        if ((int) respondMap.get("code") == 200) {
-            List<Map<String, Object>> result = gson.fromJson(respondMap.get("respond").toString(), ArrayList.class);
-
-            int cnt = 0;
-            for (Map<String, Object> i : result) {
-                Map<String, Object> instrument = new HashMap<>();
-                for (String k: this.searchInstrumentFields) {
-                    if (i.containsKey(k)) {
-                        Object v = i.get(k);
-                        instrument.put(k, v);
-                        //System.out.println(cnt + ": key: " + k + ", value: " + v);
-                    }
-                }
-                instruments.add(instrument);
-                cnt++;
-            }
-        }
-        return instruments;
+        SearchInstruments searchInstrument = new SearchInstruments(this, args);
+        return searchInstrument.getInstrumentList();
     }
 
     /********************
