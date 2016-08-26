@@ -17,15 +17,14 @@ import java.util.Map;
  * @author shuwnyuan
  */
 public class CreateOrder {
-    
+
     private final String url = "orders";
     private final DriveWealth api;
     private final OrderSide orderSide;
     private final OrderType orderType;
     private final Map<String, Object> params = new HashMap<>();
     private final Map<String, Object> orderMap = new HashMap<>();
-    private ValidationStatus validationStatus;
-    
+
     public static enum OrderSide {
         BUY("B", "buy"),
         SELL("S", "sell");
@@ -154,8 +153,8 @@ public class CreateOrder {
         
         // get market price (use "Ask Price" for Buy)
         ArrayList<String> symbols = new ArrayList<>(Arrays.asList(symbol));
-        List<Map<String, Object>> dataArray = this.api.getMarketData(symbols, false);
-        double askPrice = (double) dataArray.get(0).get("ask");
+        List<GetMarketData.MarketData> dataList = this.api.getMarketData(symbols, false);
+        double askPrice = dataList.get(0).getAsk();
 
         double price = 0;
         Map<String, Object> status = new HashMap<>();
@@ -212,8 +211,8 @@ public class CreateOrder {
         if (this.orderType == OrderType.STOP) {
             // get market price (use "Bid Price" for Sell)
             ArrayList<String> symbols = new ArrayList<>(Arrays.asList(symbol));
-            List<Map<String, Object>> dataArray = this.api.getMarketData(symbols, false);
-            double bidPrice = (double) dataArray.get(0).get("bid");
+            List<GetMarketData.MarketData> dataList = this.api.getMarketData(symbols, false);
+            double bidPrice = dataList.get(0).getBid();
             
             double price = Double.parseDouble(this.params.get("price").toString());
 

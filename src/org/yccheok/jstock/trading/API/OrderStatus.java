@@ -23,6 +23,7 @@ public class OrderStatus {
     private final String url;
     private final Map<String, Object> statusMap = new HashMap<>();
     private final OrdStatus ordStatus;
+    private String rejectedReason = null;
 
     
     public static enum OrdStatus {
@@ -146,16 +147,17 @@ public class OrderStatus {
                 && status.equals("8")
         ) {
             _ordStatus = OrdStatus.REJECTED;
+            
+            if (this.statusMap.containsKey("ordRejReason")) {
+                this.rejectedReason = this.statusMap.get("ordRejReason").toString();
+            }
         }
         
         this.ordStatus = _ordStatus;
         this.statusMap.put("ordStatus", this.ordStatus);
 
-        String reason = "";
-        if (this.ordStatus == OrdStatus.REJECTED) {
-            reason = ", reason: " + this.statusMap.get("ordRejReason").toString();
-        }
-        
+        String reason = (this.rejectedReason != null)? ", Reason: " + this.rejectedReason : "";
+
         System.out.println("Order " + this.ordStatus.getValue() + ": " + this.orderID + reason);
     }
 
@@ -168,9 +170,6 @@ public class OrderStatus {
     }
     
     public String getRejectedReason () {
-        if (this.ordStatus == OrdStatus.REJECTED && this.statusMap.containsKey("ordRejReason")) {
-            return this.statusMap.get("ordRejReason").toString();
-        }
-        return null;
+        return this.rejectedReason;
     }
 }

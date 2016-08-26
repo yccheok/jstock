@@ -15,6 +15,7 @@ import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;
 import org.yccheok.jstock.trading.API.AccountBlotter;
 import org.yccheok.jstock.trading.API.DriveWealth;
+import org.yccheok.jstock.trading.API.GetMarketData;
 import org.yccheok.jstock.trading.API.User;
 
 /**
@@ -119,11 +120,11 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
         private Map<String, Double> getMarketPrices () {
             // get latest prices for all symbols
             ArrayList<String> symbols = new ArrayList<>(symbolsSet);
-            List<Map<String, Object>> priceList = api.getMarketData(symbols, true);
+            List<GetMarketData.MarketData> dataList = api.getMarketData(symbols, true);
 
             Map<String, Double> prices = new HashMap<>();
-            for (Map<String, Object> price : priceList) {
-                prices.put(price.get("symbol").toString(), (Double) price.get("lastTrade"));
+            for (GetMarketData.MarketData marketData : dataList) {
+                prices.put(marketData.getSymbol(), marketData.getLastTrade());
             }
             
             return prices;

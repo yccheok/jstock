@@ -402,13 +402,6 @@ public class DriveWealth {
         "lastTrade"
     ));
     
-    static final List<String> marketDataFields = new ArrayList<>(Arrays.asList(
-        "symbol",
-        "bid",
-        "ask",
-        "lastTrade"
-    ));
-    
     static final List<String> settingFields = new ArrayList<>(Arrays.asList(
         "userID",
         "key",
@@ -1055,52 +1048,16 @@ public class DriveWealth {
         OrderStatus orderStatus = new OrderStatus(this, orderID);
         return orderStatus.getStatusMap();
     }
-    
+
     /************************
      * Market Data
      ************************/
     
-    public List<Map<String, Object>> getMarketData (ArrayList<String> args, boolean lastTradeOnly) {
+    public List<GetMarketData.MarketData> getMarketData (ArrayList<String> symbolList, boolean lastTradeOnly) {
         System.out.println("\n[Get Market Data]");
 
-        String symbols = null;
-        for (int i = 0; i < args.size(); i++) {
-	    String symbol = args.get(i);
-            
-            if (i == 0) {
-                symbols = symbol;
-            } else {
-                symbols = symbols + "," + symbol;
-            }
-	    System.out.println(i + ": symbol: " + symbol);
-	}
-        System.out.println("symbols: " + symbols);
-        
-        String url = "quotes?symbols=" + symbols;
-        // get last Traded price only, no bid & ask return
-        if (lastTradeOnly == true) {
-            url = url + "&lastTrade=true";
-        }
-        
-        Map<String, Object> respondMap = executeGet(url, this.getSessionKey());
-        List<Map<String, Object>> marketData = new ArrayList<>();
-
-        if ((int) respondMap.get("code") == 200) {
-            List<Map<String, Object>> result = gson.fromJson(respondMap.get("respond").toString(), ArrayList.class);
-
-            for (Map<String, Object> i : result) {
-                Map<String, Object> data = new HashMap<>();
-                for (String k: this.marketDataFields) {
-                    if (i.containsKey(k)) {
-                        Object v = i.get(k);
-                        data.put(k, v);
-                        //System.out.println("key: " + k + ", value: " + v);
-                    }
-                }
-                marketData.add(data);
-            }
-        }
-        return marketData;
+        GetMarketData getMarketData = new GetMarketData(symbolList, lastTradeOnly);
+        return getMarketData.getMarketDataList();
     }
     
     /********************
