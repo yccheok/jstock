@@ -43,6 +43,7 @@ import javafx.scene.web.WebView;
 import org.yccheok.jstock.trading.API.DriveWealth;
 import org.yccheok.jstock.trading.API.User;
 import org.yccheok.jstock.trading.API.Account;
+import org.yccheok.jstock.engine.Pair;
 
 /**
  *
@@ -153,24 +154,42 @@ public class SignIn {
                     @Override protected Map<String, Object> call() throws Exception {
                         System.out.println("Drive Wealth User Sign In....\n\n ");
 
-                        final DriveWealth _api = new DriveWealth();
-                        final Map<String, Object> login = _api.login(username, pwd);
-                        final Map<String, Object> result = new HashMap<>();
+                        DriveWealth _api = new DriveWealth();
+                        Pair<User, DriveWealth.Error> session = _api.login(username, pwd);
+
+                        System.out.println("2222222222");
                         
-                        if (login.containsKey("code") && login.containsKey("message")) {
-                            result.put("error", login.get("message"));
+                        User user = session.first;
+                        DriveWealth.Error error = session.second;
+                        
+                        System.out.println("333333333");
+                        
+                        
+                        Map<String, Object> result = new HashMap<>();
+                        if (error != null) {
+                            
+                            System.out.println("44444444");
+                        
+                            
+                            result.put("error", error.getMessage());
                             return result;
                         }
 
-                        User user = _api.getUser();
-
-                        System.out.println("DriveWealth: username: " + username
-                                            + ", pwd: " + pwd
-                                            + ", sessionKey: " + user.getSessionKey()
-                                            + ", userID: " + user.getUserID()
-                                            + ", commission: " + user.getCommissionRate());
-
+                        System.out.println("555555555");
+                        
+                        
+                        
+                        System.out.println("DriveWealth: username: "    + username
+                                            + ", pwd: "                 + pwd
+                                            + ", sessionKey: "          + user.getSessionKey()
+                                            + ", userID: "              + user.getUserID()
+                                            + ", commission: "          + user.getCommissionRate());
+                        
                         result.put("api", _api);
+                        
+                        System.out.println("666666666");
+                        
+                        
                         return result;
                     }
                 };

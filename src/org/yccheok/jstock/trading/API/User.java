@@ -15,12 +15,11 @@ import java.util.Map;
 public class User {
 
     public User (Map<String, Object> params) {
-        this.username = params.get("username").toString();
-        this.password = params.get("password").toString();
-        this.userID = params.get("userID").toString(); 
-        this.commissionRate = (Double) params.get("commissionRate");
-        
-        this.sessionKey = params.get("sessionKey").toString();
+        this.username       = params.get("username").toString();
+        this.password       = params.get("password").toString();
+        this.userID         = params.get("userID").toString(); 
+        this.commissionRate = (double) params.get("commissionRate");
+        this.sessionKey     = params.get("sessionKey").toString();
     }
 
     public String getUserName () {

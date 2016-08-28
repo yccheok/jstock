@@ -117,28 +117,28 @@ public final class AccountBlotter {
             data.put("units",       ord.get("orderQty"));
             
             // side: BUY, SELL
-            final CreateOrder.OrderSide ordSide;
+            final OrderManager.OrderSide ordSide;
             String side = ord.get("side").toString();
 
             if (side.equals("B")) {
-                ordSide = CreateOrder.OrderSide.BUY;
+                ordSide = OrderManager.OrderSide.BUY;
             } else {
-                ordSide = CreateOrder.OrderSide.SELL;
+                ordSide = OrderManager.OrderSide.SELL;
             }
             data.put("side", ordSide);
             
             // Order Type: Market, Limit, Stop
-            final CreateOrder.OrderType ordType;
+            final OrderManager.OrderType ordType;
             String type = ord.get("orderType").toString();
 
             if (type.equals("2")) {
-                ordType = CreateOrder.OrderType.LIMIT;
+                ordType = OrderManager.OrderType.LIMIT;
                 data.put("limitPrice", ord.get("limitPrice"));
             } else if (type.equals("3")) {
-                ordType = CreateOrder.OrderType.STOP;
+                ordType = OrderManager.OrderType.STOP;
                 data.put("stopPrice", ord.get("stopPrice"));
             } else {
-                ordType = CreateOrder.OrderType.MARKET;
+                ordType = OrderManager.OrderType.MARKET;
             }
             data.put("orderType", ordType);
 

@@ -10,10 +10,9 @@ import java.util.Map;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
+import org.yccheok.jstock.engine.Pair;
 import org.yccheok.jstock.trading.API.DriveWealth;
-import org.yccheok.jstock.trading.API.CreateOrder;
-import org.yccheok.jstock.trading.API.OrderStatus;
-
+import org.yccheok.jstock.trading.API.OrderManager;
 
 
 /**
@@ -46,35 +45,32 @@ public class BuySell {
             public void handle(final WorkerStateEvent workerStateEvent) {
                 Map<String, Object> result = (Map) workerStateEvent.getSource().getValue();
 
-                OrderStatus.OrdStatus ordStatus = (OrderStatus.OrdStatus) result.get("ordStatus");
+                OrderManager.OrdStatus ordStatus = (OrderManager.OrdStatus) result.get("ordStatus");
                 
                 System.out.println("buy Task succeeded....  ordStatus: " + ordStatus);
                 
-                if (ordStatus == OrderStatus.OrdStatus.VALIDATION_ERROR) {
+                if (ordStatus == OrderManager.OrdStatus.ERROR) {
                     String error = result.get("error").toString();
-                    System.out.println("BUY market order VALIDATION ERROR: " + error);
-                } else if (ordStatus == OrderStatus.OrdStatus.ERROR) {
-                    System.out.println("BUY market order ERROR: UNKNOWN");
-                } else if (ordStatus == OrderStatus.OrdStatus.REJECTED) {
+                    System.out.println("BUY market order ERROR: " + error);
+                } else if (ordStatus == OrderManager.OrdStatus.REJECTED) {
                     System.out.println("BUY market order REJECTED....");
                 } else {
                     // status: ACCEPTED, FILLED, PARTIAL_FILLED, CANCELLED
                     // trigger PortfolioService to refresh => call accBlotter
 
-                    Map<String, Object> order = (Map) result.get("order");
+                    OrderManager.Order order = (OrderManager.Order) result.get("order");
 
-                    String instrumentID = order.get("instrumentID").toString();
-                    String orderID = order.get("orderID").toString();
-                    String orderQty = order.get("orderQty").toString();
-                    String comment = order.get("comment").toString();
-                    Double commission = (Double) order.get("commission");
-                    Double grossTradeAmt = (Double) order.get("grossTradeAmt");
-                    String orderNo = order.get("orderNo").toString();
-                    String status = order.get("ordStatus").toString();
-                    String ordType = order.get("ordType").toString();
-                    String side = order.get("side").toString();
-                    double accountType = (double) order.get("accountType");
-
+                    String instrumentID     = order.getInstrumentID();
+                    String orderID          = order.getOrderID();
+                    Double grossTradeAmt    = order.getGrossTradeAmt();
+                    String orderNo          = order.getOrderNo();
+                    String status           = order.getOrdStatus();
+                    String ordType          = order.getOrdType();
+                    String side             = order.getSide();
+                    Double accountType      = order.getAccountType();
+                    Double orderQty         = order.getOrderQty();
+                    Double commission       = order.getCommission();
+                    
                     System.out.println("Successfully create market order, " +
                         " instrumentID: " + instrumentID + 
                         " orderID: " + orderID +
@@ -83,7 +79,6 @@ public class BuySell {
                         " orderType: " + ordType +
                         " side: " + side +
                         " accountType: " + accountType + 
-                        " comment: " + comment + 
                         " grossTradeAmt: " + grossTradeAmt +
                         " commission: " + commission + 
                         " status: " + status
@@ -122,48 +117,38 @@ public class BuySell {
             System.out.println("BuyTask call create order .....");
 
             // Create Order
-            Map<String, Object> order = api.createOrder(CreateOrder.OrderSide.BUY, CreateOrder.OrderType.MARKET, params);
+            Pair<OrderManager.Order, String> createOrder = OrderManager.create(api, OrderManager.OrderSide.BUY, OrderManager.OrderType.MARKET, params);
+            OrderManager.Order order = createOrder.first;
+            String error = createOrder.second;
 
             Map<String, Object> result = new HashMap<>();
-            OrderStatus.OrdStatus ordStatus;
-            
-            if (! order.containsKey("orderID")) {
+
+            if (error != null) {
                 System.out.println("BUY market order failed....");
                 updateMessage("Create Market Order Status FAILED !!");
 
-                String error = null;
-                if (order.containsKey("validationError")) {
-                    // validation error
-                    ordStatus = OrderStatus.OrdStatus.VALIDATION_ERROR;
-                    error = order.get("validationError").toString();
-                } else {
-                    // Unknown error, failed to create order
-                    ordStatus = OrderStatus.OrdStatus.ERROR;
-                }
-
-                result.put("ordStatus", ordStatus);
+                result.put("ordStatus", OrderManager.OrdStatus.ERROR);
                 result.put("error", error);
                 
                 return result;
             }
 
-            String orderID = order.get("orderID").toString();
+            String orderID = order.getOrderID();
 
             System.out.println("BuyTask call get order status, orderID: " + orderID);
-
             
             // Get Order Status
-            order = api.orderStatus(orderID);
-            ordStatus = (OrderStatus.OrdStatus) order.get("ordStatus");
-            
-            
-            System.out.println("BuyTask call get order status DONE, order status: " + ordStatus);
+            Pair<OrderManager.Order, OrderManager.OrdStatus> orderStatus = OrderManager.status(api, orderID);
 
+            order = orderStatus.first;
+            OrderManager.OrdStatus ordStatus = orderStatus.second;
             
             updateMessage("Market Order Status: " + ordStatus);
-            result.put("order", order);
             result.put("ordStatus", ordStatus);
-            
+            result.put("order", order);
+
+            System.out.println("BuyTask call get order status DONE, order status: " + ordStatus);
+
             return result;
         }
     }

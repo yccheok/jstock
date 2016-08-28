@@ -32,59 +32,16 @@ import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
+import org.yccheok.jstock.engine.Pair;
 
 /**
  *
  * @author shuwnyuan
  */
-public class DriveWealth {
+public final class DriveWealth {
 
     public DriveWealth() {}
 
-    public Map<String, Object> login(String username, String password) {
-        Map<String, String> args = new HashMap<>();
-        args.put("username",    username);
-        args.put("password",    password);
-        args.put("appTypeID",   "26");
-        args.put("appVersion",  "0.1");
-        args.put("languageID",  "en_US");
-        args.put("osType",      "iOS");
-        args.put("osVersion",   "iOS 9.1");
-        args.put("scrRes",      "1920x1080");
-        args.put("ipAddress",   "1.1.1.1");
-
-        Map<String, Object> session = createSession(args);
-
-        // error create session
-        if (session.containsKey("code") && session.containsKey("message")) {
-            System.out.println("create session ERROR, code: " + session.get("code") + ", message: " + session.get("message"));
-            return session;
-        }
-
-        Map<String, Object> params = new HashMap<>();
-        params.put("username", username);
-        params.put("password", password);
-        params.put("sessionKey", session.get("sessionKey").toString());
-        params.put("userID", session.get("userID").toString());
-        params.put("commissionRate", session.get("commissionRate"));
-
-        this.user = new User(params);
-
-        List<Map<String, Object>> accounts = (ArrayList) session.get("accounts");
-
-        for (Map<String, Object> a : accounts) {
-            double accountType = (double) a.get("accountType");
-            Account account = new Account(a);
-
-            if (accountType == 1) {
-                this.user.setPracticeAccount(account);
-            } else if (accountType == 2) {
-                this.user.setLiveAccount(account);
-            }
-        }
-        return session;
-    }
-    
     /********************
      * API Functions
      ********************/
@@ -449,6 +406,16 @@ public class DriveWealth {
      * API: Accounts
      ********************/
 
+    public Pair<User, Error> login (String userName, String password) {
+        Pair<User, Error> session = SessionManager.create(userName, password);
+        User _user = session.first;
+
+        if (_user != null) {
+            this.setUser(_user);
+        }
+        return session;
+    }
+    
     public AccountBlotter accountBlotter(String userID, String accountID) {
         System.out.println("\n[Account Blotter] userID:" + userID + ", accountID:" + accountID);
         return new AccountBlotter(this, userID, accountID);
@@ -517,7 +484,7 @@ public class DriveWealth {
 
     public Account createPracticeAccount(Map<String, Object> args) {
         System.out.println("\n[create Practice Account]");
-        String api = "signups/practice";
+        String url = "signups/practice";
         
         if (args.containsKey("userID")) {
             // user already exist, create practice a/c
@@ -540,47 +507,69 @@ public class DriveWealth {
             Map<String, Object> params = new HashMap<>();
             params.put("userID", userID);
 
-            Map<String, Object> respondMap = executePost(api, params, this.getSessionKey());
+            Map<String, Object> respondMap = executePost(url, params, this.getSessionKey());
             String respond = respondMap.get("respond").toString();
             Map<String, Object> result = gson.fromJson(respond, HashMap.class);
 
             String accountID = result.get("accountID").toString();
             System.out.println("user already exist, created practice accountID: " + accountID);
 
-            this.login(this.user.getUserName(), this.user.getPassword());
+            // Login to call Create Session again to populate User with new practice a/c
+            String userName = this.user.getUserName();
+            String password = this.user.getPassword();
+            
+            Pair<User, Error> session = login(userName, password);
+            // error
+            if (session.second != null) {
+                return null;
+            }
             
             return this.user.getPracticeAccount();
-        } else {
-            // create new user + practice a/c
-            System.out.println("create User + Practice a/c + funded");
-
-            Map<String, Object> params = new HashMap<>();
-            for (String k: this.userFields) {
-                if (args.containsKey(k)) {
-                    Object v = args.get(k);
-                    params.put(k, v);
-                    //System.out.println("key: " + k + ", value: " + v);
-                }
-            }
-            Map<String, Object> respondMap = executePost(api, params, null);
-
-            String respond = respondMap.get("respond").toString();
-            Map<String, Object> result = gson.fromJson(respond, HashMap.class);
-            int statusCode = (int) respondMap.get("code");
-
-            Account acc = null;
-            // status code: 400 => duplicate username, 200 => OK
-            if (statusCode == 200) {
-                this.login(result.get("username").toString(), result.get("password").toString());
-                acc = this.user.getPracticeAccount();
-                
-                System.out.println("New user + practice a/c created");
-            } else if (statusCode == 400) {
-                System.out.println("User already exists, error: " + result.get("message").toString());
-            }
-
-            return acc;
         }
+
+        // create new user + practice a/c
+        System.out.println("create User + Practice a/c + funded");
+
+        Map<String, Object> params = new HashMap<>();
+        for (String k: this.userFields) {
+            if (args.containsKey(k)) {
+                Object v = args.get(k);
+                params.put(k, v);
+                //System.out.println("key: " + k + ", value: " + v);
+            }
+        }
+        Map<String, Object> respondMap = executePost(url, params, null);
+
+        String respond = respondMap.get("respond").toString();
+        Map<String, Object> result = gson.fromJson(respond, HashMap.class);
+        int statusCode = (int) respondMap.get("code");
+
+        Account acc = null;
+        
+        // status code: 400 => duplicate username, 200 => OK
+        if (statusCode == 200) {
+            System.out.println("New user + practice a/c created");
+            
+            String userName = result.get("username").toString();
+            String password = result.get("password").toString();
+            
+            // Create session for new User
+            Pair<User, Error> session = login(userName, password);
+            // error
+            if (session.second != null) {
+                return null;
+            }
+
+            acc = this.user.getPracticeAccount();
+        } else {
+            Error error = getError(result);
+            Integer code = error.getCode();
+            String message = error.getMessage();
+
+            System.out.println("ERROR createPracticeAccount, code: " + code + ", message: " + message);
+        }
+
+        return acc;
     }
 
     public Map<String, Object> createLiveAccount(Map<String, Object> args) {
@@ -827,14 +816,6 @@ public class DriveWealth {
         return session;
     }
     
-    public Map<String, Object> createSession(Map<String, String> args) {
-        System.out.println("\n[Create Session]");
- 
-        CreateSession createSession = new CreateSession(args);
-        return createSession.getResultMap();
-        
-    }
-
     public boolean cancelSession(String sessionKey) {
         System.out.println("\n[Cancel Session] sessionKey: " + sessionKey);
 
@@ -907,13 +888,6 @@ public class DriveWealth {
      * API: Orders
      ********************/
 
-    public Map<String, Object> createOrder (CreateOrder.OrderSide orderSide, CreateOrder.OrderType orderType, Map<String, Object> args) {
-        System.out.println("\n[create order]: " + orderSide + ", " + orderType);
-
-        CreateOrder createOrder = new CreateOrder(this, orderSide, orderType, args);
-        return createOrder.execute();
-    }
-    
     public boolean cancelOrder (String orderID) {
         System.out.println("\n[Cancel order]: " + orderID);
 
@@ -921,13 +895,6 @@ public class DriveWealth {
         int statusCode = (int) result.get("code");
 
         return statusCode == 200;
-    }
-
-    public Map<String, Object> orderStatus (String orderID) {
-        System.out.println("\n[Order Status]");
-
-        OrderStatus orderStatus = new OrderStatus(this, orderID);
-        return orderStatus.getStatusMap();
     }
 
     /************************
@@ -1372,9 +1339,19 @@ public class DriveWealth {
      ************************/
     
     public String getSessionKey() {
+        if (this.user == null) {
+            return null;
+        }
+
         if (this.user.getSessionKey() == null) {
-            Map<String, Object> result = login(this.user.getUserName(), this.user.getPassword());
-            if (result.containsKey("code") && result.containsKey("message")) {
+            String userName = this.user.getUserName();
+            String password = this.user.getPassword();
+            
+            Pair<User, Error> session = login(userName, password);
+            Error error = session.second;
+            
+            if (error != null) {
+                System.out.println("create session ERROR, code: " + error.getCode() + ", message: " + error.getMessage());
                 return null;
             }
         }
@@ -1497,15 +1474,37 @@ public class DriveWealth {
         return executeHttpCall(deleteMethod);
     }
     
-    public static Map<String, Object> getError (Map<String, Object> result) {
-        Map<String, Object> error = new HashMap<>();
-        error.put("code", result.get("code"));
-        error.put("message", result.get("message"));
-        return error;
+    public static class Error {
+        private final Integer code;
+        private final String message;
+        
+        public Error (Integer code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+        
+        public Integer getCode () {
+            return this.code;
+        }
+        
+        public String getMessage () {
+            return this.message;
+        }
+    }
+    
+    public static Error getError (Map<String, Object> result) {
+        if (result.containsKey("code") && result.containsKey("message")) {
+            return new Error((Integer) result.get("code"), result.get("message").toString());
+        }
+        return null;
     }
     
     public User getUser () {
         return this.user;
+    }
+    
+    public void setUser (User user) {
+        this.user = user;
     }
     
     /*****************
@@ -1516,5 +1515,5 @@ public class DriveWealth {
     public static String hostURL = "https://api.drivewealth.io/v1/";
     public static String reportURL = "http://reports.drivewealth.io/";
     
-    private User user;
+    private User user = null;
 }

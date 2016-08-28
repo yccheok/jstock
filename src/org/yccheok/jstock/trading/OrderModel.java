@@ -8,7 +8,7 @@ package org.yccheok.jstock.trading;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import java.util.Map;
-import org.yccheok.jstock.trading.API.CreateOrder;
+import org.yccheok.jstock.trading.API.OrderManager;
 
 /**
  *
@@ -32,15 +32,15 @@ public class OrderModel {
         Double _stopPrice = 0.0;
         Double _limitPrice = 0.0;
 
-        CreateOrder.OrderType ordType = (CreateOrder.OrderType) ord.get("orderType");
-        if (ordType == CreateOrder.OrderType.LIMIT) {
+        OrderManager.OrderType ordType = (OrderManager.OrderType) ord.get("orderType");
+        if (ordType == OrderManager.OrderType.LIMIT) {
             _limitPrice = (Double) ord.get("limitPrice");
-        } else if (ordType == CreateOrder.OrderType.STOP) {
+        } else if (ordType == OrderManager.OrderType.STOP) {
             _stopPrice = (Double) ord.get("stopPrice");
         }
         this.type = new SimpleStringProperty(ordType.getName());
 
-        CreateOrder.OrderSide ordSide = (CreateOrder.OrderSide) ord.get("side");
+        OrderManager.OrderSide ordSide = (OrderManager.OrderSide) ord.get("side");
         this.side = new SimpleStringProperty(ordSide.getName());
 
         this.units       = new SimpleDoubleProperty((Double) ord.get("units"));

@@ -27,7 +27,6 @@ import javafx.util.Callback;
 import org.yccheok.jstock.trading.OpenPosModel;
 import org.yccheok.jstock.trading.Utils;
 import org.yccheok.jstock.trading.BuySell;
-import org.yccheok.jstock.trading.API.DriveWealth;
 import org.yccheok.jstock.trading.API.User;
 import org.yccheok.jstock.trading.API.Account;
 
