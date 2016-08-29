@@ -13,7 +13,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import org.yccheok.jstock.trading.AccountModel;
-import org.yccheok.jstock.trading.OpenPosModel;
+import org.yccheok.jstock.trading.PositionModel;
 
 /**
  *
@@ -99,7 +99,7 @@ public class AccountSummaryBuilder {
         this.shareAmount.getStyleClass().clear();
     }
     
-    public void update (ObservableList<OpenPosModel> posList) {
+    public void update (ObservableList<PositionModel> posList) {
         this.acc.update(posList);
 
         this.profitAmount.getStyleClass().clear();

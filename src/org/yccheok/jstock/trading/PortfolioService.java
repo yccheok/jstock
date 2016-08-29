@@ -13,10 +13,11 @@ import java.util.Map;
 import java.util.Set;
 import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;
-import org.yccheok.jstock.trading.API.AccountBlotter;
+import org.yccheok.jstock.trading.API.AccountManager;
 import org.yccheok.jstock.trading.API.DriveWealth;
-import org.yccheok.jstock.trading.API.GetMarketData;
 import org.yccheok.jstock.trading.API.User;
+import org.yccheok.jstock.trading.API.InstrumentManager;
+import org.yccheok.jstock.trading.API.MarketDataManager;
 
 /**
  *
@@ -27,11 +28,11 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
     
     private final DriveWealth api;
     
-    private List<OpenPosModel> posList = new ArrayList<>();
+    private List<PositionModel> posList = new ArrayList<>();
     private List<OrderModel> ordList = new ArrayList<>();
     private AccountModel accModel;
     
-    private final Map<String, Map> instruments = new HashMap<>();
+    private final Map<String, InstrumentManager.Instrument> instruments = new HashMap<>();
     private Set symbolsSet;
     private TaskState taskState = TaskState.ACC_BLOTTER;
     private boolean refresh = false;
@@ -79,14 +80,14 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
         public PortfolioTask() {}
 
         private void getAccBlotter (String userID, String accountID) {
-            AccountBlotter accBlot = api.accountBlotter(userID, accountID);
-            
-            // List of positions (OpenPosModel) & pending oders (OrderModel)
+            AccountManager.AccountBlotter accBlot = AccountManager.blotter(api, userID, accountID);
+
+            // List of positions (PositionModel) & pending oders (OrderModel)
             posList = accBlot.getPositions();
             ordList = accBlot.getOrders();
             accModel = accBlot.getAccount();
             symbolsSet = accBlot.getSymbols();
-            
+
             System.out.println("calling account Blotter DONE...");
         }
         
@@ -101,14 +102,14 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
                 if (instruments.containsKey(symbol)) {
                     continue;
                 }
-                
+
                 Map<String, String> param = new HashMap<>();
                 // only search for exact symbol match
                 param.put("symbols", symbol);
-                List<Map<String, Object>> insList = api.searchInstruments(param);
+                List<InstrumentManager.Instrument> insList = InstrumentManager.search(api, param);
 
                 if (insList.size() > 0) {
-                    Map<String, Object> ins = insList.get(0);
+                    InstrumentManager.Instrument ins = insList.get(0);
                     instruments.put(symbol, ins);
                     updated = true;
                 }
@@ -120,10 +121,10 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
         private Map<String, Double> getMarketPrices () {
             // get latest prices for all symbols
             ArrayList<String> symbols = new ArrayList<>(symbolsSet);
-            List<GetMarketData.MarketData> dataList = api.getMarketData(symbols, true);
+            List<MarketDataManager.MarketData> dataList = MarketDataManager.get(symbols, true);
 
             Map<String, Double> prices = new HashMap<>();
-            for (GetMarketData.MarketData marketData : dataList) {
+            for (MarketDataManager.MarketData marketData : dataList) {
                 prices.put(marketData.getSymbol(), marketData.getLastTrade());
             }
             

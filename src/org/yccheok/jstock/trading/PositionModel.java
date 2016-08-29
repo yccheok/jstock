@@ -14,7 +14,7 @@ import javafx.beans.property.SimpleDoubleProperty;
  * @author shuwnyuan
  */
 
-public class OpenPosModel {
+public class PositionModel {
     private final SimpleStringProperty symbol;
     private final SimpleStringProperty name;
     private final SimpleStringProperty instrumentID;
@@ -28,7 +28,7 @@ public class OpenPosModel {
     private final SimpleDoubleProperty unrealizedPL;
 
     
-    public OpenPosModel(Map<String, Object> pos) {
+    public PositionModel(Map<String, Object> pos) {
         this.symbol         = new SimpleStringProperty(pos.get("symbol").toString());
         this.name           = new SimpleStringProperty(pos.get("name").toString());
         this.instrumentID   = new SimpleStringProperty(pos.get("instrumentID").toString());

@@ -24,11 +24,12 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.paint.Color;
 import javafx.util.Callback;
-import org.yccheok.jstock.trading.OpenPosModel;
+import org.yccheok.jstock.trading.PositionModel;
 import org.yccheok.jstock.trading.Utils;
 import org.yccheok.jstock.trading.Transaction;
 import org.yccheok.jstock.trading.API.User;
 import org.yccheok.jstock.trading.API.Account;
+import org.yccheok.jstock.trading.API.InstrumentManager;
 
 /**
  *
@@ -36,16 +37,16 @@ import org.yccheok.jstock.trading.API.Account;
  */
 public class PositionsTableBuilder {
     private final TableView posTable = new TableView();
-    private final ObservableList<OpenPosModel> posList = FXCollections.observableArrayList();
+    private final ObservableList<PositionModel> posList = FXCollections.observableArrayList();
 
     
     public PositionsTableBuilder () {}
     
-    public ObservableList<OpenPosModel> getPosList () {
+    public ObservableList<PositionModel> getPosList () {
         return this.posList;
     }
     
-    private class FormatNumberCell extends TableCell<OpenPosModel, Number> {
+    private class FormatNumberCell extends TableCell<PositionModel, Number> {
         private final boolean style;
 
         public FormatNumberCell (boolean style) {
@@ -96,11 +97,10 @@ public class PositionsTableBuilder {
     }
     
     private void setRowContextMenu () {
-        this.posTable.setRowFactory(
-            new Callback<TableView<OpenPosModel>, TableRow<OpenPosModel>>() {
+        this.posTable.setRowFactory(new Callback<TableView<PositionModel>, TableRow<PositionModel>>() {
                 @Override
-                public TableRow<OpenPosModel> call(TableView<OpenPosModel> tableView) {
-                    final TableRow<OpenPosModel> row = new TableRow<>();
+                public TableRow<PositionModel> call(TableView<PositionModel> tableView) {
+                    final TableRow<PositionModel> row = new TableRow<>();
                     final ContextMenu rowMenu = new ContextMenu();
                     
                     final MenuItem buyItem = new MenuItem("Buy");
@@ -109,9 +109,8 @@ public class PositionsTableBuilder {
                         public void handle(ActionEvent event) {
                             String symbol = row.getItem().getSymbol();
                             String instrumentID = row.getItem().getInstrumentID();
-
                             
-                            System.out.println("Buy button pressed, symbol: " + symbol + "instrumentID: " + instrumentID);
+                            System.out.println("Buy button pressed, symbol: " + symbol + ", instrumentID: " + instrumentID);
 
                             Map<String, Object> params = buildBuyParam(symbol, instrumentID);
                             Transaction.buy(Portfolio.getAPI(), Portfolio.portfolioService, params);
@@ -150,42 +149,42 @@ public class PositionsTableBuilder {
     
     public TableView build () {
         // Open Positions table
-        TableColumn<OpenPosModel, String> symbolCol = new TableColumn<>("Stock");
+        TableColumn<PositionModel, String> symbolCol = new TableColumn<>("Stock");
         symbolCol.setCellValueFactory(new PropertyValueFactory("symbol"));
         symbolCol.getStyleClass().add("left");
 
-        TableColumn<OpenPosModel, String> nameCol = new TableColumn<>("Name");
+        TableColumn<PositionModel, String> nameCol = new TableColumn<>("Name");
         nameCol.setCellValueFactory(new PropertyValueFactory("name"));
         nameCol.getStyleClass().add("left");
 
-        TableColumn<OpenPosModel, Number> unitsCol = new TableColumn<>("Units");
+        TableColumn<PositionModel, Number> unitsCol = new TableColumn<>("Units");
         unitsCol.setCellValueFactory(cellData -> cellData.getValue().openQtyProperty());
-        unitsCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> new FormatNumberCell(false));
+        unitsCol.setCellFactory((TableColumn<PositionModel, Number> col) -> new FormatNumberCell(false));
         unitsCol.getStyleClass().add("right");
 
-        TableColumn<OpenPosModel, Number> avgPriceCol = new TableColumn<>("Average Purchase Price");
+        TableColumn<PositionModel, Number> avgPriceCol = new TableColumn<>("Average Purchase Price");
         avgPriceCol.setCellValueFactory(cellData -> cellData.getValue().averagePriceProperty());
-        avgPriceCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> new FormatNumberCell(false));
+        avgPriceCol.setCellFactory((TableColumn<PositionModel, Number> col) -> new FormatNumberCell(false));
         avgPriceCol.getStyleClass().add("right");
 
-        TableColumn<OpenPosModel, Number> mktPriceCol = new TableColumn<>("Current Price");
+        TableColumn<PositionModel, Number> mktPriceCol = new TableColumn<>("Current Price");
         mktPriceCol.setCellValueFactory(cellData -> cellData.getValue().marketPriceProperty());
-        mktPriceCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> new FormatNumberCell(false));
+        mktPriceCol.setCellFactory((TableColumn<PositionModel, Number> col) -> new FormatNumberCell(false));
         mktPriceCol.getStyleClass().add("right");
 
-        TableColumn<OpenPosModel, Number> costCol = new TableColumn<>("Purchase Value");
+        TableColumn<PositionModel, Number> costCol = new TableColumn<>("Purchase Value");
         costCol.setCellValueFactory(cellData -> cellData.getValue().costBasisProperty());
-        costCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> new FormatNumberCell(false));
+        costCol.setCellFactory((TableColumn<PositionModel, Number> col) -> new FormatNumberCell(false));
         costCol.getStyleClass().add("right");
 
-        TableColumn<OpenPosModel, Number> mktValueCol = new TableColumn<>("Current Value");
+        TableColumn<PositionModel, Number> mktValueCol = new TableColumn<>("Current Value");
         mktValueCol.setCellValueFactory(cellData -> cellData.getValue().marketValueProperty());
-        mktValueCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> new FormatNumberCell(false));
+        mktValueCol.setCellFactory((TableColumn<PositionModel, Number> col) -> new FormatNumberCell(false));
         mktValueCol.getStyleClass().add("right");
         
-        TableColumn<OpenPosModel, Number> plCol = new TableColumn<>("Gain/Loss Value");
+        TableColumn<PositionModel, Number> plCol = new TableColumn<>("Gain/Loss Value");
         plCol.setCellValueFactory(cellData -> cellData.getValue().unrealizedPLProperty());
-        plCol.setCellFactory((TableColumn<OpenPosModel, Number> col) -> new FormatNumberCell(true));
+        plCol.setCellFactory((TableColumn<PositionModel, Number> col) -> new FormatNumberCell(true));
         plCol.getStyleClass().add("right");
 
         symbolCol.setSortable(false);
@@ -217,7 +216,7 @@ public class PositionsTableBuilder {
         return this.posTable;
     }
     
-    public void initData (List<OpenPosModel> positions, Map<String, Map> instruments) {
+    public void initData (List<PositionModel> positions, Map<String, InstrumentManager.Instrument> instruments) {
         this.posList.clear();
         this.posList.addAll(positions);
 
@@ -229,19 +228,19 @@ public class PositionsTableBuilder {
         this.posTable.prefHeightProperty().bind(Bindings.size(this.posTable.getItems()).multiply(this.posTable.getFixedCellSize()).add(30));
     }
 
-    public void updateStocksName (Map<String, Map> instruments) {
-        for (OpenPosModel pos : this.posList) {
+    public void updateStocksName (Map<String, InstrumentManager.Instrument> instruments) {
+        for (PositionModel pos : this.posList) {
             final String symbol = pos.getSymbol();
             
             if (instruments.containsKey(symbol)) {
-                Map<String, Object> ins = instruments.get(symbol);
-                pos.setName(ins.get("name").toString());
+                InstrumentManager.Instrument ins = instruments.get(symbol);
+                pos.setName(ins.getName());
             }
         }
     }
     
     public void updatePrices (Map<String, Double> marketPrices) {
-        for (OpenPosModel pos : this.posList) {
+        for (PositionModel pos : this.posList) {
             final String symbol = pos.getSymbol();
             
             if (marketPrices.containsKey(symbol)) {

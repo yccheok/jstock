@@ -54,12 +54,10 @@ public class Transaction {
 
                 String orderID = order.getOrderID();
 
-                System.out.println("BuyTask call get order status, orderID: " + orderID);
-
                 // Get Order Status
                 order = OrderManager.status(api, orderID);
                 OrderManager.OrdStatus ordStatus = order.getOrdStatusEnum();
-
+                
                 updateMessage("Market Order Status: " + ordStatus.getValue() + " - " + ordStatus.getName());                
                 System.out.println("BuyTask call get order status DONE, order status: "
                         + ordStatus.getValue() + " - " + ordStatus.getName());

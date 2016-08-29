@@ -22,7 +22,8 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
-import org.yccheok.jstock.trading.OpenPosModel;
+import org.yccheok.jstock.trading.API.InstrumentManager;
+import org.yccheok.jstock.trading.PositionModel;
 import org.yccheok.jstock.trading.OrderModel;
 import org.yccheok.jstock.trading.Utils;
 
@@ -51,11 +52,10 @@ public class OrdersTableBuilder {
     }
     
     private void setRowContextMenu () {
-        this.ordTable.setRowFactory(
-            new Callback<TableView<OpenPosModel>, TableRow<OpenPosModel>>() {
+        this.ordTable.setRowFactory(new Callback<TableView<PositionModel>, TableRow<PositionModel>>() {
                 @Override
-                public TableRow<OpenPosModel> call(TableView<OpenPosModel> tableView) {
-                    final TableRow<OpenPosModel> row = new TableRow<>();
+                public TableRow<PositionModel> call(TableView<PositionModel> tableView) {
+                    final TableRow<PositionModel> row = new TableRow<>();
                     final ContextMenu rowMenu = new ContextMenu();
                     
                     final MenuItem cancelItem = new MenuItem("Cancel");
@@ -155,7 +155,7 @@ public class OrdersTableBuilder {
         return this.ordTable;
     }
     
-    public void initData (List<OrderModel> orders, Map<String, Map> instruments, Map<String, Double> marketPrices) {
+    public void initData (List<OrderModel> orders, Map<String, InstrumentManager.Instrument> instruments, Map<String, Double> marketPrices) {
         this.ordList.clear();
         this.ordList.addAll(orders);
         
@@ -169,13 +169,13 @@ public class OrdersTableBuilder {
         this.ordTable.prefHeightProperty().bind(Bindings.size(this.ordTable.getItems()).multiply(this.ordTable.getFixedCellSize()).add(30));
     }
     
-    public void updateStocksName (Map<String, Map> instruments) {
+    public void updateStocksName (Map<String, InstrumentManager.Instrument> instruments) {
         for (OrderModel ord : this.ordList) {
             final String symbol = ord.getSymbol();
             
             if (instruments.containsKey(symbol)) {
-                Map<String, Object> ins = instruments.get(symbol);
-                ord.setName(ins.get("name").toString());
+                InstrumentManager.Instrument ins = instruments.get(symbol);
+                ord.setName(ins.getName());
             }
         }
     }

@@ -89,10 +89,10 @@ public class OrderManager {
             this.orderID        = params.get("orderID").toString();
             this.instrumentID   = params.get("instrumentID").toString();
             this.leavesQty      = (Double) params.get("leavesQty");
-            this.ordType        = params.get("leavesQty").toString();
+            this.ordType        = params.get("ordType").toString();
             this.side           = params.get("side").toString();
             this.orderNo        = params.get("orderNo").toString();
-
+            
             if (params.containsKey("cumQty")) {
                 this.cumQty = (Double) params.get("cumQty");
             }
@@ -296,7 +296,7 @@ public class OrderManager {
 
         // get market price (use "Ask Price" for Buy)
         ArrayList<String> symbols = new ArrayList<>(Arrays.asList(symbol));
-        List<GetMarketData.MarketData> dataList = api.getMarketData(symbols, false);
+        List<MarketDataManager.MarketData> dataList = MarketDataManager.get(symbols, false);
         double askPrice = dataList.get(0).getAsk();
 
         double price = 0;
@@ -322,7 +322,8 @@ public class OrderManager {
         }
 
         // get balance
-        double balance = api.accountBlotter(api.getUser().getUserID(), accountID).getTradingBalance();
+        AccountManager.AccountBlotter accBlotter = AccountManager.blotter(api, api.getUser().getUserID(), accountID);
+        double balance = accBlotter.getTradingBalance();
 
         // check for insufficient balance
         double amount = orderQty * price + commission;
@@ -352,7 +353,7 @@ public class OrderManager {
         if (orderType == OrderType.STOP) {
             // get market price (use "Bid Price" for Sell)
             ArrayList<String> symbols = new ArrayList<>(Arrays.asList(symbol));
-            List<GetMarketData.MarketData> dataList = api.getMarketData(symbols, false);
+            List<MarketDataManager.MarketData> dataList = MarketDataManager.get(symbols, false);
             double bidPrice = dataList.get(0).getBid();
             
             double price = Double.parseDouble(params.get("price").toString());
@@ -367,7 +368,8 @@ public class OrderManager {
         }
         
         // get available trading Qty
-        double availQty = api.accountBlotter(api.getUser().getUserID(), accountID).getAvailableTradingQty(instrumentID);
+        AccountManager.AccountBlotter accBlotter = AccountManager.blotter(api, api.getUser().getUserID(), accountID);
+        double availQty = accBlotter.getAvailableTradingQty(instrumentID);
 
         System.out.println("availableForTradingQty: " + availQty + ", orderQty: " + orderQty);
 
@@ -464,8 +466,8 @@ public class OrderManager {
         double orderQty     = (double) result.get("orderQty");
         String execType     = result.get("execType").toString();
         String ordStatus    = result.get("ordStatus").toString();
-        String ordRejReason = null;
 
+        String ordRejReason     = null;
         OrdStatus ordStatusEnum = null;
 
         // New / Accepted
@@ -504,28 +506,12 @@ public class OrderManager {
             ordStatusEnum = OrdStatus.REJECTED;
             ordRejReason = result.get("ordRejReason").toString();
         }
-
-        Map<String, Object> params = new HashMap<>();
-
-        params.put("cumQty", cumQty);
-        params.put("leavesQty", leavesQty);
-        params.put("orderQty", orderQty);
-        params.put("execType", execType);
-        params.put("ordStatus", ordStatus);
-        params.put("ordRejReason", ordRejReason);
-        // enum of Order Status
-        params.put("ordStatusEnum", ordStatusEnum);
-
-        params.put("orderID", result.get("orderID"));
-        params.put("instrumentID", result.get("instrumentID"));
-        params.put("ordType", result.get("ordType"));
-        params.put("side", result.get("side"));
-        params.put("grossTradeAmt", result.get("grossTradeAmt"));
-
+        
         String reason = (ordRejReason != null)? ", Reason: " + ordRejReason : "";
         System.out.println("Order: " + orderID + ", status: " + ordStatusEnum.getName() + reason);
-        
-        return new Order(params);
+
+        result.put("ordStatusEnum", ordStatusEnum);
+        return new Order(result);
     }
 
     

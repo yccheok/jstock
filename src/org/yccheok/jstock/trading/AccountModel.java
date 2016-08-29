@@ -39,11 +39,11 @@ public class AccountModel {
         this.totalUnrealizedPLPercent.bind(this.totalUnrealizedPL.divide(this.equity.subtract(this.totalUnrealizedPL)).multiply(100));
     }
 
-    public void update (ObservableList<OpenPosModel> posList) {
+    public void update (ObservableList<PositionModel> posList) {
         Double _equity = 0.0;
         Double pl = 0.0;
 
-        for (OpenPosModel pos : posList) {
+        for (PositionModel pos : posList) {
             _equity += pos.getMarketValue();
             pl += pos.getUnrealizedPL();
         }

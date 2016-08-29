@@ -12,7 +12,7 @@ import java.util.Map;
  * @author shuwnyuan
  */
 public class Account {
-    
+
     public Account (Map<String, Object> acc) {
         this.accountID      = acc.get("accountID").toString();
         this.accountNo      = acc.get("accountNo").toString();

@@ -157,28 +157,15 @@ public class SignIn {
                         DriveWealth _api = new DriveWealth();
                         Pair<User, DriveWealth.Error> session = _api.login(username, pwd);
 
-                        System.out.println("2222222222");
-                        
                         User user = session.first;
                         DriveWealth.Error error = session.second;
                         
-                        System.out.println("333333333");
-                        
-                        
                         Map<String, Object> result = new HashMap<>();
                         if (error != null) {
-                            
-                            System.out.println("44444444");
-                        
-                            
                             result.put("error", error.getMessage());
                             return result;
                         }
 
-                        System.out.println("555555555");
-                        
-                        
-                        
                         System.out.println("DriveWealth: username: "    + username
                                             + ", pwd: "                 + pwd
                                             + ", sessionKey: "          + user.getSessionKey()
@@ -186,9 +173,6 @@ public class SignIn {
                                             + ", commission: "          + user.getCommissionRate());
                         
                         result.put("api", _api);
-                        
-                        System.out.println("666666666");
-                        
                         
                         return result;
                     }

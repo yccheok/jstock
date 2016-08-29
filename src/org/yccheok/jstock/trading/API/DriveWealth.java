@@ -416,11 +416,6 @@ public final class DriveWealth {
         return session;
     }
     
-    public AccountBlotter accountBlotter(String userID, String accountID) {
-        System.out.println("\n[Account Blotter] userID:" + userID + ", accountID:" + accountID);
-        return new AccountBlotter(this, userID, accountID);
-    }
-            
     public Map<String, Object> getAccount(String userID, String accountID) {
         System.out.println("\n[getAccount] " + accountID);
         
@@ -877,13 +872,6 @@ public final class DriveWealth {
         return instrument;
     }
 
-    public List<Map<String, Object>> searchInstruments (Map<String, String> args) {
-        System.out.println("\n[searchInstruments]");
-
-        SearchInstruments searchInstrument = new SearchInstruments(this, args);
-        return searchInstrument.getInstrumentList();
-    }
-
     /********************
      * API: Orders
      ********************/
@@ -897,17 +885,6 @@ public final class DriveWealth {
         return statusCode == 200;
     }
 
-    /************************
-     * Market Data
-     ************************/
-    
-    public List<GetMarketData.MarketData> getMarketData (ArrayList<String> symbolList, boolean lastTradeOnly) {
-        System.out.println("\n[Get Market Data]");
-
-        GetMarketData getMarketData = new GetMarketData(symbolList, lastTradeOnly);
-        return getMarketData.getMarketDataList();
-    }
-    
     /********************
      * API: Settings
      ********************/

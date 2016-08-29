@@ -8,7 +8,6 @@ package org.yccheok.jstock.trading.API;
 import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,23 +15,15 @@ import java.util.Map;
  *
  * @author shuwnyuan
  */
-public class GetMarketData {
+public class MarketDataManager {
 
-    private final String url;
-    private final List<MarketData> marketDataList = new ArrayList<>();
+    private MarketDataManager () {}
     
-    private static final List<String> OUTPUT_FIELDS = new ArrayList<>(Arrays.asList(
-        "symbol",
-        "bid",
-        "ask",
-        "lastTrade"
-    ));
-
-    public class MarketData {
+    public static class MarketData {
         private final String symbol;
-        private double bid;
-        private double ask;
-        private double lastTrade;
+        private Double bid = null;
+        private Double ask = null;
+        private Double lastTrade = null;
 
         public MarketData (Map<String, Object> params) {
             this.symbol = params.get("symbol").toString();
@@ -54,53 +45,64 @@ public class GetMarketData {
             return this.symbol;
         }
         
-        public double getBid () {
+        public Double getBid () {
             return this.bid;
         }
         
-        public double getAsk () {
+        public Double getAsk () {
             return this.ask;
         }
         
-        public double getLastTrade () {
+        public Double getLastTrade () {
             return this.lastTrade;
         }
     }
     
     
-    public GetMarketData (ArrayList<String> symbolList, boolean lastTradeOnly) {
+    public static List<MarketData> get (ArrayList<String> symbolList, boolean lastTradeOnly) {
+        List<String> OUTPUT_FIELDS = new ArrayList<>(Arrays.asList(
+            "symbol",
+            "bid",
+            "ask",
+            "lastTrade"
+        ));
+
         String symbols = String.join(",", symbolList);
         System.out.println("symbols: " + symbols);
 
-        this.url = "quotes?symbols=" + symbols;
         // get last Traded price only, no bid & ask return
+        String lastTrade = "";
         if (lastTradeOnly == true) {
-            this.url.concat("&lastTrade=true");
+            lastTrade = "&lastTrade=true";
         }
         
+        String url = "quotes?symbols=" + symbols + lastTrade;
+
         // no Session Key is required, consider as unauthorized call
-        Map<String, Object> respondMap = DriveWealth.executeGet(this.url, null);
+        Map<String, Object> respondMap = DriveWealth.executeGet(url, null);
+
+        List<MarketData> marketDataList = new ArrayList<>();
 
         if ((int) respondMap.get("code") == 200) {
             List<Map<String, Object>> result = new Gson().fromJson(respondMap.get("respond").toString(), ArrayList.class);
 
-            for (Map<String, Object> i : result) {
-                Map<String, Object> params = new HashMap<>();
+            for (Map<String, Object> data : result) {
+                
+                // debugging only
                 for (String k: OUTPUT_FIELDS) {
-                    if (i.containsKey(k)) {
-                        Object v = i.get(k);
-                        params.put(k, v);
+                    if (data.containsKey(k)) {
+                        Object v = data.get(k);
                         //System.out.println("key: " + k + ", value: " + v);
                     }
                 }
-                
-                this.marketDataList.add(new MarketData(params));
+
+                marketDataList.add(new MarketData(data));
             }
         }
+        
+        return marketDataList;
     }
 
-    public List<MarketData> getMarketDataList () {
-        return this.marketDataList;
-    }
+    
     
 }

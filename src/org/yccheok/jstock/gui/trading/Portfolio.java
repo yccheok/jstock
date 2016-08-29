@@ -22,7 +22,8 @@ import javafx.util.Duration;
 import org.yccheok.jstock.trading.AccountModel;
 import org.yccheok.jstock.trading.PortfolioService;
 import org.yccheok.jstock.trading.API.DriveWealth;
-import org.yccheok.jstock.trading.OpenPosModel;
+import org.yccheok.jstock.trading.API.InstrumentManager;
+import org.yccheok.jstock.trading.PositionModel;
 import org.yccheok.jstock.trading.OrderModel;
 
 
@@ -68,7 +69,7 @@ public class Portfolio {
                 }
 
                 if (state.equals("ACC_BLOTTER")) {
-                    List<OpenPosModel> posList = (List) result.get("posList");
+                    List<PositionModel> posList = (List) result.get("posList");
                     List<OrderModel> ordList = (List) result.get("ordList");
                     AccountModel accModel = (AccountModel) result.get("accModel");
                     
@@ -77,7 +78,7 @@ public class Portfolio {
                     accSummaryBuilder.initData(accModel);
                 } else {
                     if (state.equals("INSTRUMENTS")) {
-                        instruments = (Map<String, Map>) result.get("instruments");
+                        instruments = (Map<String, InstrumentManager.Instrument>) result.get("instruments");
                         
                         // new instruments added from last call
                         if ((boolean) result.get("updated") == true) {
@@ -146,7 +147,7 @@ public class Portfolio {
 
     private static DriveWealth api;
     
-    private Map<String, Map> instruments = new HashMap<>();
+    private Map<String, InstrumentManager.Instrument> instruments = new HashMap<>();
     private Map<String, Double> marketPrices;
 
     private final PositionsTableBuilder posTableBuilder = new PositionsTableBuilder();

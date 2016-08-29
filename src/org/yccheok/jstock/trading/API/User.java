@@ -76,7 +76,6 @@ public class User {
         return false;
     }
 
-    
     private final String username;
     private final String password;
     private final String userID;
