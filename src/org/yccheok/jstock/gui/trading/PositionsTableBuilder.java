@@ -26,7 +26,7 @@ import javafx.scene.paint.Color;
 import javafx.util.Callback;
 import org.yccheok.jstock.trading.OpenPosModel;
 import org.yccheok.jstock.trading.Utils;
-import org.yccheok.jstock.trading.BuySell;
+import org.yccheok.jstock.trading.Transaction;
 import org.yccheok.jstock.trading.API.User;
 import org.yccheok.jstock.trading.API.Account;
 
@@ -113,10 +113,8 @@ public class PositionsTableBuilder {
                             
                             System.out.println("Buy button pressed, symbol: " + symbol + "instrumentID: " + instrumentID);
 
-                            
-                            BuySell buySell = new BuySell(Portfolio.getAPI(), Portfolio.portfolioService);
                             Map<String, Object> params = buildBuyParam(symbol, instrumentID);
-                            buySell.buy(params);
+                            Transaction.buy(Portfolio.getAPI(), Portfolio.portfolioService, params);
                         }
                     });
                     

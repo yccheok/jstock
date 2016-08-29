@@ -82,8 +82,9 @@ public class OrderManager {
         private Double accountType = null;
         private Double orderQty = null;
         private Double commission = null;
+        // enum for ordStatus
+        private OrdStatus ordStatusEnum = null;
 
-        
         public Order (Map<String, Object> params) {
             this.orderID        = params.get("orderID").toString();
             this.instrumentID   = params.get("instrumentID").toString();
@@ -122,6 +123,10 @@ public class OrderManager {
             
             if (params.containsKey("commission")) {
                 this.commission = (Double) params.get("commission");
+            }
+            
+            if (params.containsKey("ordStatusEnum")) {
+                this.ordStatusEnum = (OrdStatus) params.get("ordStatusEnum");
             }
         }
         
@@ -179,6 +184,10 @@ public class OrderManager {
         
         public Double getCommission () {
             return this.commission;
+        }
+
+        public OrdStatus getOrdStatusEnum () {
+            return this.ordStatusEnum;
         }
     }
 
@@ -374,26 +383,30 @@ public class OrderManager {
     }
     
     public static enum OrdStatus {
-        ACCEPTED("ACCEPTED"),
-        FILLED("FILLED"),
-        PARTIAL_FILLED("PARTIAL_FILLED"),
-        CANCELLED("CANCELLED"),
-        REJECTED("REJECTED"),
-        // Failed to create order
-        ERROR("ERROR");
-        
+        NEW("0", "NEW"),
+        PARTIAL_FILLED("1", "PARTIAL_FILLED"),
+        FILLED("2", "FILLED"),
+        CANCELLED("4", "CANCELLED"),
+        REJECTED("8", "REJECTED");
+
         private final String value;
+        private final String name;
         
-        private OrdStatus (String value) {
+        private OrdStatus (String value, String name) {
             this.value = value;
+            this.name = name;
         }
         
         public String getValue () {
             return this.value;
         }
+        
+        public String getName () {
+            return this.name;
+        }
     }
 
-    public static Pair<OrderManager.Order, OrdStatus> status (DriveWealth api, String orderID) {
+    public static Order status (DriveWealth api, String orderID) {
         String url = "orders/" + orderID;
         
         List<String> RESULT_FIELDS = new ArrayList<>(Arrays.asList(
@@ -450,56 +463,58 @@ public class OrderManager {
         double leavesQty    = (double) result.get("leavesQty");
         double orderQty     = (double) result.get("orderQty");
         String execType     = result.get("execType").toString();
-        String status       = result.get("ordStatus").toString();
+        String ordStatus    = result.get("ordStatus").toString();
         String ordRejReason = null;
 
-        OrdStatus ordStatus = OrdStatus.ERROR;
+        OrdStatus ordStatusEnum = null;
 
-        // accepted
+        // New / Accepted
         if (    orderQty == leavesQty
                 && execType.equals("0")
-                && status.equals("0")
+                && ordStatus.equals("0")
         ) {
-            ordStatus = OrdStatus.ACCEPTED;
-        }
-        // filled
-        else if (  orderQty == cumQty
-                && execType.equals("2")
-                && status.equals("2")
-        ) {
-            ordStatus = OrdStatus.FILLED;
+            ordStatusEnum = OrdStatus.NEW;
         }
         // partially filled
         else if (  orderQty > cumQty
                 && execType.equals("1")
-                && status.equals("1")
+                && ordStatus.equals("1")
         ) {
-            ordStatus = OrdStatus.PARTIAL_FILLED;
+            ordStatusEnum = OrdStatus.PARTIAL_FILLED;
+        }
+        // filled
+        else if (  orderQty == cumQty
+                && execType.equals("2")
+                && ordStatus.equals("2")
+        ) {
+            ordStatusEnum = OrdStatus.FILLED;
         }
         // Cancelled
         else if (  orderQty == leavesQty
                 && execType.equals("4")
-                && status.equals("4")
+                && ordStatus.equals("4")
         ) {
-            ordStatus = OrdStatus.CANCELLED;
+            ordStatusEnum = OrdStatus.CANCELLED;
         }
         // Rejected
         else if (  leavesQty == 0
                 && execType.equals("8")
-                && status.equals("8")
+                && ordStatus.equals("8")
         ) {
-            ordStatus = OrdStatus.REJECTED;
+            ordStatusEnum = OrdStatus.REJECTED;
             ordRejReason = result.get("ordRejReason").toString();
         }
 
         Map<String, Object> params = new HashMap<>();
-        
+
         params.put("cumQty", cumQty);
         params.put("leavesQty", leavesQty);
         params.put("orderQty", orderQty);
         params.put("execType", execType);
-        params.put("status", status);
+        params.put("ordStatus", ordStatus);
         params.put("ordRejReason", ordRejReason);
+        // enum of Order Status
+        params.put("ordStatusEnum", ordStatusEnum);
 
         params.put("orderID", result.get("orderID"));
         params.put("instrumentID", result.get("instrumentID"));
@@ -507,12 +522,10 @@ public class OrderManager {
         params.put("side", result.get("side"));
         params.put("grossTradeAmt", result.get("grossTradeAmt"));
 
-        OrderManager.Order order = new OrderManager.Order (params);
-
         String reason = (ordRejReason != null)? ", Reason: " + ordRejReason : "";
-        System.out.println("Order: " + orderID + ", status: " + ordStatus.getValue() + reason);
+        System.out.println("Order: " + orderID + ", status: " + ordStatusEnum.getName() + reason);
         
-        return new Pair<>(order, ordStatus);
+        return new Order(params);
     }
 
     
