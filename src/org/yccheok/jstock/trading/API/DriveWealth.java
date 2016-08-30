@@ -430,7 +430,7 @@ public final class DriveWealth {
         Map<String, Object> result = gson.fromJson(respondMap.get("respond").toString(), HashMap.class);
 
         Map<String, Object> account = new HashMap<>();
-        for (String k: this.accountFields) {
+        for (String k: accountFields) {
             if (result.containsKey(k)) {
                 Object v = result.get(k);
                 account.put(k, v);
@@ -449,7 +449,7 @@ public final class DriveWealth {
         
         for (Map<String, Object> a : result) {
             Map<String, Object> accMap = new HashMap<>();
-            for (String k: this.accountFields) {
+            for (String k: accountFields) {
                 if (a.containsKey(k)) {
                     Object v = a.get(k);
                     accMap.put(k, v);
@@ -486,13 +486,13 @@ public final class DriveWealth {
             String userID = args.get("userID").toString();
             
             // existing user requires SignIn: to create SessionKey
-            if (this.user == null || !this.user.getUserID().equals(userID)) {
+            if (DriveWealth.user == null || ! DriveWealth.user.getUserID().equals(userID)) {
                 System.out.println("Please Sign In, userID: " + userID);
                 return null;
             }
 
             // practice acc exists
-            List<SessionManager.Account> accs = this.user.getPracticeAccounts();
+            List<SessionManager.Account> accs = DriveWealth.user.getPracticeAccounts();
             SessionManager.Account acc = accs.get(0);
             
             if (acc != null) {
@@ -512,25 +512,23 @@ public final class DriveWealth {
             System.out.println("user already exist, created practice accountID: " + accountID);
 
             // Login to create session
-            String userName = this.user.getUserName();
-            String password = this.user.getPassword();
+            String userName = DriveWealth.user.getUserName();
+            String password = DriveWealth.user.getPassword();
 
             Pair<SessionManager.Session, Error> login = login(userName, password);
-            SessionManager.Session session = login.first;
-            Error error = login.second;
 
-            if (error != null) {
+            if (login.second != null) {
                 return null;
             }
 
-            return this.user.getPracticeAccounts().get(0);
+            return DriveWealth.user.getPracticeAccounts().get(0);
         }
 
         // create new user + practice a/c
         System.out.println("create User + Practice a/c + funded");
 
         Map<String, Object> params = new HashMap<>();
-        for (String k: this.userFields) {
+        for (String k: userFields) {
             if (args.containsKey(k)) {
                 Object v = args.get(k);
                 params.put(k, v);
@@ -559,7 +557,7 @@ public final class DriveWealth {
                 return null;
             }
 
-            acc = this.user.getPracticeAccounts().get(0);
+            acc = DriveWealth.user.getPracticeAccounts().get(0);
         } else {
             Error error = getError(result);
             Integer code = error.getCode();
@@ -576,7 +574,7 @@ public final class DriveWealth {
         System.out.println("\n[Create Live Account]");
 
         Map<String, Object> params = new HashMap<>();
-        for (String k: this.liveAccountFields) {
+        for (String k: liveAccountFields) {
             if (args.containsKey(k)) {
                 Object v = args.get(k);
                 params.put(k, v);
@@ -629,7 +627,7 @@ public final class DriveWealth {
         System.out.println("\n[create User Only]");
 
         Map<String, Object> params = new HashMap<>();
-        for (String k: this.userFields) {
+        for (String k: userFields) {
             if (k.equals("tranAmount")) {
                 continue;
             }
@@ -667,7 +665,7 @@ public final class DriveWealth {
         Map<String, Object> result  = gson.fromJson(respondMap.get("respond").toString(), HashMap.class);
 
         Map<String, Object> user = new HashMap<>();
-        for (String k: this.getUserFields) {
+        for (String k: getUserFields) {
             if (result.containsKey(k)) {
                 Object v = result.get(k);
                 user.put(k, v);
@@ -695,7 +693,7 @@ public final class DriveWealth {
         Map<String, Object> result  = gson.fromJson(respondMap.get("respond").toString(), HashMap.class);
 
         Map<String, Object> status = new HashMap<>();
-        for (String k: this.userStatusFields) {
+        for (String k: userStatusFields) {
             if (result.containsKey(k)) {
                 Object v = result.get(k);
                 status.put(k, v);
@@ -726,7 +724,7 @@ public final class DriveWealth {
         String userID = args.get("userID").toString();
 
         Map<String, Object> params = new HashMap<>();
-        for (String k: this.updateUserFields) {
+        for (String k: updateUserFields) {
             if (args.containsKey(k)) {
                 String v = args.get(k);
                 
@@ -773,7 +771,7 @@ public final class DriveWealth {
 
         String passwordResetID = args.get("passwordResetID");
         Map<String, Object> params = new HashMap<>();
-        for (String k: this.resetPasswordFields) {
+        for (String k: resetPasswordFields) {
             if (args.containsKey(k)) {
                 String v = args.get(k);
                 params.put(k, v);
@@ -805,7 +803,7 @@ public final class DriveWealth {
         System.out.println("Get Session, login state: " + login);
 
         Map<String, Object> session = new HashMap<>();
-        for (String k: this.getSessionFields) {
+        for (String k: getSessionFields) {
             if (result.containsKey(k)) {
                 Object v = result.get(k);
                 session.put(k, v);
@@ -842,7 +840,7 @@ public final class DriveWealth {
 
             for (Map<String, Object> i : result) {
                 Map<String, Object> instrument = new HashMap<>();
-                for (String k: this.instrumentFields) {
+                for (String k: instrumentFields) {
                     if (i.containsKey(k)) {
                         Object v = i.get(k);
                         instrument.put(k, v);
@@ -864,7 +862,7 @@ public final class DriveWealth {
         if ((int) respondMap.get("code") == 200) {
             Map<String, Object> result = gson.fromJson(respondMap.get("respond").toString(), HashMap.class);
 
-            for (String k: this.getInstrumentFields) {
+            for (String k: getInstrumentFields) {
                 if (result.containsKey(k)) {
                     Object v = result.get(k);
                     instrument.put(k, v);
@@ -895,11 +893,11 @@ public final class DriveWealth {
     public Map<String, Object> getSetting (String key) {
         System.out.println("\n[Get Setting]");
 
-        Map<String, Object> respondMap = executeGet("users/" + this.user.getUserID() + "/settings/" + key, getSessionKey());
+        Map<String, Object> respondMap = executeGet("users/" + DriveWealth.user.getUserID() + "/settings/" + key, getSessionKey());
         Map<String, Object> result = gson.fromJson(respondMap.get("respond").toString(), HashMap.class);
         Map<String, Object> setting = new HashMap<>();
 
-        for (String k: this.settingFields) {
+        for (String k: settingFields) {
             if (result.containsKey(k)) {
                 Object v = result.get(k);
                 setting.put(k, v);
@@ -912,13 +910,13 @@ public final class DriveWealth {
     public List<Map<String, Object>> listAllSettings () {
         System.out.println("\n[List all Settings]");
 
-        Map<String, Object> respondMap = executeGet("users/" + this.user.getUserID() + "/settings", getSessionKey());
+        Map<String, Object> respondMap = executeGet("users/" + DriveWealth.user.getUserID() + "/settings", getSessionKey());
         List<Map<String, Object>> result = gson.fromJson(respondMap.get("respond").toString(), ArrayList.class);
         List<Map<String, Object>> settings = new ArrayList<>();
         
         for (Map<String, Object> a : result) {
             Map<String, Object> setting = new HashMap<>();
-            for (String k: this.settingFields) {
+            for (String k: settingFields) {
                 if (a.containsKey(k)) {
                     Object v = a.get(k);
                     setting.put(k, v);
@@ -934,17 +932,17 @@ public final class DriveWealth {
         System.out.println("\n[Create Setting]");
 
         Map<String, Object> params = new HashMap<>();
-        params.put("userID", this.user.getUserID());
+        params.put("userID", DriveWealth.user.getUserID());
         params.put("key", args.get("key"));
         params.put("value", args.get("value"));
         
-        Map<String, Object> respondMap = executePost("users/" + this.user.getUserID() + "/settings", params, getSessionKey());
+        Map<String, Object> respondMap = executePost("users/" + DriveWealth.user.getUserID() + "/settings", params, getSessionKey());
         String respond = respondMap.get("respond").toString();
         Map<String, Object> result = gson.fromJson(respond, HashMap.class);
 
         Map<String, Object> setting = new HashMap<>();
             
-        for (String k: this.settingFields) {
+        for (String k: settingFields) {
             if (result.containsKey(k)) {
                 Object v = result.get(k);
                 setting.put(k, v);
@@ -957,7 +955,7 @@ public final class DriveWealth {
     public boolean deleteSetting (String key) {
         System.out.println("\n[Delete Setting]");
 
-        Map<String, Object> result = executeDelete("users/" + this.user.getUserID() + "/settings/" + key, getSessionKey());
+        Map<String, Object> result = executeDelete("users/" + DriveWealth.user.getUserID() + "/settings/" + key, getSessionKey());
         int statusCode = (int) result.get("code");
 
         return statusCode == 200;
@@ -1089,7 +1087,7 @@ public final class DriveWealth {
                 DateStart = "&DateStart=" + args.get("DateStart");
                 DateEnd = "&DateEnd=" + args.get("DateEnd");
 
-                txnFields = this.financialTxnFields;
+                txnFields = financialTxnFields;
                 break;
             case ORDER_TRANS:
                 DateStart = "&DateStart=" + args.get("DateStart");
@@ -1100,10 +1098,10 @@ public final class DriveWealth {
                     symbol = "&symbol=" + args.get("symbol");
                 }
 
-                txnFields = this.orderTxnFields;
+                txnFields = orderTxnFields;
                 break;
             case POSITION_RESTING_ORDER:
-                txnFields = this.openPosFields;
+                txnFields = openPosFields;
                 break;
             default:
                 System.out.println("Unsupported reportType: " + reportName.getValue());
@@ -1221,7 +1219,7 @@ public final class DriveWealth {
             System.out.println("\n\n stock [" + cnt++ + "]\n\n");
 
             Map<String, Object> stock = new HashMap<>();
-            for (String k: this.stockFields) {
+            for (String k: stockFields) {
                 if (a.containsKey(k)) {
                     Object v = a.get(k);
                     stock.put(k, v);
@@ -1233,7 +1231,7 @@ public final class DriveWealth {
             Map<String, Object> ins = (Map<String, Object>) stock.get("instrument");
             Map<String, Object> instrument = new HashMap<>();
 
-            for (String k: this.stockInstrumentFields) {
+            for (String k: stockInstrumentFields) {
                 if (ins.containsKey(k)) {
                     Object v = ins.get(k);
                     instrument.put(k, v);
@@ -1282,7 +1280,7 @@ public final class DriveWealth {
         
         for (Map<String, Object> a : result) {
             Map<String, Object> statement = new HashMap<>();
-            for (String k: this.listStatementFields) {
+            for (String k: listStatementFields) {
                 if (a.containsKey(k)) {
                     Object v = a.get(k);
                     statement.put(k, v);
@@ -1302,7 +1300,7 @@ public final class DriveWealth {
         Map<String, Object> result = gson.fromJson(respondMap.get("respond").toString(), HashMap.class);
 
         Map<String, Object> statement = new HashMap<>();
-        for (String k: this.getStatementFields) {
+        for (String k: getStatementFields) {
             if (result.containsKey(k)) {
                 Object v = result.get(k);
                 statement.put(k, v);
