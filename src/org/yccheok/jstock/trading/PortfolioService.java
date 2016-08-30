@@ -14,8 +14,8 @@ import java.util.Set;
 import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;
 import org.yccheok.jstock.trading.API.AccountManager;
+import org.yccheok.jstock.trading.API.SessionManager;
 import org.yccheok.jstock.trading.API.DriveWealth;
-import org.yccheok.jstock.trading.API.User;
 import org.yccheok.jstock.trading.API.InstrumentManager;
 import org.yccheok.jstock.trading.API.MarketDataManager;
 
@@ -154,12 +154,12 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
         @Override
         protected Map<String, Object> call() throws Exception {
             checkResetState();
-            
+
             Map<String, Object> result = new HashMap<>();
 
-            User user = api.getUser();
+            SessionManager.User user = DriveWealth.getUser();
             String userID = user.getUserID();
-            String accountID = user.getPracticeAccount().getAccountID();
+            String accountID = user.getActiveAccount().getAccountID();
             
             if (userID != null && accountID != null) {
                 result.put("state", taskState.getValue());

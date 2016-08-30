@@ -41,8 +41,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import org.yccheok.jstock.trading.API.DriveWealth;
-import org.yccheok.jstock.trading.API.User;
-import org.yccheok.jstock.trading.API.Account;
+import org.yccheok.jstock.trading.API.SessionManager;
 import org.yccheok.jstock.engine.Pair;
 
 /**
@@ -150,16 +149,17 @@ public class SignIn {
                     return;
                 }
 
-                Task< Map<String, Object> > task = new Task< Map<String, Object> >() {
+                Task< Map<String, Object> > loginTask = new Task< Map<String, Object> >() {
                     @Override protected Map<String, Object> call() throws Exception {
                         System.out.println("Drive Wealth User Sign In....\n\n ");
 
                         DriveWealth _api = new DriveWealth();
-                        Pair<User, DriveWealth.Error> session = _api.login(username, pwd);
+                        Pair<SessionManager.Session, DriveWealth.Error> login = _api.login(username, pwd);
 
-                        User user = session.first;
-                        DriveWealth.Error error = session.second;
-                        
+                        SessionManager.Session session = login.first;
+                        DriveWealth.Error error = login.second;
+                        SessionManager.User user = session.getUser();
+
                         Map<String, Object> result = new HashMap<>();
                         if (error != null) {
                             result.put("error", error.getMessage());
@@ -168,7 +168,7 @@ public class SignIn {
 
                         System.out.println("DriveWealth: username: "    + username
                                             + ", pwd: "                 + pwd
-                                            + ", sessionKey: "          + user.getSessionKey()
+                                            + ", sessionKey: "          + session.getSessionKey()
                                             + ", userID: "              + user.getUserID()
                                             + ", commission: "          + user.getCommissionRate());
                         
@@ -178,10 +178,10 @@ public class SignIn {
                     }
                 };
 
-                task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+                loginTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
                     @Override
                     public void handle(WorkerStateEvent t) {
-                        Map<String, Object> result = task.getValue();
+                        Map<String, Object> result = loginTask.getValue();
 
                         if (result.containsKey("error")) {
                             System.out.println("Sign In failed, code: " + result.get("error"));
@@ -189,11 +189,13 @@ public class SignIn {
                         } else {
                             api = (DriveWealth) result.get("api");
 
-                            User user = api.getUser();
+                            SessionManager.User user = DriveWealth.getUser();
                             if (user != null && api.getSessionKey() != null) {
                                 System.out.println("Successfully Sign In, userID: " + user.getUserID());
 
-                                Account acc = user.getPracticeAccount();
+                                SessionManager.Account acc = user.getPracticeAccounts().get(0);
+                                user.setActiveAccount(acc);
+
                                 String welcomeStr;
 
                                 if (acc == null) {
@@ -206,7 +208,7 @@ public class SignIn {
                                     acc = api.createPracticeAccount(params);
                                     */
                                 } else {
-                                    welcomeStr = "Start trading now with " + acc.getNickName()
+                                    welcomeStr = "Start trading with Practice Account "
                                         + ".\n AccountNo: " + acc.getAccountNo()
                                         + "\n AccountID: " + acc.getAccountID()
                                         + "\n Balance: " + acc.getCash();
@@ -238,7 +240,7 @@ public class SignIn {
                     }
                 });
 
-                new Thread(task).start();
+                new Thread(loginTask).start();
 
                 // disable "Sign In" button
                 signInBtn.setDisable(true);

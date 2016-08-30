@@ -406,14 +406,17 @@ public final class DriveWealth {
      * API: Accounts
      ********************/
 
-    public Pair<User, Error> login (String userName, String password) {
-        Pair<User, Error> session = SessionManager.create(userName, password);
-        User _user = session.first;
+    public static Pair<SessionManager.Session, Error> login (String userName, String password) {
+        Pair<SessionManager.Session, Error> createSession = SessionManager.create(userName, password);
+        
+        SessionManager.Session _session = createSession.first;
 
-        if (_user != null) {
-            this.setUser(_user);
+        if (_session != null) {
+            session = _session;
+            user    = _session.getUser();
         }
-        return session;
+        
+        return createSession;
     }
     
     public Map<String, Object> getAccount(String userID, String accountID) {
@@ -459,13 +462,6 @@ public final class DriveWealth {
             // accountTypeID: 1 => Practice a/c, 2 => Live a/c
             String accountType = (accountTypeID == 1) ? "Practice" : "Live";
 
-            Account acc = new Account(accMap);
-            if (accountTypeID == 1) {
-                this.user.setPracticeAccount(acc);
-            } else if (accountTypeID == 2) {
-                this.user.setLiveAccount(acc);
-            }
-            
             System.out.println("accountID: " + accountID + ", accountNo: " + accountNo + ", accountType: " + accountType + ", cash" + cash);
         }
         return accounts;
@@ -477,7 +473,7 @@ public final class DriveWealth {
         if user & practice accMap exist, POST with userID returns existing accountID
     */
 
-    public Account createPracticeAccount(Map<String, Object> args) {
+    public SessionManager.Account createPracticeAccount(Map<String, Object> args) {
         System.out.println("\n[create Practice Account]");
         String url = "signups/practice";
         
@@ -492,7 +488,9 @@ public final class DriveWealth {
             }
 
             // practice acc exists
-            Account acc = this.user.getPracticeAccount();
+            List<SessionManager.Account> accs = this.user.getPracticeAccounts();
+            SessionManager.Account acc = accs.get(0);
+            
             if (acc != null) {
                 System.out.println("Practice a/c exists: accountID: " + acc.getAccountID() + ", accountNo: " + acc.getAccountNo());
                 return acc;
@@ -509,17 +507,19 @@ public final class DriveWealth {
             String accountID = result.get("accountID").toString();
             System.out.println("user already exist, created practice accountID: " + accountID);
 
-            // Login to call Create Session again to populate User with new practice a/c
+            // Login to create session
             String userName = this.user.getUserName();
             String password = this.user.getPassword();
-            
-            Pair<User, Error> session = login(userName, password);
-            // error
-            if (session.second != null) {
+
+            Pair<SessionManager.Session, Error> login = login(userName, password);
+            SessionManager.Session session = login.first;
+            Error error = login.second;
+
+            if (error != null) {
                 return null;
             }
-            
-            return this.user.getPracticeAccount();
+
+            return this.user.getPracticeAccounts().get(0);
         }
 
         // create new user + practice a/c
@@ -539,7 +539,7 @@ public final class DriveWealth {
         Map<String, Object> result = gson.fromJson(respond, HashMap.class);
         int statusCode = (int) respondMap.get("code");
 
-        Account acc = null;
+        SessionManager.Account acc = null;
         
         // status code: 400 => duplicate username, 200 => OK
         if (statusCode == 200) {
@@ -549,13 +549,13 @@ public final class DriveWealth {
             String password = result.get("password").toString();
             
             // Create session for new User
-            Pair<User, Error> session = login(userName, password);
+            Pair<SessionManager.Session, Error> login = login(userName, password);
             // error
-            if (session.second != null) {
+            if (login.second != null) {
                 return null;
             }
 
-            acc = this.user.getPracticeAccount();
+            acc = this.user.getPracticeAccounts().get(0);
         } else {
             Error error = getError(result);
             Integer code = error.getCode();
@@ -818,7 +818,6 @@ public final class DriveWealth {
         int statusCode = (int) result.get("code");
 
         if (statusCode == 200) {
-            this.user.setSessionKey(null);
             return true;
         }
         return false;
@@ -1316,23 +1315,10 @@ public final class DriveWealth {
      ************************/
     
     public String getSessionKey() {
-        if (this.user == null) {
+        if (session == null) {
             return null;
         }
-
-        if (this.user.getSessionKey() == null) {
-            String userName = this.user.getUserName();
-            String password = this.user.getPassword();
-            
-            Pair<User, Error> session = login(userName, password);
-            Error error = session.second;
-            
-            if (error != null) {
-                System.out.println("create session ERROR, code: " + error.getCode() + ", message: " + error.getMessage());
-                return null;
-            }
-        }
-        return this.user.getSessionKey();
+        return session.getSessionKey();
     }
     
     /************************
@@ -1476,12 +1462,20 @@ public final class DriveWealth {
         return null;
     }
     
-    public User getUser () {
-        return this.user;
+    public static SessionManager.User getUser () {
+        return user;
     }
     
-    public void setUser (User user) {
-        this.user = user;
+    public static void setUser (SessionManager.User _user) {
+        user = _user;
+    }
+    
+    public static SessionManager.Session getSession () {
+        return session;
+    }
+    
+    public static void setSession (SessionManager.Session _session) {
+        session = _session;
     }
     
     /*****************
@@ -1492,5 +1486,6 @@ public final class DriveWealth {
     public static String hostURL = "https://api.drivewealth.io/v1/";
     public static String reportURL = "http://reports.drivewealth.io/";
     
-    private User user = null;
+    private static SessionManager.User user = null;
+    private static SessionManager.Session session = null;
 }

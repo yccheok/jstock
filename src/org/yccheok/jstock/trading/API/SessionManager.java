@@ -22,8 +22,165 @@ public class SessionManager {
     // avoid being instantiated as object instance
     private SessionManager () {}
 
+    public static class Session {
+        private final String sessionKey;
+        private final User user;
+
+        public Session (Map<String, Object> params) {
+            this.sessionKey = params.get("sessionKey").toString();
+            this.user = new User(params);
+        }
+        
+        public String getSessionKey () {
+            return this.sessionKey;
+        }
+        
+        public User getUser () {
+            return this.user;
+        }
+    }
     
-    public static Pair<User, DriveWealth.Error> create (String userName, String password) {
+    public static class User {
+        private final String username;
+        private final String password;
+        private final String userID;
+        private final Double commissionRate;
+        private final List<Account> accounts = new ArrayList<>();
+        private Account activeAccount = null;
+        
+        
+        public User (Map<String, Object> params) {
+            this.username       = params.get("username").toString();
+            this.password       = params.get("password").toString();
+            this.userID         = params.get("userID").toString(); 
+            this.commissionRate = (Double) params.get("commissionRate");
+            
+            // populate user accounts
+            List<Map<String, Object>> accs = (ArrayList) params.get("accounts");
+            for (Map<String, Object> accMap : accs) {
+
+                System.out.println("Create session, class of accountType: "
+                        + accMap.get("accountType").getClass());
+
+                Account acc = new Account(accMap);
+                this.accounts.add(acc);
+            }
+        }
+
+        public String getUserName () {
+            return this.username;
+        }
+
+        public String getPassword () {
+            return this.password;
+        }
+
+        public String getUserID () {
+            return this.userID;
+        }
+
+        public Double getCommissionRate () {
+            return this.commissionRate;
+        }
+
+        public List<Account> getAccounts () {
+            return this.accounts;
+        }
+        
+        public List<Account> getPracticeAccounts () {
+            return getAccountsByType(AccountType.PRACTICE);
+        }
+
+        public List<Account> getLiveAccounts () {
+            return getAccountsByType(AccountType.LIVE);
+        }
+
+        private List<Account> getAccountsByType (AccountType accType) {
+            List<Account> accounts = new ArrayList<>();
+            
+            for (Account acc: this.accounts) {
+                if (acc.getAccountType() == accType) {
+                    accounts.add(acc);
+                }
+            }
+            return accounts;
+        }
+        
+        public void setActiveAccount (Account account) {
+            this.activeAccount = account;
+        }
+        
+        public Account getActiveAccount () {
+            return this.activeAccount;
+        }
+    }
+    
+    public static enum AccountType {
+        PRACTICE(1, "PRACTICE"),
+        LIVE(2, "LIVE");
+
+        private final Integer value;
+        private final String name;
+
+        private AccountType(Integer value, String name) {
+           this.value = value;
+           this.name = name;
+        }
+
+        public Integer getValue () {
+            return this.value;
+        }
+
+        public String getName () {
+            return this.name;
+        }
+    }
+
+    public static class Account {
+        
+        public Account (Map<String, Object> acc) {
+            this.accountID      = acc.get("accountID").toString();
+            this.accountNo      = acc.get("accountNo").toString();
+            this.userID         = acc.get("userID").toString();
+            this.cash           = (Double) acc.get("cash");
+
+            Double type = (Double) acc.get("accountType");
+            if (type == 1) {
+                this.accountType = AccountType.PRACTICE;
+            } else {
+                this.accountType = AccountType.LIVE;
+            }
+        }
+
+        public String getAccountID () {
+            return this.accountID;
+        }
+
+        public String getAccountNo () {
+            return this.accountNo;
+        }
+
+        public String getUserID () {
+            return this.userID;
+        }
+
+        public AccountType getAccountType () {
+            return this.accountType;
+        }
+
+        public Double getCash () {
+            return this.cash;
+        }
+
+        private final String accountID;
+        private final String accountNo;
+        private final String userID;
+        private final AccountType accountType;
+        private final Double cash;
+    }
+    
+    
+    public static Pair<Session, DriveWealth.Error> create (String userName, String password) {
         String url = "userSessions";
 
         List<String> INPUT_FIELDS = new ArrayList<>(Arrays.asList(
@@ -75,50 +232,27 @@ public class SessionManager {
         String respond = respondMap.get("respond").toString();
         Map<String, Object> result  = new Gson().fromJson(respond, HashMap.class);
 
-        Map<String, Object> resultMap = new HashMap<>();
-        User user = null;
+        Session session = null;
         DriveWealth.Error error = null;
 
         if ((int) respondMap.get("code") == 200) {
+            // debugging only
             for (String k: OUTPUT_FIELDS) {
                 if (result.containsKey(k)) {
                     Object v = result.get(k);
-                    resultMap.put(k, v);
                     System.out.println("key: " + k + ", value: " + v);
                 }
             }
 
-            // initialise User Object & set accounts
-            user = initUser(userName, password, resultMap);
+            result.put("username", userName);
+            result.put("password", password);
+            
+            session = new Session(result);
         } else {
             error = DriveWealth.getError(result);
         }
-        
-        return new Pair<>(user, error);
+
+        return new Pair<>(session, error);
     }
 
-    private static User initUser (String userName, String password, Map<String, Object> resultMap) {
-        Map<String, Object> params = new HashMap<>();
-
-        params.put("username",       userName);
-        params.put("password",       password);
-        params.put("sessionKey",     resultMap.get("sessionKey"));
-        params.put("userID",         resultMap.get("userID"));
-        params.put("commissionRate", resultMap.get("commissionRate"));
-
-        User user = new User(params);
-        
-        List<Map<String, Object>> accounts = (ArrayList) resultMap.get("accounts");
-        for (Map<String, Object> acc : accounts) {
-            double accountType = (double) acc.get("accountType");
-            Account account = new Account(acc);
-
-            if (accountType == 1) {
-                user.setPracticeAccount(account);
-            } else if (accountType == 2) {
-                user.setLiveAccount(account);
-            }
-        }
-        return user;
-    }    
 }

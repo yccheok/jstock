@@ -27,9 +27,9 @@ import javafx.util.Callback;
 import org.yccheok.jstock.trading.PositionModel;
 import org.yccheok.jstock.trading.Utils;
 import org.yccheok.jstock.trading.Transaction;
-import org.yccheok.jstock.trading.API.User;
-import org.yccheok.jstock.trading.API.Account;
+import org.yccheok.jstock.trading.API.DriveWealth;
 import org.yccheok.jstock.trading.API.InstrumentManager;
+import org.yccheok.jstock.trading.API.SessionManager;
 
 /**
  *
@@ -71,8 +71,8 @@ public class PositionsTableBuilder {
     public Map<String, Object> buildBuyParam (String symbol, String instrumentID) {
         Map<String, Object> params = new HashMap<>();
 
-        User user = Portfolio.getAPI().getUser();
-        Account acc = user.getPracticeAccount();
+        SessionManager.User user = DriveWealth.getUser();
+        SessionManager.Account acc = user.getActiveAccount();
         
         String userID = user.getUserID();
         String accountID = acc.getAccountID();
