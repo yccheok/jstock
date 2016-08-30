@@ -270,7 +270,7 @@ public class OrderManager {
         
 
         // create order
-        Map<String, Object> respondMap = DriveWealth.executePost(url, params, DriveWealth.getSessionKey());
+        Map<String, Object> respondMap = Http.post(url, params, DriveWealth.getSessionKey());
         String respond = respondMap.get("respond").toString();
         Map<String, Object> result = new Gson().fromJson(respond, HashMap.class);
 
@@ -450,7 +450,7 @@ public class OrderManager {
         ));
 
         
-        Map<String, Object> respondMap = DriveWealth.executeGet(url, DriveWealth.getSessionKey());
+        Map<String, Object> respondMap = Http.get(url, DriveWealth.getSessionKey());
         Map<String, Object> result = new Gson().fromJson(respondMap.get("respond").toString(), HashMap.class);
 
         // debugging only

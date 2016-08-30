@@ -228,7 +228,7 @@ public class SessionManager {
             }
         }
 
-        Map<String, Object> respondMap = DriveWealth.executePost(url, params, null);
+        Map<String, Object> respondMap = Http.post(url, params, null);
         String respond = respondMap.get("respond").toString();
         Map<String, Object> result  = new Gson().fromJson(respond, HashMap.class);
 

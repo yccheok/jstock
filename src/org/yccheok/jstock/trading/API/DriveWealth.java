@@ -7,12 +7,8 @@ package org.yccheok.jstock.trading.API;
 
 
 import com.google.gson.Gson;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -20,13 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.DeleteMethod;
-import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
 
 import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
@@ -40,7 +30,7 @@ import org.yccheok.jstock.engine.Pair;
  */
 public final class DriveWealth {
 
-    public DriveWealth() {}
+    private DriveWealth() {}
 
     /********************
      * API Functions
@@ -423,10 +413,10 @@ public final class DriveWealth {
         return createSession;
     }
     
-    public Map<String, Object> getAccount(String userID, String accountID) {
+    public static Map<String, Object> getAccount(String userID, String accountID) {
         System.out.println("\n[getAccount] " + accountID);
         
-        Map<String, Object> respondMap = executeGet("users/" + userID + "/accounts/" + accountID, getSessionKey());
+        Map<String, Object> respondMap = Http.get("users/" + userID + "/accounts/" + accountID, getSessionKey());
         Map<String, Object> result = gson.fromJson(respondMap.get("respond").toString(), HashMap.class);
 
         Map<String, Object> account = new HashMap<>();
@@ -440,10 +430,10 @@ public final class DriveWealth {
         return account;
     }
     
-    public List<Map<String, Object>> listAllAccounts(String userID) {
+    public static List<Map<String, Object>> listAllAccounts(String userID) {
         System.out.println("\n[listAllAccounts]");
         
-        Map<String, Object> respondMap = executeGet("users/" + userID + "/accounts", getSessionKey());
+        Map<String, Object> respondMap = Http.get("users/" + userID + "/accounts", getSessionKey());
         List<Map<String, Object>> result = gson.fromJson(respondMap.get("respond").toString(), ArrayList.class);
         List<Map<String, Object>> accounts = new ArrayList<>();
         
@@ -472,20 +462,20 @@ public final class DriveWealth {
     }
 
     /* API endpoint: "signups/practice"
-        if user not exists, POST creates user + practice a/c
-        if user exist but no practice a/c, POST with userID creates practice a/c
-        if user & practice accMap exist, POST with userID returns existing accountID
+        if userMap not exists, POST creates userMap + practice a/c
+        if userMap exist but no practice a/c, POST with userID creates practice a/c
+        if userMap & practice accMap exist, POST with userID returns existing accountID
     */
 
-    public SessionManager.Account createPracticeAccount(Map<String, Object> args) {
+    public static SessionManager.Account createPracticeAccount(Map<String, Object> args) {
         System.out.println("\n[create Practice Account]");
         String url = "signups/practice";
         
         if (args.containsKey("userID")) {
-            // user already exist, create practice a/c
+            // userMap already exist, create practice a/c
             String userID = args.get("userID").toString();
             
-            // existing user requires SignIn: to create SessionKey
+            // existing userMap requires SignIn: to create SessionKey
             if (DriveWealth.user == null || ! DriveWealth.user.getUserID().equals(userID)) {
                 System.out.println("Please Sign In, userID: " + userID);
                 return null;
@@ -504,14 +494,14 @@ public final class DriveWealth {
             Map<String, Object> params = new HashMap<>();
             params.put("userID", userID);
 
-            Map<String, Object> respondMap = executePost(url, params, getSessionKey());
+            Map<String, Object> respondMap = Http.post(url, params, getSessionKey());
             String respond = respondMap.get("respond").toString();
             Map<String, Object> result = gson.fromJson(respond, HashMap.class);
 
             String accountID = result.get("accountID").toString();
             System.out.println("user already exist, created practice accountID: " + accountID);
 
-            // Login to create session
+            // Login to create sessionMap
             String userName = DriveWealth.user.getUserName();
             String password = DriveWealth.user.getPassword();
 
@@ -524,7 +514,7 @@ public final class DriveWealth {
             return DriveWealth.user.getPracticeAccounts().get(0);
         }
 
-        // create new user + practice a/c
+        // create new userMap + practice a/c
         System.out.println("create User + Practice a/c + funded");
 
         Map<String, Object> params = new HashMap<>();
@@ -535,7 +525,7 @@ public final class DriveWealth {
                 //System.out.println("key: " + k + ", value: " + v);
             }
         }
-        Map<String, Object> respondMap = executePost(url, params, null);
+        Map<String, Object> respondMap = Http.post(url, params, null);
 
         String respond = respondMap.get("respond").toString();
         Map<String, Object> result = gson.fromJson(respond, HashMap.class);
@@ -550,7 +540,7 @@ public final class DriveWealth {
             String userName = result.get("username").toString();
             String password = result.get("password").toString();
             
-            // Create session for new User
+            // Create sessionMap for new User
             Pair<SessionManager.Session, Error> login = login(userName, password);
             // error
             if (login.second != null) {
@@ -569,8 +559,8 @@ public final class DriveWealth {
         return acc;
     }
 
-    public Map<String, Object> createLiveAccount(Map<String, Object> args) {
-        // user already exist, create live accMap
+    public static Map<String, Object> createLiveAccount(Map<String, Object> args) {
+        // userMap already exist, create live accMap
         System.out.println("\n[Create Live Account]");
 
         Map<String, Object> params = new HashMap<>();
@@ -582,7 +572,7 @@ public final class DriveWealth {
             }
         }
 
-        Map<String, Object> respondMap = executePost("signups/live", params, getSessionKey());
+        Map<String, Object> respondMap = Http.post("signups/live", params, getSessionKey());
         String respond = respondMap.get("respond").toString();
         Map<String, Object> result = gson.fromJson(respond, HashMap.class);
         
@@ -593,7 +583,7 @@ public final class DriveWealth {
         return liveAc;
     }
 
-    public boolean addDocument (Map<String, Object> args) {
+    public static boolean addDocument (Map<String, Object> args) {
         System.out.println("\n[add Document]\n\n\n");
 
         String userID = args.get("userID").toString();
@@ -614,7 +604,7 @@ public final class DriveWealth {
         PostMethod postMethod = new PostMethod(hostURL + "documents");
         postMethod.setRequestEntity(new MultipartRequestEntity(parts, postMethod.getParams()));
         postMethod.addRequestHeader("x-mysolomeo-session-key", getSessionKey());
-        Map<String, Object> result = executeHttpCall(postMethod);
+        Map<String, Object> result = Http.executeCall(postMethod);
         
         return (int) result.get("code") == 200;
     }
@@ -623,7 +613,7 @@ public final class DriveWealth {
      * API: Users
      ********************/
 
-    public Map<String, Object> createUser(Map<String, String> args) {
+    public static Map<String, Object> createUser(Map<String, String> args) {
         System.out.println("\n[create User Only]");
 
         Map<String, Object> params = new HashMap<>();
@@ -639,46 +629,46 @@ public final class DriveWealth {
             }
         }
         
-        Map<String, Object> respondMap = executePost("signups/live", params, null);
+        Map<String, Object> respondMap = Http.post("signups/live", params, null);
         String respond = respondMap.get("respond").toString();
         Map<String, Object> result  = gson.fromJson(respond, HashMap.class);
         int code = (int) result.get("code");
         
-        Map<String, Object> user = new HashMap<>();
+        Map<String, Object> userMap = new HashMap<>();
         
         if (code == 200) {
-            user.put("password", result.get("password").toString());
-            user.put("userID", result.get("userID").toString());
-            user.put("username", result.get("username").toString());
+            userMap.put("password", result.get("password").toString());
+            userMap.put("userID", result.get("userID").toString());
+            userMap.put("username", result.get("username").toString());
         } else if (code == 400) {
             System.out.println("create user, error: " + result.get("message").toString());
         }
-        return user;
+        return userMap;
     }
     
     // NOTE:
     // temporary rename to "getUserAPI" as method name clash with "getUser" which return API.User Object
-    public Map<String, Object> getUserAPI(String userID) {
+    public static Map<String, Object> getUserAPI(String userID) {
         System.out.println("\n[getUser]");
         
-        Map<String, Object> respondMap = executeGet("users/" + userID, getSessionKey());
+        Map<String, Object> respondMap = Http.get("users/" + userID, getSessionKey());
         Map<String, Object> result  = gson.fromJson(respondMap.get("respond").toString(), HashMap.class);
 
-        Map<String, Object> user = new HashMap<>();
+        Map<String, Object> userMap = new HashMap<>();
         for (String k: getUserFields) {
             if (result.containsKey(k)) {
                 Object v = result.get(k);
-                user.put(k, v);
+                userMap.put(k, v);
                 //System.out.println("key: " + k + ", value: " + v);
             }
         }
-        return user;
+        return userMap;
     }
     
-    public boolean checkUserNameAvailability(String username) {
+    public static boolean checkUserNameAvailability(String username) {
         System.out.println("\n[checkUserNameAvailability]");
 
-        Map<String, Object> respondMap = executeGet("users?username=" + username, null);
+        Map<String, Object> respondMap = Http.get("users?username=" + username, null);
         int statusCode  = (int) respondMap.get("code");
 
         // 404 : username not found => available
@@ -686,10 +676,10 @@ public final class DriveWealth {
         return statusCode == 404;
     }
     
-    public Map<String, Object> userStatus(String userID) {
+    public static Map<String, Object> userStatus(String userID) {
         System.out.println("\n[userStatus]");
         
-        Map<String, Object> respondMap = executeGet("users/" + userID + "/status", getSessionKey());
+        Map<String, Object> respondMap = Http.get("users/" + userID + "/status", getSessionKey());
         Map<String, Object> result  = gson.fromJson(respondMap.get("respond").toString(), HashMap.class);
 
         Map<String, Object> status = new HashMap<>();
@@ -718,10 +708,10 @@ public final class DriveWealth {
         return status;
     }
 
-    public boolean updateUser(Map<String, String> args) {
+    public static boolean updateUser(Map<String, String> args) {
         System.out.println("\n[updateUser]");
         
-        String userID = args.get("userID").toString();
+        String userID = args.get("userID");
 
         Map<String, Object> params = new HashMap<>();
         for (String k: updateUserFields) {
@@ -741,19 +731,19 @@ public final class DriveWealth {
             }
         }
         
-        Map<String, Object> respondMap = executePut("users/" + userID, params, getSessionKey());
+        Map<String, Object> respondMap = Http.put("users/" + userID, params, getSessionKey());
         Map<String, Object> result  = gson.fromJson(respondMap.get("respond").toString(), HashMap.class);
 
         return (int) respondMap.get("code") == 200;
     }
     
-    public String forgotPassword(String username) {
+    public static String forgotPassword(String username) {
         System.out.println("\n[Forgot password]");
         
         Map<String, Object> params = new HashMap<>();
         params.put("username", username);
 
-        Map<String, Object> respondMap = executePost("users/passwords", params, null);
+        Map<String, Object> respondMap = Http.post("users/passwords", params, null);
         
         String respond = respondMap.get("respond").toString();
         Map<String, Object> result  = gson.fromJson(respond, HashMap.class);
@@ -766,7 +756,7 @@ public final class DriveWealth {
         return passwordResetID;
     }
     
-    public boolean resetPassword (Map<String, String> args) {
+    public static boolean resetPassword (Map<String, String> args) {
         System.out.println("\n[Reset password]");
 
         String passwordResetID = args.get("passwordResetID");
@@ -779,7 +769,7 @@ public final class DriveWealth {
             }
         }
 
-        Map<String, Object> respondMap = executePut("users/passwords/" + passwordResetID, params, null);
+        Map<String, Object> respondMap = Http.put("users/passwords/" + passwordResetID, params, null);
         Map<String, Object> result  = gson.fromJson(respondMap.get("respond").toString(), HashMap.class);
 
         return (int) respondMap.get("code") == 200;
@@ -789,10 +779,10 @@ public final class DriveWealth {
      * API: Session
      ********************/
     
-    public Map<String, Object> getSession(String sessionKey) {
+    public static Map<String, Object> getSession(String sessionKey) {
         System.out.println("\n[Get Session]");
 
-        Map<String, Object> respondMap = executeGet("userSessions/" + sessionKey, getSessionKey());
+        Map<String, Object> respondMap = Http.get("userSessions/" + sessionKey, getSessionKey());
         Map<String, Object> result  = gson.fromJson(respondMap.get("respond").toString(), HashMap.class);
         
         double loginState = (double) result.get("loginState");
@@ -802,37 +792,34 @@ public final class DriveWealth {
         }
         System.out.println("Get Session, login state: " + login);
 
-        Map<String, Object> session = new HashMap<>();
+        Map<String, Object> sessionMap = new HashMap<>();
         for (String k: getSessionFields) {
             if (result.containsKey(k)) {
                 Object v = result.get(k);
-                session.put(k, v);
+                sessionMap.put(k, v);
                 //System.out.println("key: " + k + ", value: " + v);
             }
         }
-        return session;
+        return sessionMap;
     }
     
-    public boolean cancelSession(String sessionKey) {
+    public static boolean cancelSession(String sessionKey) {
         System.out.println("\n[Cancel Session] sessionKey: " + sessionKey);
 
-        Map<String, Object> result = executeDelete("userSessions/" + sessionKey, getSessionKey());
+        Map<String, Object> result = Http.delete("userSessions/" + sessionKey, getSessionKey());
         int statusCode = (int) result.get("code");
 
-        if (statusCode == 200) {
-            return true;
-        }
-        return false;
+        return statusCode == 200;
     }
     
     /********************
      * API: Instruments
      ********************/
     
-    public List<Map<String, Object>> listAllInstruments() {
+    public static List<Map<String, Object>> listAllInstruments() {
         System.out.println("\n[listAllInstruments]");
 
-        Map<String, Object> respondMap = executeGet("instruments?tradeStatus=1", getSessionKey());
+        Map<String, Object> respondMap = Http.get("instruments?tradeStatus=1", getSessionKey());
         List<Map<String, Object>> instruments = new ArrayList<>();
         
         if ((int) respondMap.get("code") == 200) {
@@ -853,10 +840,10 @@ public final class DriveWealth {
         return instruments;
     }
 
-    public Map<String, Object> getInstrument (String instrumentID) {
+    public static Map<String, Object> getInstrument (String instrumentID) {
         System.out.println("\n[getInstrument]");
 
-        Map<String, Object> respondMap = executeGet("instruments/" + instrumentID + "?options=F", getSessionKey());
+        Map<String, Object> respondMap = Http.get("instruments/" + instrumentID + "?options=F", getSessionKey());
         Map<String, Object> instrument = new HashMap<>();
         
         if ((int) respondMap.get("code") == 200) {
@@ -877,10 +864,10 @@ public final class DriveWealth {
      * API: Orders
      ********************/
 
-    public boolean cancelOrder (String orderID) {
+    public static boolean cancelOrder (String orderID) {
         System.out.println("\n[Cancel order]: " + orderID);
 
-        Map<String, Object> result = executeDelete("orders/" + orderID, getSessionKey());
+        Map<String, Object> result = Http.delete("orders/" + orderID, getSessionKey());
         int statusCode = (int) result.get("code");
 
         return statusCode == 200;
@@ -890,10 +877,10 @@ public final class DriveWealth {
      * API: Settings
      ********************/
 
-    public Map<String, Object> getSetting (String key) {
+    public static Map<String, Object> getSetting (String key) {
         System.out.println("\n[Get Setting]");
 
-        Map<String, Object> respondMap = executeGet("users/" + DriveWealth.user.getUserID() + "/settings/" + key, getSessionKey());
+        Map<String, Object> respondMap = Http.get("users/" + DriveWealth.user.getUserID() + "/settings/" + key, getSessionKey());
         Map<String, Object> result = gson.fromJson(respondMap.get("respond").toString(), HashMap.class);
         Map<String, Object> setting = new HashMap<>();
 
@@ -907,10 +894,10 @@ public final class DriveWealth {
         return setting;
     }
     
-    public List<Map<String, Object>> listAllSettings () {
+    public static List<Map<String, Object>> listAllSettings () {
         System.out.println("\n[List all Settings]");
 
-        Map<String, Object> respondMap = executeGet("users/" + DriveWealth.user.getUserID() + "/settings", getSessionKey());
+        Map<String, Object> respondMap = Http.get("users/" + DriveWealth.user.getUserID() + "/settings", getSessionKey());
         List<Map<String, Object>> result = gson.fromJson(respondMap.get("respond").toString(), ArrayList.class);
         List<Map<String, Object>> settings = new ArrayList<>();
         
@@ -928,7 +915,7 @@ public final class DriveWealth {
         return settings;
     }
 
-    public Map<String, Object> createSetting (Map<String, String> args) {
+    public static Map<String, Object> createSetting (Map<String, String> args) {
         System.out.println("\n[Create Setting]");
 
         Map<String, Object> params = new HashMap<>();
@@ -936,7 +923,7 @@ public final class DriveWealth {
         params.put("key", args.get("key"));
         params.put("value", args.get("value"));
         
-        Map<String, Object> respondMap = executePost("users/" + DriveWealth.user.getUserID() + "/settings", params, getSessionKey());
+        Map<String, Object> respondMap = Http.post("users/" + DriveWealth.user.getUserID() + "/settings", params, getSessionKey());
         String respond = respondMap.get("respond").toString();
         Map<String, Object> result = gson.fromJson(respond, HashMap.class);
 
@@ -952,10 +939,10 @@ public final class DriveWealth {
         return setting;
     }
     
-    public boolean deleteSetting (String key) {
+    public static boolean deleteSetting (String key) {
         System.out.println("\n[Delete Setting]");
 
-        Map<String, Object> result = executeDelete("users/" + DriveWealth.user.getUserID() + "/settings/" + key, getSessionKey());
+        Map<String, Object> result = Http.delete("users/" + DriveWealth.user.getUserID() + "/settings/" + key, getSessionKey());
         int statusCode = (int) result.get("code");
 
         return statusCode == 200;
@@ -994,7 +981,7 @@ public final class DriveWealth {
         }
     }
 
-    public List<String[]> getCharts (ChartCompression chartCompression, Map<String, Object> args) {
+    public static List<String[]> getCharts (ChartCompression chartCompression, Map<String, Object> args) {
         System.out.println("\n[get Charts]");
 
         // required fields: instrumentID, compression
@@ -1014,10 +1001,10 @@ public final class DriveWealth {
         }
         System.out.println("\n url: " + url);
         
-        Map<String, Object> respondMap = executeGet(url, getSessionKey());
+        Map<String, Object> respondMap = Http.get(url, getSessionKey());
         Map<String, Object> result = gson.fromJson(respondMap.get("respond").toString(), HashMap.class);
 
-        List<String[]> data = new ArrayList<String[]>();
+        List<String[]> data = new ArrayList<>();
         
         if (   result.get("instrumentID").toString().equals(instrumentID)
             && (int) result.get("compression") == compression)
@@ -1070,10 +1057,10 @@ public final class DriveWealth {
             This report allows users to generate order related transactions for the specified accMap number
             over the specified date interval. These transactions can be also filtered by symbol if desired.
         3) Open Positions and Resting Orders
-            Provides the user their current open positions and resting orders.
+            Provides the userMap their current open positions and resting orders.
     */
     
-    public List<Map<String, Object>> transactionReport (ReportName reportName, Map<String, String> args) {
+    public static List<Map<String, Object>> transactionReport (ReportName reportName, Map<String, String> args) {
         System.out.println("\n[Transaction Report] - " + reportName);
 
         String AccountNumber = args.get("AccountNumber");
@@ -1119,7 +1106,7 @@ public final class DriveWealth {
         System.out.println("URL: " + url);
         
         Map<String, Object> params = new HashMap<>();
-        Map<String, Object> respondMap = executePost(url, params, getSessionKey(), "reportServer");
+        Map<String, Object> respondMap = Http.post(url, params, getSessionKey(), "reportServer");
 
         int statusCode = (int) respondMap.get("code");
         if (statusCode != 200) {
@@ -1179,7 +1166,7 @@ public final class DriveWealth {
     }
 
     // View all instruments available on the DriveWealth platform
-    public List<Map<String, Object>> stocksReport (Map<String, String> args) {
+    public static List<Map<String, Object>> stocksReport (Map<String, String> args) {
         System.out.println("\n[Stocks, ETFs and ADRs Report]");
 
         String url = "DriveWealth?ReportFormat=JSON&wlpID=DW&LanguageID=en_US"
@@ -1196,7 +1183,7 @@ public final class DriveWealth {
         System.out.println("URL: " + url);
 
         Map<String, Object> params = new HashMap<>();
-        Map<String, Object> respondMap = executePost(url, params, getSessionKey(), "reportServer");
+        Map<String, Object> respondMap = Http.post(url, params, getSessionKey(), "reportServer");
 
         int statusCode = (int) respondMap.get("code");
         if (statusCode != 200) {
@@ -1248,7 +1235,7 @@ public final class DriveWealth {
      * API: Statements
      ********************/
 
-    public List<Map<String, Object>> listStatements (String type, Map<String, String> args) {
+    public static List<Map<String, Object>> listStatements (String type, Map<String, String> args) {
         switch (type) {
             // List trade confirms
             case "trade":
@@ -1274,7 +1261,7 @@ public final class DriveWealth {
 
         System.out.println("URL: " + url);
 
-        Map<String, Object> respondMap = executeGet(url, getSessionKey());
+        Map<String, Object> respondMap = Http.get(url, getSessionKey());
         List<Map<String, Object>> result = gson.fromJson(respondMap.get("respond").toString(), ArrayList.class);
         List<Map<String, Object>> statements = new ArrayList<>();
         
@@ -1292,11 +1279,11 @@ public final class DriveWealth {
         return statements;
     }
     
-    public Map<String, Object> getStatement (String accountID, String fileKey) {
+    public static Map<String, Object> getStatement (String accountID, String fileKey) {
         String url = "statements/" + accountID + "/" + fileKey;
         System.out.println("URL: " + url);
 
-        Map<String, Object> respondMap = executeGet(url, getSessionKey());
+        Map<String, Object> respondMap = Http.get(url, getSessionKey());
         Map<String, Object> result = gson.fromJson(respondMap.get("respond").toString(), HashMap.class);
 
         Map<String, Object> statement = new HashMap<>();
@@ -1327,118 +1314,6 @@ public final class DriveWealth {
      * Http Helper functions
      ************************/
 
-    private static HttpMethod setJsonHeader (HttpMethod httpMethod, String sessionKey) {
-        httpMethod.addRequestHeader("Accept", "application/json");
-        httpMethod.addRequestHeader("Content-Type", "application/json");
-
-        if (sessionKey != null) {
-            httpMethod.addRequestHeader("x-mysolomeo-session-key", sessionKey);
-        }
-        return httpMethod;
-    }
-
-    public static Map<String, Object> executeHttpCall (HttpMethod httpMethod) {
-        HttpClient httpClient = new HttpClient();
-        int statusCode = 0;
-        try {
-            statusCode = httpClient.executeMethod(httpMethod);
-            System.out.println("status code: " + statusCode);
-        } catch (IOException ex) {
-            Logger.getLogger(DriveWealth.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        String respond = null;
-        try {
-            StringBuilder resultStr = new StringBuilder();
-            try (BufferedReader rd = new BufferedReader(new InputStreamReader(httpMethod.getResponseBodyAsStream()))) {
-                String line;
-                while ((line = rd.readLine()) != null) {
-                    resultStr.append(line);
-                }
-            }
-            respond = resultStr.toString();
-            httpMethod.releaseConnection();
-        } catch (IOException ex) {
-            Logger.getLogger(DriveWealth.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        Map<String, Object> result = new HashMap<>();
-        result.put("code", statusCode);
-        result.put("respond", respond);
-        
-        System.out.println("respond: " + respond);
-        
-        return result;
-    }
-
-    public static Map<String, Object> executeGet(String url, String sessionKey) {
-        GetMethod getMethod = new GetMethod(hostURL + url);
-        getMethod = (GetMethod) setJsonHeader(getMethod, sessionKey);
-        return executeHttpCall(getMethod);
-    }
-
-    public static Map<String, Object> executePost(String url, Map<String, Object> params, String sessionKey, String server) {
-        Gson gson = new Gson();
-        String paramsJson = gson.toJson(params);
-
-        StringRequestEntity requestEntity = null;
-        try {
-            requestEntity = new StringRequestEntity(
-                    paramsJson,
-                    "application/json",
-                    "UTF-8");
-        } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(DriveWealth.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        String host = null;
-        if (server.equals("apiServer")) {
-            host = hostURL;
-        } else if (server.equals("reportServer")) {
-            host = reportURL;
-        } else {
-            System.out.println("[executePost] unknown hostType: " + server);
-            return null;
-        }
-        
-        PostMethod postMethod = new PostMethod(host + url);
-        postMethod.setRequestEntity(requestEntity);
-
-        postMethod = (PostMethod) setJsonHeader(postMethod, sessionKey);
-        return executeHttpCall(postMethod);
-    }
-    
-    public static Map<String, Object> executePost(String url, Map<String, Object> params, String sessionKey) {
-        return executePost(url, params, sessionKey, "apiServer");
-    }
-    
-    public static Map<String, Object> executePut(String url, Map<String, Object> params, String sessionKey) {
-        Gson gson = new Gson();
-        String paramsJson = gson.toJson(params);
-
-        StringRequestEntity requestEntity = null;
-        try {
-            requestEntity = new StringRequestEntity(
-                    paramsJson,
-                    "application/json",
-                    "UTF-8");
-        } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(DriveWealth.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        PutMethod putMethod = new PutMethod(hostURL + url);
-        putMethod.setRequestEntity(requestEntity);
-
-        putMethod = (PutMethod) setJsonHeader(putMethod, sessionKey);
-        return executeHttpCall(putMethod);
-    }
-
-    public static Map<String, Object> executeDelete(String url, String sessionKey) {
-        DeleteMethod deleteMethod = new DeleteMethod(hostURL + url);
-        deleteMethod = (DeleteMethod) setJsonHeader(deleteMethod, sessionKey);
-        return executeHttpCall(deleteMethod);
-    }
-    
     public static class Error {
         private final Integer code;
         private final String message;
@@ -1484,10 +1359,10 @@ public final class DriveWealth {
      * Variables
      *****************/
 
-    private final Gson gson = new Gson();
+    private static final Gson gson = new Gson();
     public static String hostURL = "https://api.drivewealth.io/v1/";
     public static String reportURL = "http://reports.drivewealth.io/";
-    
+
     private static SessionManager.User user = null;
     private static SessionManager.Session session = null;
 }

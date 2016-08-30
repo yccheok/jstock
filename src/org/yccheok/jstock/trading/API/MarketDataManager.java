@@ -79,7 +79,7 @@ public class MarketDataManager {
         String url = "quotes?symbols=" + symbols + lastTrade;
 
         // no Session Key is required, consider as unauthorized call
-        Map<String, Object> respondMap = DriveWealth.executeGet(url, null);
+        Map<String, Object> respondMap = Http.get(url, null);
 
         List<MarketData> marketDataList = new ArrayList<>();
 

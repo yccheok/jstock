@@ -189,7 +189,7 @@ public final class AccountManager {
             "transactions"
         ));
 
-        Map<String, Object> respondMap = DriveWealth.executeGet(url, DriveWealth.getSessionKey());
+        Map<String, Object> respondMap = Http.get(url, DriveWealth.getSessionKey());
         Map<String, Object> result = new Gson().fromJson(respondMap.get("respond").toString(), HashMap.class);
 
         // debugging only
