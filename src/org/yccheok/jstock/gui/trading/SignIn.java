@@ -149,56 +149,58 @@ public class SignIn {
                     return;
                 }
 
-                Task< Map<String, Object> > loginTask = new Task< Map<String, Object> >() {
-                    @Override protected Map<String, Object> call() throws Exception {
+                Task< Pair<SessionManager.Session, DriveWealth.Error> > loginTask = new Task< Pair<SessionManager.Session, DriveWealth.Error> >() {
+                    @Override protected Pair<SessionManager.Session, DriveWealth.Error> call() throws Exception {
                         System.out.println("Drive Wealth User Sign In....\n\n ");
 
                         DriveWealth _api = new DriveWealth();
                         Pair<SessionManager.Session, DriveWealth.Error> login = _api.login(username, pwd);
 
-                        SessionManager.Session session = login.first;
-                        DriveWealth.Error error = login.second;
-                        SessionManager.User user = session.getUser();
+                        SessionManager.Session session  = login.first;
+                        DriveWealth.Error error         = login.second;
+                        SessionManager.User user        = session.getUser();
 
-                        Map<String, Object> result = new HashMap<>();
+                        /*
                         if (error != null) {
                             result.put("error", error.getMessage());
                             return result;
                         }
-
-                        System.out.println("DriveWealth: username: "    + username
-                                            + ", pwd: "                 + pwd
-                                            + ", sessionKey: "          + session.getSessionKey()
-                                            + ", userID: "              + user.getUserID()
-                                            + ", commission: "          + user.getCommissionRate());
+                        */
                         
-                        result.put("api", _api);
+                        if (error == null) {
+                            System.out.println("DriveWealth: username: "    + username
+                                                + ", pwd: "                 + pwd
+                                                + ", sessionKey: "          + session.getSessionKey()
+                                                + ", userID: "              + user.getUserID()
+                                                + ", commission: "          + user.getCommissionRate());
+                        }
                         
-                        return result;
+                        return login;
                     }
                 };
 
                 loginTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
                     @Override
                     public void handle(WorkerStateEvent t) {
-                        Map<String, Object> result = loginTask.getValue();
+                        Pair<SessionManager.Session, DriveWealth.Error> login = loginTask.getValue();
 
-                        if (result.containsKey("error")) {
-                            System.out.println("Sign In failed, code: " + result.get("error"));
-                            successText.setText("Sign In failed: " + result.get("error"));
+                        SessionManager.Session session  = login.first;
+                        DriveWealth.Error error         = login.second;
+                        
+                        if (error != null) {
+                            System.out.println("Sign In failed, code: " + error.getMessage());
+                            successText.setText("Sign In failed: " + error.getMessage());
                         } else {
-                            api = (DriveWealth) result.get("api");
-
-                            SessionManager.User user = DriveWealth.getUser();
-                            if (user != null && DriveWealth.getSessionKey() != null) {
+                            SessionManager.User user = session.getUser();
+                            
+                            if (user != null && session.getSessionKey() != null) {
                                 System.out.println("Successfully Sign In, userID: " + user.getUserID());
 
-                                SessionManager.Account acc = user.getPracticeAccounts().get(0);
-                                user.setActiveAccount(acc);
-
+                                // Login will set practice acc as active account
+                                SessionManager.Account acc = user.getActiveAccount();
                                 String welcomeStr;
 
-                                if (acc == null) {
+                                if (acc == null && user.getPracticeAccounts().isEmpty()) {
                                     System.out.println("No practice account, prompt for creating ??");
                                     welcomeStr = "Successfully Sign In, please create practice account to start trading";
 

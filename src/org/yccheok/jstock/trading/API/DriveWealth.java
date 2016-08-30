@@ -414,6 +414,10 @@ public final class DriveWealth {
         if (_session != null) {
             session = _session;
             user    = _session.getUser();
+            
+            if (! user.getPracticeAccounts().isEmpty()) {
+                user.setActiveAccount(user.getPracticeAccounts().get(0));
+            }
         }
         
         return createSession;
