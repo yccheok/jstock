@@ -140,12 +140,12 @@ public class SignIn {
                 String password = pwdField.getText();
 
                 if (userName.isEmpty() || password.isEmpty()) {
-                    String welcomeStr = "Please enter username and password";
+                    String errorStr = "Please enter username and password";
                     successText.setTextFill(Color.FIREBRICK);
-                    successText.setText(welcomeStr);
+                    successText.setText(errorStr);
                     successText.setVisible(true);
 
-                    System.out.println(welcomeStr);
+                    System.out.println(errorStr);
                     return;
                 }
 

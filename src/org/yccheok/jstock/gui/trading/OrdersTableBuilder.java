@@ -152,6 +152,10 @@ public class OrdersTableBuilder {
         // display empty message when table is empty
         this.ordTable.setPlaceholder(new Label());
         
+        // set Data Model
+        this.ordTable.setItems(this.ordList);
+        this.ordTable.prefHeightProperty().bind(Bindings.size(this.ordTable.getItems()).multiply(this.ordTable.getFixedCellSize()).add(30));
+        
         return this.ordTable;
     }
     
@@ -164,9 +168,6 @@ public class OrdersTableBuilder {
         }
         
         updatePrices(marketPrices);
-        
-        this.ordTable.setItems(this.ordList);
-        this.ordTable.prefHeightProperty().bind(Bindings.size(this.ordTable.getItems()).multiply(this.ordTable.getFixedCellSize()).add(30));
     }
     
     public void updateStocksName (Map<String, InstrumentManager.Instrument> instruments) {

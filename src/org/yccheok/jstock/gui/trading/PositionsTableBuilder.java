@@ -149,11 +149,11 @@ public class PositionsTableBuilder {
     
     public TableView build () {
         // Open Positions table
-        TableColumn<PositionModel, String> symbolCol = new TableColumn<>("Stock");
+        TableColumn<PositionModel, String> symbolCol = new TableColumn<>("Symbol");
         symbolCol.setCellValueFactory(new PropertyValueFactory("symbol"));
         symbolCol.getStyleClass().add("left");
 
-        TableColumn<PositionModel, String> nameCol = new TableColumn<>("Name");
+        TableColumn<PositionModel, String> nameCol = new TableColumn<>("Company");
         nameCol.setCellValueFactory(new PropertyValueFactory("name"));
         nameCol.getStyleClass().add("left");
 
@@ -213,6 +213,10 @@ public class PositionsTableBuilder {
         // display empty message when table is empty
         this.posTable.setPlaceholder(new Label());
         
+        // set Data Model
+        this.posTable.setItems(this.posList);
+        this.posTable.prefHeightProperty().bind(Bindings.size(this.posTable.getItems()).multiply(this.posTable.getFixedCellSize()).add(30));
+        
         return this.posTable;
     }
     
@@ -223,9 +227,6 @@ public class PositionsTableBuilder {
         if (! instruments.isEmpty()) {
             updateStocksName(instruments);
         }
-        
-        this.posTable.setItems(this.posList);
-        this.posTable.prefHeightProperty().bind(Bindings.size(this.posTable.getItems()).multiply(this.posTable.getFixedCellSize()).add(30));
     }
 
     public void updateStocksName (Map<String, InstrumentManager.Instrument> instruments) {
