@@ -90,11 +90,11 @@ public class OrdersTableBuilder {
 
     public TableView build () {
         // Pending Orders table
-        TableColumn<OrderModel, String> symbolCol = new TableColumn("Stock");
+        TableColumn<OrderModel, String> symbolCol = new TableColumn("Symbol");
         symbolCol.setCellValueFactory(new PropertyValueFactory("symbol"));
         symbolCol.getStyleClass().add("left");
 
-        TableColumn<OrderModel, String> nameCol = new TableColumn("Name");
+        TableColumn<OrderModel, String> nameCol = new TableColumn("Company");
         nameCol.setCellValueFactory(new PropertyValueFactory("name"));
         nameCol.getStyleClass().add("left");
 
