@@ -21,7 +21,6 @@ import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import org.yccheok.jstock.trading.AccountModel;
 import org.yccheok.jstock.trading.PortfolioService;
-import org.yccheok.jstock.trading.API.DriveWealth;
 import org.yccheok.jstock.trading.API.InstrumentManager;
 import org.yccheok.jstock.trading.PositionModel;
 import org.yccheok.jstock.trading.OrderModel;
@@ -33,21 +32,77 @@ import org.yccheok.jstock.trading.OrderModel;
  */
 public class Portfolio {
     
-    public Portfolio () {
-        startPortfolioService();
-    }
+    private Portfolio () {}
 
-    private void startPortfolioService () {
+    public static Tab createTab () {
+        initTab();
+        startPortfolioService();
+
+        return Portfolio.PortfolioTab;
+    }
+    
+    private static void initTab () {
+        final VBox vBox = new VBox();
+        vBox.setSpacing(5);
+        vBox.setPadding(new Insets(5, 10, 5, 10));  // Insets: top, right, bottom, left
+        vBox.setPrefWidth(1000);
+
+        // Account Summary
+        final BorderPane accBorderPane = accSummaryBuilder.build();
+        vBox.getChildren().add(accBorderPane);
+        
+        // Open Positions
+        final TableView posTable = Portfolio.posTableBuilder.build();
+        
+        VBox vboxOpenPos = new VBox(5);
+        vboxOpenPos.setPadding(new Insets(5, 5, 5, 5));  // Insets: top, right, bottom, left
+
+        final Label posLabel = new Label("Current Investments");
+        vboxOpenPos.getChildren().addAll(posLabel, posTable);
+
+        // Pending orders
+        final TableView ordTable = Portfolio.ordTableBuilder.build();
+        
+        VBox vboxOrder = new VBox(5);
+        vboxOrder.setPadding(new Insets(5, 5, 5, 5));  // Insets: top, right, bottom, left
+
+        final Label ordLabel = new Label("Pending Orders");
+        vboxOrder.getChildren().addAll(ordLabel, ordTable);
+
+        // Up Down partition
+        SplitPane splitPane = new SplitPane();
+        splitPane.setOrientation(VERTICAL);
+        splitPane.setDividerPositions(0.6);
+        splitPane.getItems().addAll(vboxOpenPos, vboxOrder);
+        splitPane.setPrefHeight(500);
+        vBox.getChildren().add(splitPane);
+        
+        vboxOpenPos.prefWidthProperty().bind(splitPane.widthProperty());
+        vboxOrder.prefWidthProperty().bind(splitPane.widthProperty());
+
+        // add Portfolio tab
+        Portfolio.PortfolioTab.setText("Portfolio (Practice Account)");
+        Portfolio.PortfolioTab.setClosable(false);
+        Portfolio.PortfolioTab.setContent(vBox);
+    }
+    
+    private static void startPortfolioService () {
         Portfolio.portfolioService = new PortfolioService();
         
         // The initial delay between when the ScheduledService is first started, and when it will begin operation.
         // This is the amount of time the ScheduledService will remain in the SCHEDULED state, before entering the RUNNING state,
         // following a fresh invocation of Service.start() or Service.restart().
-        portfolioService.setDelay(this.delay);
+        portfolioService.setDelay(Portfolio.delay);
         
         // The minimum amount of time to allow between the start of the last run and the start of the next run.
-        portfolioService.setPeriod(this.period);
+        portfolioService.setPeriod(Portfolio.period);
         
+        setSucceedHandler(portfolioService);
+        
+        portfolioService.start();
+    }
+
+    private static void setSucceedHandler (PortfolioService portfolioService) {
         portfolioService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(final WorkerStateEvent workerStateEvent) {
@@ -88,71 +143,20 @@ public class Portfolio {
                 }
             }
         });
-        
-        portfolioService.start();
-    }
-
-    public Tab createTab() {
-        final VBox vBox = new VBox();
-        vBox.setSpacing(5);
-        vBox.setPadding(new Insets(5, 10, 5, 10));  // Insets: top, right, bottom, left
-        vBox.setPrefWidth(1000);
-
-        // Account Summary
-        final BorderPane accBorderPane = accSummaryBuilder.build();
-        vBox.getChildren().add(accBorderPane);
-        
-        // Open Positions
-        final TableView posTable = this.posTableBuilder.build();
-        
-        VBox vboxOpenPos = new VBox(5);
-        vboxOpenPos.setPadding(new Insets(5, 5, 5, 5));  // Insets: top, right, bottom, left
-
-        final Label posLabel = new Label("Current Investments");
-        vboxOpenPos.getChildren().addAll(posLabel, posTable);
-
-        // Pending orders
-        final TableView ordTable = this.ordTableBuilder.build();
-        
-        VBox vboxOrder = new VBox(5);
-        vboxOrder.setPadding(new Insets(5, 5, 5, 5));  // Insets: top, right, bottom, left
-
-        final Label ordLabel = new Label("Pending Orders");
-        vboxOrder.getChildren().addAll(ordLabel, ordTable);
-
-        // Up Down partition
-        SplitPane splitPane = new SplitPane();
-        splitPane.setOrientation(VERTICAL);
-        splitPane.setDividerPositions(0.6);
-        splitPane.getItems().addAll(vboxOpenPos, vboxOrder);
-        splitPane.setPrefHeight(500);
-        vBox.getChildren().add(splitPane);
-        
-        vboxOpenPos.prefWidthProperty().bind(splitPane.widthProperty());
-        vboxOrder.prefWidthProperty().bind(splitPane.widthProperty());
-
-        // add Portfolio tab
-        this.PortfolioTab.setText("Portfolio (Practice Account)");
-        this.PortfolioTab.setClosable(false);
-        this.PortfolioTab.setContent(vBox);
-
-        return this.PortfolioTab;
-    }
+    } 
     
 
-    private static DriveWealth api;
-    
-    private Map<String, InstrumentManager.Instrument> instruments = new HashMap<>();
-    private Map<String, Double> marketPrices;
+    private static Map<String, InstrumentManager.Instrument> instruments = new HashMap<>();
+    private static Map<String, Double> marketPrices;
 
-    private final PositionsTableBuilder posTableBuilder = new PositionsTableBuilder();
-    private final OrdersTableBuilder ordTableBuilder = new OrdersTableBuilder();
-    private final AccountSummaryBuilder accSummaryBuilder = new AccountSummaryBuilder();
+    private static final PositionsTableBuilder posTableBuilder   = new PositionsTableBuilder();
+    private static final OrdersTableBuilder ordTableBuilder      = new OrdersTableBuilder();
+    private static final AccountSummaryBuilder accSummaryBuilder = new AccountSummaryBuilder();
 
-    private final Tab PortfolioTab = new Tab();
+    private static final Tab PortfolioTab = new Tab();
     
-    private final Duration delay = new Duration(0);
-    private final Duration period = Duration.seconds(10);
+    private static final Duration delay = new Duration(0);
+    private static final Duration period = Duration.seconds(10);
     
     public static final double TABLE_CELL_SIZE = 25;
     public static PortfolioService portfolioService;

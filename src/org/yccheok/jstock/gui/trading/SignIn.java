@@ -5,8 +5,6 @@
  */
 package org.yccheok.jstock.gui.trading;
 
-import java.util.HashMap;
-import java.util.Map;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
@@ -49,11 +47,11 @@ import org.yccheok.jstock.engine.Pair;
  * @author shuwnyuan
  */
 public class SignIn {
-    public SignIn (TabPane tabPane) {
-        this.tabPane = tabPane;
-    }
-    
-    public void createTab () {
+    private SignIn () {}
+
+    public static void createTab (TabPane tabPane) {
+        SignIn.tabPane = tabPane;
+
         initUI();
         initEventHandler();
         
@@ -61,7 +59,7 @@ public class SignIn {
         initLicenceTab();
     }
 
-    private void initUI () {
+    private static void initUI () {
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
         grid.setHgap(10);
@@ -71,7 +69,9 @@ public class SignIn {
 
         // Drive Wealth Logo as Title
         Label titleLabel = new Label();
-        Image image = new Image(getClass().getResourceAsStream("drivewealth-logo.png"));
+        
+        Image image = new Image(SignIn.class.getResourceAsStream("drivewealth-logo.png"));
+        
         titleLabel.setGraphic(new ImageView(image));
         titleLabel.setAlignment(Pos.CENTER);
         grid.add(titleLabel, 0, 0);
@@ -99,11 +99,11 @@ public class SignIn {
         Label licenceLabel = new Label("By signing in you agree to ");
 
         licenceLabel.setPrefHeight(30);
-        this.licenceLink.setPrefHeight(30);
+        SignIn.licenceLink.setPrefHeight(30);
         HBox.setHgrow(licenceLabel, Priority.ALWAYS);
-        HBox.setHgrow(this.licenceLink, Priority.ALWAYS);
+        HBox.setHgrow(SignIn.licenceLink, Priority.ALWAYS);
 
-        licenceHBox.getChildren().addAll(licenceLabel, this.licenceLink);
+        licenceHBox.getChildren().addAll(licenceLabel, SignIn.licenceLink);
         // HBox max size will follow max size of all children nodes
         licenceHBox.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE );
         grid.add(licenceHBox, 0, 6);
@@ -123,23 +123,23 @@ public class SignIn {
         rr.setVgrow(Priority.ALWAYS);
         grid.getRowConstraints().setAll(rr, rr, rr, rr, rr, rr, rr);
 
-        this.signInTab.setTooltip(new Tooltip("Sign In"));
-        this.signInTab.setText("Sign In");
-        this.signInTab.setContent(grid);
-        this.signInTab.setClosable(false);
-        tabPane.getTabs().add(this.signInTab);
+        SignIn.signInTab.setTooltip(new Tooltip("Sign In"));
+        SignIn.signInTab.setText("Sign In");
+        SignIn.signInTab.setContent(grid);
+        SignIn.signInTab.setClosable(false);
+        SignIn.tabPane.getTabs().add(SignIn.signInTab);
     }
     
-    private void initEventHandler () {
+    private static void initEventHandler () {
         // Sign In Button action
         signInBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
                 successText.setVisible(false);
-                String username = userField.getText();
-                String pwd = pwdField.getText();
+                String userName = userField.getText();
+                String password = pwdField.getText();
 
-                if (username.isEmpty() || pwd.isEmpty()) {
+                if (userName.isEmpty() || password.isEmpty()) {
                     String welcomeStr = "Please enter username and password";
                     successText.setTextFill(Color.FIREBRICK);
                     successText.setText(welcomeStr);
@@ -149,99 +149,7 @@ public class SignIn {
                     return;
                 }
 
-                Task< Pair<SessionManager.Session, DriveWealth.Error> > loginTask = new Task< Pair<SessionManager.Session, DriveWealth.Error> >() {
-                    @Override protected Pair<SessionManager.Session, DriveWealth.Error> call() throws Exception {
-                        System.out.println("Drive Wealth User Sign In....\n\n ");
-
-                        DriveWealth _api = new DriveWealth();
-                        Pair<SessionManager.Session, DriveWealth.Error> login = _api.login(username, pwd);
-
-                        SessionManager.Session session  = login.first;
-                        DriveWealth.Error error         = login.second;
-                        SessionManager.User user        = session.getUser();
-
-                        /*
-                        if (error != null) {
-                            result.put("error", error.getMessage());
-                            return result;
-                        }
-                        */
-                        
-                        if (error == null) {
-                            System.out.println("DriveWealth: username: "    + username
-                                                + ", pwd: "                 + pwd
-                                                + ", sessionKey: "          + session.getSessionKey()
-                                                + ", userID: "              + user.getUserID()
-                                                + ", commission: "          + user.getCommissionRate());
-                        }
-                        
-                        return login;
-                    }
-                };
-
-                loginTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-                    @Override
-                    public void handle(WorkerStateEvent t) {
-                        Pair<SessionManager.Session, DriveWealth.Error> login = loginTask.getValue();
-
-                        SessionManager.Session session  = login.first;
-                        DriveWealth.Error error         = login.second;
-                        
-                        if (error != null) {
-                            System.out.println("Sign In failed, code: " + error.getMessage());
-                            successText.setText("Sign In failed: " + error.getMessage());
-                        } else {
-                            SessionManager.User user = session.getUser();
-                            
-                            if (user != null && session.getSessionKey() != null) {
-                                System.out.println("Successfully Sign In, userID: " + user.getUserID());
-
-                                // Login will set practice acc as active account
-                                SessionManager.Account acc = user.getActiveAccount();
-                                String welcomeStr;
-
-                                if (acc == null && user.getPracticeAccounts().isEmpty()) {
-                                    System.out.println("No practice account, prompt for creating ??");
-                                    welcomeStr = "Successfully Sign In, please create practice account to start trading";
-
-                                    /*
-                                    Map<String, Object> params = new HashMap<>();
-                                    params.put("userID", user.getUserID());
-                                    acc = api.createPracticeAccount(params);
-                                    */
-                                } else {
-                                    welcomeStr = "Start trading with Practice Account "
-                                        + ".\n AccountNo: " + acc.getAccountNo()
-                                        + "\n AccountID: " + acc.getAccountID()
-                                        + "\n Balance: " + acc.getCash();
-                                }
-                                successText.setText(welcomeStr);
-                                
-                                // create Portfolio Tab
-                                if (acc != null) {
-                                    Portfolio portfolio = new Portfolio();
-                                    Tab portfolioTab = portfolio.createTab();
-                                    tabPane.getTabs().add(portfolioTab);
-                                    // select tab
-                                    SingleSelectionModel<Tab> selectionModel = tabPane.getSelectionModel();
-                                    selectionModel.select(portfolioTab);
-
-                                    tabPane.getTabs().remove(signInTab);
-                                    System.out.println("Init Portfolio tab DONE....");
-                                }
-                            } else {
-                                System.out.println("Sign In failed");
-                                successText.setText("Sign In failed");
-                            }
-                        }
-
-                        successText.setTextFill(Color.FIREBRICK);
-                        successText.setVisible(true);
-                        // reenable "Sign In" button
-                        signInBtn.setDisable(false);
-                    }
-                });
-
+                Task loginTask = createLoginTask(userName, password);
                 new Thread(loginTask).start();
 
                 // disable "Sign In" button
@@ -250,21 +158,98 @@ public class SignIn {
         });
     }
     
-    private void initLicenceTab () {
+    private static Task createLoginTask (String userName, String password) {
+        
+        Task< Pair<SessionManager.Session, DriveWealth.Error> > loginTask = new Task< Pair<SessionManager.Session, DriveWealth.Error> >() {
+            @Override protected Pair<SessionManager.Session, DriveWealth.Error> call() throws Exception {
+                System.out.println("Drive Wealth User Sign In....\n\n ");
+
+                Pair<SessionManager.Session, DriveWealth.Error> login = DriveWealth.login(userName, password);
+
+                SessionManager.Session session  = login.first;
+                DriveWealth.Error error         = login.second;
+                SessionManager.User user        = session.getUser();
+
+                if (error == null) {
+                    System.out.println("DriveWealth: username: "    + userName
+                                        + ", pwd: "                 + password
+                                        + ", sessionKey: "          + session.getSessionKey()
+                                        + ", userID: "              + user.getUserID()
+                                        + ", commission: "          + user.getCommissionRate());
+                }
+
+                return login;
+            }
+        };
+
+        loginTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+            @Override
+            public void handle(WorkerStateEvent t) {
+                Pair<SessionManager.Session, DriveWealth.Error> login = loginTask.getValue();
+
+                SessionManager.Session session  = login.first;
+                DriveWealth.Error error         = login.second;
+
+                if (error != null) {
+                    System.out.println("Sign In failed, code: " + error.getMessage());
+                    successText.setText("Sign In failed: " + error.getMessage());
+                } else {
+                    SessionManager.User user = session.getUser();
+
+                    System.out.println("Successfully Sign In, userID: " + user.getUserID());
+
+                    // Login will set practice acc as active account
+                    SessionManager.Account acc = user.getActiveAccount();
+                    String welcomeStr;
+
+                    if (acc == null && user.getPracticeAccounts().isEmpty()) {
+                        System.out.println("No practice account, prompt for creating ??");
+                        welcomeStr = "Successfully Sign In, please create practice account to start trading";
+                    } else {
+                        welcomeStr = "Start trading with Practice Account "
+                            + ".\n AccountNo: " + acc.getAccountNo()
+                            + "\n AccountID: " + acc.getAccountID()
+                            + "\n Balance: " + acc.getCash();
+                    }
+                    successText.setText(welcomeStr);
+
+                    // create Portfolio Tab
+                    if (acc != null) {
+                        Tab portfolioTab = Portfolio.createTab();
+                        tabPane.getTabs().add(portfolioTab);
+                        // select tab
+                        SingleSelectionModel<Tab> selectionModel = tabPane.getSelectionModel();
+                        selectionModel.select(portfolioTab);
+
+                        tabPane.getTabs().remove(signInTab);
+                        System.out.println("Init Portfolio tab DONE....");
+                    }
+                }
+
+                successText.setTextFill(Color.FIREBRICK);
+                successText.setVisible(true);
+                // reenable "Sign In" button
+                signInBtn.setDisable(false);
+            }
+        });
+
+        return loginTask;
+    }
+    
+    private static void initLicenceTab () {
         // Load Drive Wealth's licence in new Tab with browser
         final WebView browser = new WebView();
         final WebEngine webEngine = browser.getEngine();
 
-        this.licenceTab.setText("Drive Wealth's Terms of Use");
-        this.licenceTab.setContent(browser);
-        this.licenceTab.setClosable(true);
+        SignIn.licenceTab.setText("Drive Wealth's Terms of Use");
+        SignIn.licenceTab.setContent(browser);
+        SignIn.licenceTab.setClosable(true);
 
         final ProgressIndicator progressIn = new ProgressIndicator();
         progressIn.setMaxSize(15, 15);
-        licenceTab.setGraphic(progressIn);
+        SignIn.licenceTab.setGraphic(progressIn);
 
-
-        this.licenceLink.setOnAction(new EventHandler<ActionEvent>() {
+        SignIn.licenceLink.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
                 webEngine.load("https://drivewealth.com/terms-of-use/");
@@ -300,16 +285,15 @@ public class SignIn {
         );
     }
 
-    private DriveWealth api;
-    private final TabPane tabPane;
+    private static TabPane tabPane;
 
-    private final Hyperlink licenceLink = new Hyperlink("Drive Wealth's Terms of Use");
+    private static final Hyperlink licenceLink = new Hyperlink("Drive Wealth's Terms of Use");
     
-    private final Button signInBtn = new Button("Sign in");;
-    private final TextField userField = new TextField();;
-    private final PasswordField pwdField = new PasswordField();
-    private final Label successText = new Label();
+    private static final Button signInBtn = new Button("Sign in");;
+    private static final TextField userField = new TextField();;
+    private static final PasswordField pwdField = new PasswordField();
+    private static final Label successText = new Label();
     
-    private final Tab signInTab  = new Tab();
-    private final Tab licenceTab = new Tab();
+    private static final Tab signInTab  = new Tab();
+    private static final Tab licenceTab = new Tab();
 }

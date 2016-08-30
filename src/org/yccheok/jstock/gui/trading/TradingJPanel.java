@@ -48,10 +48,9 @@ public class TradingJPanel extends javax.swing.JPanel {
                 tabPane = new TabPane();
                 tabPane.setTabClosingPolicy(TabClosingPolicy.ALL_TABS);
 
-                // create Sign In Tab
-                SignIn signIn = new SignIn(tabPane);
-                signIn.createTab();
-
+                // create Sign In Tab & license Tab
+                SignIn.createTab(tabPane);
+                
                 scene = new Scene(tabPane);
                 scene.getStylesheets().add(TradingJPanel.class.getResource("trading.css").toExternalForm());
                 jfxPanel.setScene(scene);
