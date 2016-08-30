@@ -27,9 +27,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.PopupMenuEvent;
@@ -61,7 +63,7 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
     /** Creates a new instance of AutoCompleteJComboBox */
     public AutoCompleteJComboBox() {
         this.stockInfoDatabase = null;
-
+        
         // Save the offline mode renderer, so that we may reuse it when we
         // switch back to offline mode.
         this.oldListCellRenderer = this.getRenderer();
@@ -304,11 +306,10 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
                     // Only enable ajaxYahooSearchEngineMonitor, till we solve
                     // http://sourceforge.net/apps/mediawiki/jstock/index.php?title=TechnicalDisability
                     busySubject.notify(AutoCompleteJComboBox.this, true);
-                    if (ajaxServiceProvider == AjaxServiceProvider.Yahoo) {
-                        ajaxYahooSearchEngineMonitor.clearAndPut(string);
-                    } else if (ajaxServiceProvider == AjaxServiceProvider.Google) {
-                        ajaxGoogleSearchEngineMonitor.clearAndPut(string);
-                    }                    
+                    
+                    canRemoveAllItems = true;
+                    ajaxYahooSearchEngineMonitor.clearAndPut(string);
+                    ajaxGoogleSearchEngineMonitor.clearAndPut(string);
                 }
                 
                 // When we are in windows look n feel, the text will always be selected. We do not want that.
@@ -434,13 +435,6 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
         this.codeExtensionSortingOption = codeExtensionSortingOption;
     }
     
-    public void setAjaxProvider(AjaxServiceProvider ajaxServiceProvider, List<String> exchs) {
-        this.ajaxServiceProvider = ajaxServiceProvider;
-        if (this.ajaxServiceProvider == AjaxServiceProvider.Google) {
-            this.ajaxGoogleSearchEngineMonitor.setExchs(exchs);
-        }
-    }
-    
     private void adjustScrollBar() {
         final int max_search = 8;
         // i < max_search is just a safe guard when getAccessibleChildrenCount
@@ -520,14 +514,17 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
      **************************************************************************/
     private enum Mode {
         Offline,        // Suggestion will be getting through offline database.
-        YahooOnline,    // Suggestion will be getting through online database.
-        GoogleOnline    // Suggestion will be getting through online database.
+        Online          // Suggestion will be getting through online database.
     }
 
     private void changeMode(Mode mode) {
         ListCellRenderer me = null;
 
         if (mode == Mode.Offline) {
+            if (this.getModel() instanceof SortedComboBoxModel) {
+                this.setModel(new DefaultComboBoxModel());
+            }
+            
             // Check through JStockOptions, to determine which renderer to be
             // applied.
             if (JStock.instance().getJStockOptions().getStockInputSuggestionListOption() == JStockOptions.StockInputSuggestionListOption.OneColumn) {
@@ -536,10 +533,12 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
                 assert(JStock.instance().getJStockOptions().getStockInputSuggestionListOption() == JStockOptions.StockInputSuggestionListOption.TwoColumns);
                 me = offlineModeCellRenderer;
             }
-        } else if (mode == Mode.YahooOnline) {
-            me = yahooOnlineModeCellRenderer;
-        } else if (mode == Mode.GoogleOnline) {
-            me = googleOnlineModeCellRenderer;
+        } else if (mode == Mode.Online) {
+            if (!(this.getModel() instanceof SortedComboBoxModel)) {
+                this.setModel(new SortedComboBoxModel());
+            }
+            
+            me = onlineModeCellRenderer;
         }
 
         if (this.currentListCellRenderer != me) {
@@ -606,20 +605,36 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
 
                 // Must hide popup. If not, the pop up windows will not be
                 // resized. But this causes flickering. :(
-                AutoCompleteJComboBox.this.hidePopup();
-                AutoCompleteJComboBox.this.removeAllItems();
+                boolean isPopupHide = false;
+                if (canRemoveAllItems) {
+                    canRemoveAllItems = false;
+                    
+                    isPopupHide = true;
+                    AutoCompleteJComboBox.this.hidePopup();
+                    AutoCompleteJComboBox.this.removeAllItems();
+                    
+                    codes.clear();
+                }  
 
                 if (arg.Match.isEmpty() == false) {
                     // Change to online mode before adding any item.
-                    changeMode(Mode.GoogleOnline);
+                    changeMode(Mode.Online);
                 }
 
-                boolean shouldShowPopup = false;
                 for (MatchType match : arg.Match) {
+                    if (codes.contains(match.getCode().toString())) {
+                        continue;
+                    }
+
+                    if (!isPopupHide) {
+                        isPopupHide = true;
+                        AutoCompleteJComboBox.this.hidePopup();
+                    }
+                    
+                    codes.add(match.getCode().toString());
                     AutoCompleteJComboBox.this.addItem(match);
-                    shouldShowPopup = true;
                 }
-                if (shouldShowPopup) {
+                if (isPopupHide && AutoCompleteJComboBox.this.getItemCount() > 0) {
                     AutoCompleteJComboBox.this.showPopup();
                 }
 
@@ -682,20 +697,36 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
 
                 // Must hide popup. If not, the pop up windows will not be
                 // resized. But this causes flickering. :(
-                AutoCompleteJComboBox.this.hidePopup();
-                AutoCompleteJComboBox.this.removeAllItems();
+                boolean isPopupHide = false;
+                if (canRemoveAllItems) {
+                    canRemoveAllItems = false;
+                    
+                    isPopupHide = true;
+                    AutoCompleteJComboBox.this.hidePopup();
+                    AutoCompleteJComboBox.this.removeAllItems();
+                    
+                    codes.clear();
+                }                
 
                 if (arg.Result.isEmpty() == false) {
                     // Change to online mode before adding any item.
-                    changeMode(Mode.YahooOnline);
+                    changeMode(Mode.Online);
                 }
 
-                boolean shouldShowPopup = false;
                 for (ResultType result : arg.Result) {
+                    if (codes.contains(result.symbol)) {
+                        continue;
+                    }
+                    
+                    if (!isPopupHide) {
+                        isPopupHide = true;
+                        AutoCompleteJComboBox.this.hidePopup();
+                    }
+                    
+                    codes.add(result.symbol);
                     AutoCompleteJComboBox.this.addItem(result);
-                    shouldShowPopup = true;
                 }
-                if (shouldShowPopup) {
+                if (isPopupHide && AutoCompleteJComboBox.this.getItemCount() > 0) {
                     AutoCompleteJComboBox.this.showPopup();
                 }
 
@@ -814,13 +845,11 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
     private List<String> codeExtensionSortingOption = java.util.Collections.emptyList();
     
     private final ListCellRenderer offlineModeCellRenderer = new StockInfoCellRenderer();
-    private final ListCellRenderer yahooOnlineModeCellRenderer = new ResultSetCellRenderer();
-    private final ListCellRenderer googleOnlineModeCellRenderer = new MatchSetCellRenderer();
+    private final ListCellRenderer onlineModeCellRenderer = new MatchSetOrResultSetCellRenderer();
     private final ListCellRenderer oldListCellRenderer;
     private ListCellRenderer currentListCellRenderer;
 
     // Online database.
-    private AjaxServiceProvider ajaxServiceProvider;
     private final AjaxYahooSearchEngineMonitor ajaxYahooSearchEngineMonitor = new AjaxYahooSearchEngineMonitor();
     private final AjaxGoogleSearchEngineMonitor ajaxGoogleSearchEngineMonitor = new AjaxGoogleSearchEngineMonitor();
     private final AjaxStockInfoSearchEngine ajaxStockInfoSearchEngine = new AjaxStockInfoSearchEngine();
@@ -894,6 +923,9 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
      * Keep track of whether layout is happening.
      */
     private boolean layingOut = false;
+    
+    private volatile boolean canRemoveAllItems = false;
+    private final Set<String> codes = new HashSet<>();
     
     /*
      * 

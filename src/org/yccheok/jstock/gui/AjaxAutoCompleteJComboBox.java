@@ -26,7 +26,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
@@ -113,6 +115,8 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
     public AjaxAutoCompleteJComboBox() {
         super();
 
+        this.setModel(new SortedComboBoxModel());
+        
         this.setEditable(true);
 
         this.keyAdapter = this.getEditorComponentKeyAdapter();
@@ -136,6 +140,8 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
             log.error("Unable to attach DocumentListener to AjaxAutoCompleteJComboBox.");
         }
 
+        this.setRenderer(new MatchSetOrResultSetCellRenderer());
+        
         ajaxYahooSearchEngineMonitor.attach(getYahooMonitorObserver());
         ajaxGoogleSearchEngineMonitor.attach(getGoogleMonitorObserver());
 
@@ -272,11 +278,10 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
 
                 // We are busy contacting server right now.
                 busySubject.notify(AjaxAutoCompleteJComboBox.this, true);
-                if (ajaxServiceProvider == org.yccheok.jstock.gui.AjaxServiceProvider.Yahoo) {
-                    ajaxYahooSearchEngineMonitor.clearAndPut(string);
-                } else if (ajaxServiceProvider == org.yccheok.jstock.gui.AjaxServiceProvider.Google) {
-                    ajaxGoogleSearchEngineMonitor.clearAndPut(string);
-                }
+                
+                canRemoveAllItems = true;
+                ajaxYahooSearchEngineMonitor.clearAndPut(string);
+                ajaxGoogleSearchEngineMonitor.clearAndPut(string);
             }
        };
     }
@@ -404,15 +409,31 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
 
                 // Must hide popup. If not, the pop up windows will not be
                 // resized. But this causes flickering. :(
-                AjaxAutoCompleteJComboBox.this.hidePopup();
-                AjaxAutoCompleteJComboBox.this.removeAllItems();
-
-                boolean shouldShowPopup = false;
-                for (MatchType match : arg.Match) {
-                    AjaxAutoCompleteJComboBox.this.addItem(match);
-                    shouldShowPopup = true;
+                boolean isPopupHide = false;
+                if (canRemoveAllItems) {
+                    canRemoveAllItems = false;
+                    
+                    isPopupHide = true;
+                    AjaxAutoCompleteJComboBox.this.hidePopup();
+                    AjaxAutoCompleteJComboBox.this.removeAllItems();
+                    
+                    codes.clear();
                 }
-                if (shouldShowPopup) {
+
+                for (MatchType match : arg.Match) {
+                    if (codes.contains(match.getCode().toString())) {
+                        continue;
+                    }
+                    
+                    if (!isPopupHide) {
+                        isPopupHide = true;
+                        AjaxAutoCompleteJComboBox.this.hidePopup();
+                    }
+                    
+                    codes.add(match.getCode().toString());
+                    AjaxAutoCompleteJComboBox.this.addItem(match);
+                }
+                if (isPopupHide && AjaxAutoCompleteJComboBox.this.getItemCount() > 0) {
                     AjaxAutoCompleteJComboBox.this.showPopup();
                 }
 
@@ -475,15 +496,33 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
 
                 // Must hide popup. If not, the pop up windows will not be
                 // resized. But this causes flickering. :(
-                AjaxAutoCompleteJComboBox.this.hidePopup();
-                AjaxAutoCompleteJComboBox.this.removeAllItems();
+                boolean isPopupHide = false;
+                
+                if (canRemoveAllItems) {
+                    canRemoveAllItems = false;
+                    
+                    isPopupHide = true;
+                    AjaxAutoCompleteJComboBox.this.hidePopup();
+                    AjaxAutoCompleteJComboBox.this.removeAllItems();
+                    
+                    codes.clear();
+                }
 
                 boolean shouldShowPopup = false;
                 for (ResultType result : arg.Result) {
+                    if (codes.contains(result.symbol)) {
+                        continue;
+                    }
+                    
+                    if (!isPopupHide) {
+                        isPopupHide = true;
+                        AjaxAutoCompleteJComboBox.this.hidePopup();
+                    }
+                    
+                    codes.add(result.symbol);
                     AjaxAutoCompleteJComboBox.this.addItem(result);
-                    shouldShowPopup = true;
                 }
-                if (shouldShowPopup) {
+                if (isPopupHide && AjaxAutoCompleteJComboBox.this.getItemCount() > 0) {
                     AjaxAutoCompleteJComboBox.this.showPopup();
                 }
 
@@ -491,17 +530,6 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
                 AjaxAutoCompleteJComboBox.this.jComboBoxEditor.setReadOnly(false);
             }
         };
-    }
-    
-    public void setAjaxProvider(AjaxServiceProvider ajaxServiceProvider, List<String> exchs) {
-        this.ajaxServiceProvider = ajaxServiceProvider;
-        if (this.ajaxServiceProvider == AjaxServiceProvider.Google) {
-            this.ajaxGoogleSearchEngineMonitor.setExchs(exchs);
-            this.setRenderer(new MatchSetCellRenderer());
-        } else {
-            assert(this.ajaxServiceProvider == AjaxServiceProvider.Yahoo);
-            this.setRenderer(new ResultSetCellRenderer());
-        }
     }
     
     private void adjustScrollBar() {
@@ -587,8 +615,7 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
         ajaxGoogleSearchEngineMonitor.stop();
     }
 
-    // Online database.
-    private AjaxServiceProvider ajaxServiceProvider;    
+    // Online database. 
     private final AjaxYahooSearchEngineMonitor ajaxYahooSearchEngineMonitor = new AjaxYahooSearchEngineMonitor();
     private final AjaxGoogleSearchEngineMonitor ajaxGoogleSearchEngineMonitor = new AjaxGoogleSearchEngineMonitor();
     private final AjaxStockInfoSearchEngine ajaxStockInfoSearchEngine = new AjaxStockInfoSearchEngine();
@@ -655,6 +682,9 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
      * Keep track of whether layout is happening.
      */
     private boolean layingOut = false;
+    
+    private volatile boolean canRemoveAllItems = false;
+    private final Set<String> codes = new HashSet<>();
     
     /*
      * 

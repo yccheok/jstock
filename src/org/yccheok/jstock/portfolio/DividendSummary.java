@@ -53,9 +53,9 @@ public class DividendSummary extends AbstractSummary<Dividend> {
         for (int i = 0; i < size; i++) {
             final Dividend dividend = this.get(i);
             double exchangeRate = org.yccheok.jstock.portfolio.Utils.getExchangeRate(portfolioRealTimeInfo, localCurrency, dividend.stockInfo.code);
-                        
-            if (org.yccheok.jstock.portfolio.Utils.getStockCurrency(portfolioRealTimeInfo, dividend.stockInfo.code).isGBX()) {
-                // Use will input cash in GBP instead of GBX.
+            final Currency stockCurrency = org.yccheok.jstock.portfolio.Utils.getStockCurrency(portfolioRealTimeInfo, dividend.stockInfo.code);
+            if (stockCurrency.isGBX() || stockCurrency.isZAC()) {
+                // Use will input cash in GBP/ZAR instead of GBX/ZAC.
                 tmp += (dividend.amount * exchangeRate * 100.0);
             } else {
                 tmp += (dividend.amount * exchangeRate);

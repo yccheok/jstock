@@ -1321,13 +1321,10 @@ public class IndicatorPanel extends JPanel {
         final AutoCompleteJComboBox autoCompleteJComboBox = ((AutoCompleteJComboBox)this.jComboBox1);
 
         if (country == Country.India) {
-            autoCompleteJComboBox.setAjaxProvider(AjaxServiceProvider.Google, Arrays.asList("NSE", "BOM"));
             autoCompleteJComboBox.setGreedyEnabled(true, Arrays.asList("N", "B"));
         } else if (country == Country.Japan) {
-            autoCompleteJComboBox.setAjaxProvider(AjaxServiceProvider.Google, Arrays.asList("TYO"));
             autoCompleteJComboBox.setGreedyEnabled(false, java.util.Collections.<String>emptyList());
         } else {
-            autoCompleteJComboBox.setAjaxProvider(AjaxServiceProvider.Yahoo, java.util.Collections.<String>emptyList());
             autoCompleteJComboBox.setGreedyEnabled(false, java.util.Collections.<String>emptyList());
         }
     }
