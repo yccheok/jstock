@@ -10,7 +10,6 @@ import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import org.yccheok.jstock.engine.Pair;
-import org.yccheok.jstock.trading.API.DriveWealth;
 import org.yccheok.jstock.trading.API.OrderManager;
 
 
@@ -22,26 +21,26 @@ public class Transaction {
 
     private Transaction () {}
 
-    public static void buy (DriveWealth api, PortfolioService portfolioService, Map<String, Object> params) {
+    public static void buy (PortfolioService portfolioService, Map<String, Object> params) {
         System.out.println("Buy market order...");
 
         // temporary stop Portfolio Scheduled Service
         portfolioService.cancel();
 
-        Task buyTask = createBuyTask(api, params);
+        Task buyTask = createBuyTask(params);
         setSucceedHandler(buyTask, portfolioService);
 
         Thread buyThread = new Thread(buyTask);
         buyThread.start();
     }
 
-    private static Task createBuyTask (final DriveWealth api, final Map<String, Object> params) {
+    private static Task createBuyTask (final Map<String, Object> params) {
         Task buyTask = new Task<Pair<OrderManager.Order, String>>() {
             @Override protected Pair<OrderManager.Order, String> call() throws Exception {
                 System.out.println("BuyTask call create order .....");
 
                 // Create Order
-                Pair<OrderManager.Order, String> createOrder = OrderManager.create(api, OrderManager.OrderSide.BUY, OrderManager.OrderType.MARKET, params);
+                Pair<OrderManager.Order, String> createOrder = OrderManager.create(OrderManager.OrderSide.BUY, OrderManager.OrderType.MARKET, params);
                 OrderManager.Order order = createOrder.first;
                 String error = createOrder.second;
 
@@ -55,7 +54,7 @@ public class Transaction {
                 String orderID = order.getOrderID();
 
                 // Get Order Status
-                order = OrderManager.status(api, orderID);
+                order = OrderManager.status(orderID);
                 OrderManager.OrdStatus ordStatus = order.getOrdStatusEnum();
                 
                 updateMessage("Market Order Status: " + ordStatus.getValue() + " - " + ordStatus.getName());                

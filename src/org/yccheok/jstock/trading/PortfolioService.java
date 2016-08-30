@@ -26,8 +26,6 @@ import org.yccheok.jstock.trading.API.MarketDataManager;
 
 public class PortfolioService extends ScheduledService<Map<String, Object>> {
     
-    private final DriveWealth api;
-    
     private List<PositionModel> posList = new ArrayList<>();
     private List<OrderModel> ordList = new ArrayList<>();
     private AccountModel accModel;
@@ -63,9 +61,7 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
     // rebuild on each accBlotter call
 
     
-    public PortfolioService (DriveWealth api) {
-        this.api = api;
-    }
+    public PortfolioService () {}
     
     public synchronized void setRefresh () {
         this.refresh = true;
@@ -80,7 +76,7 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
         public PortfolioTask() {}
 
         private void getAccBlotter (String userID, String accountID) {
-            AccountManager.AccountBlotter accBlot = AccountManager.blotter(api, userID, accountID);
+            AccountManager.AccountBlotter accBlot = AccountManager.blotter(userID, accountID);
 
             // List of positions (PositionModel) & pending oders (OrderModel)
             posList = accBlot.getPositions();
@@ -106,7 +102,7 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
                 Map<String, String> param = new HashMap<>();
                 // only search for exact symbol match
                 param.put("symbols", symbol);
-                List<InstrumentManager.Instrument> insList = InstrumentManager.search(api, param);
+                List<InstrumentManager.Instrument> insList = InstrumentManager.search(param);
 
                 if (insList.size() > 0) {
                     InstrumentManager.Instrument ins = insList.get(0);

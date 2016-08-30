@@ -192,7 +192,7 @@ public class OrderManager {
     }
 
     
-    public static Pair<Order, String> create (DriveWealth api, OrderSide orderSide, OrderType orderType, Map<String, Object> params) {
+    public static Pair<Order, String> create (OrderSide orderSide, OrderType orderType, Map<String, Object> params) {
         String url = "orders";
 
         List<String> INPUT_FIELDS = new ArrayList<>(Arrays.asList(
@@ -251,9 +251,9 @@ public class OrderManager {
         
         Pair<Boolean, String> validate;
         if (orderSide == OrderSide.BUY) {
-            validate = validateBuy(api, orderType, ordParams);
+            validate = validateBuy(orderType, ordParams);
         } else {
-            validate = validateSell(api, orderType, ordParams);
+            validate = validateSell(orderType, ordParams);
         }
 
         // validation error
@@ -270,7 +270,7 @@ public class OrderManager {
         
 
         // create order
-        Map<String, Object> respondMap = DriveWealth.executePost(url, params, api.getSessionKey());
+        Map<String, Object> respondMap = DriveWealth.executePost(url, params, DriveWealth.getSessionKey());
         String respond = respondMap.get("respond").toString();
         Map<String, Object> result = new Gson().fromJson(respond, HashMap.class);
 
@@ -286,13 +286,13 @@ public class OrderManager {
         return new Pair<>(order, null);
     }
     
-    private static Pair<Boolean, String> validateBuy (DriveWealth api, OrderType orderType, Map<String, Object> params) {
+    private static Pair<Boolean, String> validateBuy (OrderType orderType, Map<String, Object> params) {
         System.out.println("\n validate Buy Order - " + orderType);
         
         String accountID  = params.get("accountID").toString();
         String symbol     = params.get("symbol").toString();
         double orderQty   = Double.parseDouble(params.get("orderQty").toString());
-        double commission = api.getUser().getCommissionRate();
+        double commission = DriveWealth.getUser().getCommissionRate();
 
         // get market price (use "Ask Price" for Buy)
         ArrayList<String> symbols = new ArrayList<>(Arrays.asList(symbol));
@@ -322,7 +322,7 @@ public class OrderManager {
         }
 
         // get balance
-        AccountManager.AccountBlotter accBlotter = AccountManager.blotter(api, api.getUser().getUserID(), accountID);
+        AccountManager.AccountBlotter accBlotter = AccountManager.blotter(DriveWealth.getUser().getUserID(), accountID);
         double balance = accBlotter.getTradingBalance();
 
         // check for insufficient balance
@@ -342,7 +342,7 @@ public class OrderManager {
         return new Pair<>(true, null);
     }
 
-    private static Pair<Boolean, String> validateSell (DriveWealth api, OrderType orderType, Map<String, Object> params) {
+    private static Pair<Boolean, String> validateSell (OrderType orderType, Map<String, Object> params) {
         System.out.println("\n validate Sell order - " + orderType);
         
         String accountID    = params.get("accountID").toString();
@@ -368,7 +368,7 @@ public class OrderManager {
         }
         
         // get available trading Qty
-        AccountManager.AccountBlotter accBlotter = AccountManager.blotter(api, api.getUser().getUserID(), accountID);
+        AccountManager.AccountBlotter accBlotter = AccountManager.blotter(DriveWealth.getUser().getUserID(), accountID);
         double availQty = accBlotter.getAvailableTradingQty(instrumentID);
 
         System.out.println("availableForTradingQty: " + availQty + ", orderQty: " + orderQty);
@@ -408,7 +408,7 @@ public class OrderManager {
         }
     }
 
-    public static Order status (DriveWealth api, String orderID) {
+    public static Order status (String orderID) {
         String url = "orders/" + orderID;
         
         List<String> RESULT_FIELDS = new ArrayList<>(Arrays.asList(
@@ -450,7 +450,7 @@ public class OrderManager {
         ));
 
         
-        Map<String, Object> respondMap = DriveWealth.executeGet(url, api.getSessionKey());
+        Map<String, Object> respondMap = DriveWealth.executeGet(url, DriveWealth.getSessionKey());
         Map<String, Object> result = new Gson().fromJson(respondMap.get("respond").toString(), HashMap.class);
 
         // debugging only

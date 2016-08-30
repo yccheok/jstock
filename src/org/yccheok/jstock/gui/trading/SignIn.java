@@ -190,7 +190,7 @@ public class SignIn {
                             api = (DriveWealth) result.get("api");
 
                             SessionManager.User user = DriveWealth.getUser();
-                            if (user != null && api.getSessionKey() != null) {
+                            if (user != null && DriveWealth.getSessionKey() != null) {
                                 System.out.println("Successfully Sign In, userID: " + user.getUserID());
 
                                 SessionManager.Account acc = user.getPracticeAccounts().get(0);
@@ -217,7 +217,7 @@ public class SignIn {
                                 
                                 // create Portfolio Tab
                                 if (acc != null) {
-                                    Portfolio portfolio = new Portfolio(api);
+                                    Portfolio portfolio = new Portfolio();
                                     Tab portfolioTab = portfolio.createTab();
                                     tabPane.getTabs().add(portfolioTab);
                                     // select tab

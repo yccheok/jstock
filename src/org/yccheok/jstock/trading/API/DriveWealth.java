@@ -422,7 +422,7 @@ public final class DriveWealth {
     public Map<String, Object> getAccount(String userID, String accountID) {
         System.out.println("\n[getAccount] " + accountID);
         
-        Map<String, Object> respondMap = executeGet("users/" + userID + "/accounts/" + accountID, this.getSessionKey());
+        Map<String, Object> respondMap = executeGet("users/" + userID + "/accounts/" + accountID, getSessionKey());
         Map<String, Object> result = gson.fromJson(respondMap.get("respond").toString(), HashMap.class);
 
         Map<String, Object> account = new HashMap<>();
@@ -439,7 +439,7 @@ public final class DriveWealth {
     public List<Map<String, Object>> listAllAccounts(String userID) {
         System.out.println("\n[listAllAccounts]");
         
-        Map<String, Object> respondMap = executeGet("users/" + userID + "/accounts", this.getSessionKey());
+        Map<String, Object> respondMap = executeGet("users/" + userID + "/accounts", getSessionKey());
         List<Map<String, Object>> result = gson.fromJson(respondMap.get("respond").toString(), ArrayList.class);
         List<Map<String, Object>> accounts = new ArrayList<>();
         
@@ -500,7 +500,7 @@ public final class DriveWealth {
             Map<String, Object> params = new HashMap<>();
             params.put("userID", userID);
 
-            Map<String, Object> respondMap = executePost(url, params, this.getSessionKey());
+            Map<String, Object> respondMap = executePost(url, params, getSessionKey());
             String respond = respondMap.get("respond").toString();
             Map<String, Object> result = gson.fromJson(respond, HashMap.class);
 
@@ -580,7 +580,7 @@ public final class DriveWealth {
             }
         }
 
-        Map<String, Object> respondMap = executePost("signups/live", params, this.getSessionKey());
+        Map<String, Object> respondMap = executePost("signups/live", params, getSessionKey());
         String respond = respondMap.get("respond").toString();
         Map<String, Object> result = gson.fromJson(respond, HashMap.class);
         
@@ -659,7 +659,7 @@ public final class DriveWealth {
     public Map<String, Object> getUserAPI(String userID) {
         System.out.println("\n[getUser]");
         
-        Map<String, Object> respondMap = executeGet("users/" + userID, this.getSessionKey());
+        Map<String, Object> respondMap = executeGet("users/" + userID, getSessionKey());
         Map<String, Object> result  = gson.fromJson(respondMap.get("respond").toString(), HashMap.class);
 
         Map<String, Object> user = new HashMap<>();
@@ -687,7 +687,7 @@ public final class DriveWealth {
     public Map<String, Object> userStatus(String userID) {
         System.out.println("\n[userStatus]");
         
-        Map<String, Object> respondMap = executeGet("users/" + userID + "/status", this.getSessionKey());
+        Map<String, Object> respondMap = executeGet("users/" + userID + "/status", getSessionKey());
         Map<String, Object> result  = gson.fromJson(respondMap.get("respond").toString(), HashMap.class);
 
         Map<String, Object> status = new HashMap<>();
@@ -739,7 +739,7 @@ public final class DriveWealth {
             }
         }
         
-        Map<String, Object> respondMap = executePut("users/" + userID, params, this.getSessionKey());
+        Map<String, Object> respondMap = executePut("users/" + userID, params, getSessionKey());
         Map<String, Object> result  = gson.fromJson(respondMap.get("respond").toString(), HashMap.class);
 
         return (int) respondMap.get("code") == 200;
@@ -790,7 +790,7 @@ public final class DriveWealth {
     public Map<String, Object> getSession(String sessionKey) {
         System.out.println("\n[Get Session]");
 
-        Map<String, Object> respondMap = executeGet("userSessions/" + sessionKey, this.getSessionKey());
+        Map<String, Object> respondMap = executeGet("userSessions/" + sessionKey, getSessionKey());
         Map<String, Object> result  = gson.fromJson(respondMap.get("respond").toString(), HashMap.class);
         
         double loginState = (double) result.get("loginState");
@@ -814,7 +814,7 @@ public final class DriveWealth {
     public boolean cancelSession(String sessionKey) {
         System.out.println("\n[Cancel Session] sessionKey: " + sessionKey);
 
-        Map<String, Object> result = executeDelete("userSessions/" + sessionKey, this.getSessionKey());
+        Map<String, Object> result = executeDelete("userSessions/" + sessionKey, getSessionKey());
         int statusCode = (int) result.get("code");
 
         if (statusCode == 200) {
@@ -830,7 +830,7 @@ public final class DriveWealth {
     public List<Map<String, Object>> listAllInstruments() {
         System.out.println("\n[listAllInstruments]");
 
-        Map<String, Object> respondMap = executeGet("instruments?tradeStatus=1", this.getSessionKey());
+        Map<String, Object> respondMap = executeGet("instruments?tradeStatus=1", getSessionKey());
         List<Map<String, Object>> instruments = new ArrayList<>();
         
         if ((int) respondMap.get("code") == 200) {
@@ -854,7 +854,7 @@ public final class DriveWealth {
     public Map<String, Object> getInstrument (String instrumentID) {
         System.out.println("\n[getInstrument]");
 
-        Map<String, Object> respondMap = executeGet("instruments/" + instrumentID + "?options=F", this.getSessionKey());
+        Map<String, Object> respondMap = executeGet("instruments/" + instrumentID + "?options=F", getSessionKey());
         Map<String, Object> instrument = new HashMap<>();
         
         if ((int) respondMap.get("code") == 200) {
@@ -878,7 +878,7 @@ public final class DriveWealth {
     public boolean cancelOrder (String orderID) {
         System.out.println("\n[Cancel order]: " + orderID);
 
-        Map<String, Object> result = executeDelete("orders/" + orderID, this.getSessionKey());
+        Map<String, Object> result = executeDelete("orders/" + orderID, getSessionKey());
         int statusCode = (int) result.get("code");
 
         return statusCode == 200;
@@ -891,7 +891,7 @@ public final class DriveWealth {
     public Map<String, Object> getSetting (String key) {
         System.out.println("\n[Get Setting]");
 
-        Map<String, Object> respondMap = executeGet("users/" + this.user.getUserID() + "/settings/" + key, this.getSessionKey());
+        Map<String, Object> respondMap = executeGet("users/" + this.user.getUserID() + "/settings/" + key, getSessionKey());
         Map<String, Object> result = gson.fromJson(respondMap.get("respond").toString(), HashMap.class);
         Map<String, Object> setting = new HashMap<>();
 
@@ -908,7 +908,7 @@ public final class DriveWealth {
     public List<Map<String, Object>> listAllSettings () {
         System.out.println("\n[List all Settings]");
 
-        Map<String, Object> respondMap = executeGet("users/" + this.user.getUserID() + "/settings", this.getSessionKey());
+        Map<String, Object> respondMap = executeGet("users/" + this.user.getUserID() + "/settings", getSessionKey());
         List<Map<String, Object>> result = gson.fromJson(respondMap.get("respond").toString(), ArrayList.class);
         List<Map<String, Object>> settings = new ArrayList<>();
         
@@ -934,7 +934,7 @@ public final class DriveWealth {
         params.put("key", args.get("key"));
         params.put("value", args.get("value"));
         
-        Map<String, Object> respondMap = executePost("users/" + this.user.getUserID() + "/settings", params, this.getSessionKey());
+        Map<String, Object> respondMap = executePost("users/" + this.user.getUserID() + "/settings", params, getSessionKey());
         String respond = respondMap.get("respond").toString();
         Map<String, Object> result = gson.fromJson(respond, HashMap.class);
 
@@ -953,7 +953,7 @@ public final class DriveWealth {
     public boolean deleteSetting (String key) {
         System.out.println("\n[Delete Setting]");
 
-        Map<String, Object> result = executeDelete("users/" + this.user.getUserID() + "/settings/" + key, this.getSessionKey());
+        Map<String, Object> result = executeDelete("users/" + this.user.getUserID() + "/settings/" + key, getSessionKey());
         int statusCode = (int) result.get("code");
 
         return statusCode == 200;
@@ -1012,7 +1012,7 @@ public final class DriveWealth {
         }
         System.out.println("\n url: " + url);
         
-        Map<String, Object> respondMap = executeGet(url, this.getSessionKey());
+        Map<String, Object> respondMap = executeGet(url, getSessionKey());
         Map<String, Object> result = gson.fromJson(respondMap.get("respond").toString(), HashMap.class);
 
         List<String[]> data = new ArrayList<String[]>();
@@ -1108,7 +1108,7 @@ public final class DriveWealth {
         
         String url = "DriveWealth?ReportFormat=JSON&wlpID=DW&LanguageID=en_US"
                 + "&ReportName="    + reportName.getValue()
-                + "&sessionKey="    + this.getSessionKey()
+                + "&sessionKey="    + getSessionKey()
                 + "&AccountNumber=" + AccountNumber
                 + DateStart
                 + DateEnd
@@ -1117,7 +1117,7 @@ public final class DriveWealth {
         System.out.println("URL: " + url);
         
         Map<String, Object> params = new HashMap<>();
-        Map<String, Object> respondMap = executePost(url, params, this.getSessionKey(), "reportServer");
+        Map<String, Object> respondMap = executePost(url, params, getSessionKey(), "reportServer");
 
         int statusCode = (int) respondMap.get("code");
         if (statusCode != 200) {
@@ -1182,7 +1182,7 @@ public final class DriveWealth {
 
         String url = "DriveWealth?ReportFormat=JSON&wlpID=DW&LanguageID=en_US"
                 + "&ReportName="    + ReportName.INSTRUMENT.getValue()
-                + "&sessionKey="    + this.getSessionKey()
+                + "&sessionKey="    + getSessionKey()
                 + "&AccountNumber=" + args.get("AccountNumber")
                 + "&DateStart="     + args.get("DateStart")
                 + "&DateEnd="       + args.get("DateEnd")
@@ -1194,7 +1194,7 @@ public final class DriveWealth {
         System.out.println("URL: " + url);
 
         Map<String, Object> params = new HashMap<>();
-        Map<String, Object> respondMap = executePost(url, params, this.getSessionKey(), "reportServer");
+        Map<String, Object> respondMap = executePost(url, params, getSessionKey(), "reportServer");
 
         int statusCode = (int) respondMap.get("code");
         if (statusCode != 200) {
@@ -1272,7 +1272,7 @@ public final class DriveWealth {
 
         System.out.println("URL: " + url);
 
-        Map<String, Object> respondMap = executeGet(url, this.getSessionKey());
+        Map<String, Object> respondMap = executeGet(url, getSessionKey());
         List<Map<String, Object>> result = gson.fromJson(respondMap.get("respond").toString(), ArrayList.class);
         List<Map<String, Object>> statements = new ArrayList<>();
         
@@ -1294,7 +1294,7 @@ public final class DriveWealth {
         String url = "statements/" + accountID + "/" + fileKey;
         System.out.println("URL: " + url);
 
-        Map<String, Object> respondMap = executeGet(url, this.getSessionKey());
+        Map<String, Object> respondMap = executeGet(url, getSessionKey());
         Map<String, Object> result = gson.fromJson(respondMap.get("respond").toString(), HashMap.class);
 
         Map<String, Object> statement = new HashMap<>();
@@ -1314,7 +1314,7 @@ public final class DriveWealth {
      * API Utility Functions
      ************************/
     
-    public String getSessionKey() {
+    public static String getSessionKey() {
         if (session == null) {
             return null;
         }

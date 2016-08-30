@@ -113,7 +113,7 @@ public class PositionsTableBuilder {
                             System.out.println("Buy button pressed, symbol: " + symbol + ", instrumentID: " + instrumentID);
 
                             Map<String, Object> params = buildBuyParam(symbol, instrumentID);
-                            Transaction.buy(Portfolio.getAPI(), Portfolio.portfolioService, params);
+                            Transaction.buy(Portfolio.portfolioService, params);
                         }
                     });
                     

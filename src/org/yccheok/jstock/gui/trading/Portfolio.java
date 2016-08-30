@@ -33,17 +33,12 @@ import org.yccheok.jstock.trading.OrderModel;
  */
 public class Portfolio {
     
-    public Portfolio (DriveWealth api) {
-        Portfolio.api = api;
+    public Portfolio () {
         startPortfolioService();
     }
 
-    public static DriveWealth getAPI () {
-        return Portfolio.api;
-    }
-    
     private void startPortfolioService () {
-        Portfolio.portfolioService = new PortfolioService(Portfolio.api);
+        Portfolio.portfolioService = new PortfolioService();
         
         // The initial delay between when the ScheduledService is first started, and when it will begin operation.
         // This is the amount of time the ScheduledService will remain in the SCHEDULED state, before entering the RUNNING state,

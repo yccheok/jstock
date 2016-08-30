@@ -128,7 +128,7 @@ public class InstrumentManager {
     }
 
 
-    public static List<Instrument> search (DriveWealth api, Map<String, String> args) {
+    public static List<Instrument> search (Map<String, String> args) {
         System.out.println("\n[searchInstruments]");
         
         String url = "instruments?";
@@ -192,7 +192,7 @@ public class InstrumentManager {
         //System.out.println(params);
         url = url.concat(params);
         
-        Map<String, Object> respondMap = DriveWealth.executeGet(url, api.getSessionKey());
+        Map<String, Object> respondMap = DriveWealth.executeGet(url, DriveWealth.getSessionKey());
         
         List<Instrument> instrumentList = new ArrayList<>();
         

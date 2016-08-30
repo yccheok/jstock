@@ -177,7 +177,7 @@ public final class AccountManager {
         }
     }
 
-    public static AccountBlotter blotter (DriveWealth api, String userID, String accountID) {
+    public static AccountBlotter blotter (String userID, String accountID) {
         String url = "users/" + userID + "/accountSummary/" + accountID;
         
         List<String> RESULT_FIELDS = new ArrayList<>(Arrays.asList(
@@ -189,7 +189,7 @@ public final class AccountManager {
             "transactions"
         ));
 
-        Map<String, Object> respondMap = DriveWealth.executeGet(url, api.getSessionKey());
+        Map<String, Object> respondMap = DriveWealth.executeGet(url, DriveWealth.getSessionKey());
         Map<String, Object> result = new Gson().fromJson(respondMap.get("respond").toString(), HashMap.class);
 
         // debugging only
