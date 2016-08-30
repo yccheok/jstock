@@ -98,6 +98,7 @@ public class Portfolio {
         portfolioService.setPeriod(Portfolio.period);
         
         setSucceedHandler(portfolioService);
+        setFailedHandler(portfolioService);
         
         portfolioService.start();
     }
@@ -144,6 +145,16 @@ public class Portfolio {
             }
         });
     } 
+    
+    public static void setFailedHandler (PortfolioService portfolioService) {
+        portfolioService.setOnFailed(new EventHandler<WorkerStateEvent>() {
+            @Override
+            public void handle(WorkerStateEvent event) {
+                System.out.println("Portfolio Service - Error in call : "
+                        + event.getSource().getException().getMessage());
+            }
+        });
+    }
     
 
     private static Map<String, InstrumentManager.Instrument> instruments = new HashMap<>();
