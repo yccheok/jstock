@@ -52,14 +52,14 @@ public class SignIn {
     public static void createTab (TabPane tabPane) {
         SignIn.tabPane = tabPane;
 
-        initUI();
+        initTab();
         initEventHandler();
         
         // Drive Wealth Terms & Condition
         initLicenceTab();
     }
 
-    private static void initUI () {
+    private static void initTab () {
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
         grid.setHgap(10);
