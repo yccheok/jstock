@@ -12,7 +12,7 @@ import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import org.yccheok.jstock.trading.AccountModel;
+import org.yccheok.jstock.trading.AccountSummaryModel;
 import org.yccheok.jstock.trading.PositionModel;
 
 /**
@@ -27,7 +27,7 @@ public class AccountSummaryBuilder {
     private final Label cashAmount = new Label();
     private final Label totalAmount = new Label();
     
-    private AccountModel acc;
+    private AccountSummaryModel acc;
 
     
     public AccountSummaryBuilder() {}
@@ -65,7 +65,7 @@ public class AccountSummaryBuilder {
         return this.accBorderPane;
     }
 
-    public void initData (AccountModel accModel) {
+    public void initData (AccountSummaryModel accModel) {
         resetData();
 
         this.acc = accModel;

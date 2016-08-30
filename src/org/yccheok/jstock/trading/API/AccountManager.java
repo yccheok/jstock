@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Set;
 import org.yccheok.jstock.trading.PositionModel;
 import org.yccheok.jstock.trading.OrderModel;
-import org.yccheok.jstock.trading.AccountModel;
+import org.yccheok.jstock.trading.AccountSummaryModel;
 
 
 /**
@@ -31,7 +31,7 @@ public final class AccountManager {
     
         private final List<PositionModel> posList = new ArrayList();
         private final List<OrderModel> ordList = new ArrayList();
-        private AccountModel accModel;
+        private AccountSummaryModel accModel;
     
         private final Set symbolsSet = new HashSet();
 
@@ -123,7 +123,7 @@ public final class AccountManager {
             return this.ordList;
         }
     
-        public AccountModel getAccount () {
+        public AccountSummaryModel getAccount () {
             LinkedTreeMap<String, Object> equity  = (LinkedTreeMap) this.resultMap.get("equity");
             LinkedTreeMap<String, Object> balance = (LinkedTreeMap) this.resultMap.get("cash");
 
@@ -140,7 +140,7 @@ public final class AccountManager {
             }
             params.put("totalUnrealizedPL", totalUnrealizedPL);
 
-            this.accModel = new AccountModel(params);
+            this.accModel = new AccountSummaryModel(params);
             return this.accModel;
         }
 

@@ -15,7 +15,7 @@ import javafx.collections.ObservableList;
  *
  * @author shuwnyuan
  */
-public class AccountModel {
+public class AccountSummaryModel {
     private final SimpleDoubleProperty equity;
     private final SimpleDoubleProperty cashBalance;
     private final SimpleDoubleProperty cashForTrade;
@@ -25,7 +25,7 @@ public class AccountModel {
     private final SimpleDoubleProperty totalUnrealizedPLPercent;
 
     
-    public AccountModel (Map<String, Object> acc) {
+    public AccountSummaryModel (Map<String, Object> acc) {
         this.equity             = new SimpleDoubleProperty((Double) acc.get("equity"));
         this.cashBalance        = new SimpleDoubleProperty((Double) acc.get("cashBalance"));
         this.cashForTrade       = new SimpleDoubleProperty((Double) acc.get("cashForTrade"));

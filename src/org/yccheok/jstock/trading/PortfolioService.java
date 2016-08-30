@@ -28,7 +28,7 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
     
     private List<PositionModel> posList = new ArrayList<>();
     private List<OrderModel> ordList = new ArrayList<>();
-    private AccountModel accModel;
+    private AccountSummaryModel accModel;
     
     private final Map<String, InstrumentManager.Instrument> instruments = new HashMap<>();
     private Set symbolsSet;
