@@ -1,5 +1,5 @@
-applicationVersionID=1144
-windowsDownloadLink=https://github.com/yccheok/jstock/releases/download/release_1-0-7-15/jstock-1.0.7.15-setup.exe
-linuxDownloadLink=https://github.com/yccheok/jstock/releases/download/release_1-0-7-15/jstock-1.0.7.15-bin.zip
-macDownloadLink=https://github.com/yccheok/jstock/releases/download/release_1-0-7-15/jstock-1.0.7.15-bin.zip
-solarisDownloadLink=https://github.com/yccheok/jstock/releases/download/release_1-0-7-15/jstock-1.0.7.15-bin.zip
+applicationVersionID=1145
+windowsDownloadLink=https://github.com/yccheok/jstock/releases/download/release_1-0-7-16/jstock-1.0.7.16-setup.exe
+linuxDownloadLink=https://github.com/yccheok/jstock/releases/download/release_1-0-7-16/jstock-1.0.7.16-bin.zip
+macDownloadLink=https://github.com/yccheok/jstock/releases/download/release_1-0-7-16/jstock-1.0.7.16-bin.zip
+solarisDownloadLink=https://github.com/yccheok/jstock/releases/download/release_1-0-7-16/jstock-1.0.7.16-bin.zip
