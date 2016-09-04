@@ -25,10 +25,10 @@ public class Transaction {
         System.out.println("Buy market order...");
 
         // temporary stop Portfolio Scheduled Service
-        portfolioService.cancel();
+        // portfolioService.cancel();
 
         Task buyTask = createBuyTask(params);
-        setSucceedHandler(buyTask, portfolioService);
+        setBuySucceedHandler(buyTask, portfolioService);
 
         Thread buyThread = new Thread(buyTask);
         buyThread.start();
@@ -69,7 +69,7 @@ public class Transaction {
     }
     
     
-    private static void setSucceedHandler (Task buyTask, PortfolioService portfolioService) {
+    private static void setBuySucceedHandler (Task buyTask, PortfolioService portfolioService) {
         buyTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(final WorkerStateEvent workerStateEvent) {
@@ -132,4 +132,5 @@ public class Transaction {
             }
         });
     }
+    
 }
