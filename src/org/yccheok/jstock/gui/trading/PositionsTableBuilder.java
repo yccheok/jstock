@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -40,6 +41,7 @@ import org.yccheok.jstock.trading.Utils;
 import org.yccheok.jstock.trading.Transaction;
 import org.yccheok.jstock.trading.API.DriveWealth;
 import org.yccheok.jstock.trading.API.InstrumentManager;
+import org.yccheok.jstock.trading.API.OrderManager;
 import org.yccheok.jstock.trading.API.SessionManager;
 
 /**
@@ -79,34 +81,6 @@ public class PositionsTableBuilder {
         }
     }
     
-    public Map<String, Object> buildBuyParam (String symbol, String instrumentID) {
-        Map<String, Object> params = new HashMap<>();
-
-        SessionManager.User user = DriveWealth.getUser();
-        SessionManager.Account acc = user.getActiveAccount();
-        
-        String userID = user.getUserID();
-        String accountID = acc.getAccountID();
-        String accountNo = acc.getAccountNo();
-
-        // get instrumentID
-        params.put("symbol", symbol);
-        params.put("instrumentID", instrumentID);
-        params.put("accountID", accountID);
-        params.put("accountNo", accountNo);
-        params.put("userID", userID);
-        
-        // 1: practice a/c, 2: live a/c
-        params.put("accountType", 1);
-        // 1: market order
-        params.put("ordType", 1);
-        params.put("side", "B");
-        params.put("orderQty", 1.0);
-        params.put("comment", "SY Testing");
-
-        return params;
-    }
-    
     private void setRowContextMenu () {
         this.posTable.setRowFactory(new Callback<TableView<PositionModel>, TableRow<PositionModel>>() {
                 @Override
@@ -118,37 +92,12 @@ public class PositionsTableBuilder {
                     buyItem.setOnAction(new EventHandler<ActionEvent>() {
                         @Override
                         public void handle(ActionEvent event) {
-                            String symbol = row.getItem().getSymbol();
-                            String name = row.getItem().getName();
-                            String instrumentID = row.getItem().getInstrumentID();
+                            PositionModel pos = row.getItem();
                             
-                            /////////////
-                            // TODO: add ASK price to Model, this Last Price is WRONG
-                            Double askPrice = row.getItem().getMarketPrice();
-
-                            System.out.println("Buy button pressed, symbol: " + symbol + ", instrumentID: " + instrumentID);
+                            System.out.println("Buy button pressed, symbol: " + pos.getSymbol()
+                                    + ", instrumentID: " + pos.getInstrumentID());
                             
-                            // TODO: BUY Dialog => should add scheduled service background - keep updating ASK / BID price
-
-                            SessionManager.User user = DriveWealth.getUser();
-                            SessionManager.Account acc = user.getActiveAccount();
-
-                            String userID = user.getUserID();
-                            String accountID = acc.getAccountID();
-                            String accountNo = acc.getAccountNo();
-
-                            Map<String, Object> params = new HashMap<>();
-                                    
-                            params.put("symbol", symbol);
-                            params.put("instrumentID", instrumentID);
-                            params.put("name", name);
-                            params.put("askPrice", askPrice);
-                            
-                            params.put("accountID", accountID);
-                            params.put("accountNo", accountNo);
-                            params.put("userID", userID);                    
-                            
-                            showBuyDialog(params);
+                            showBuyDialog(pos);
                         }
                     });
                     
@@ -182,46 +131,25 @@ public class PositionsTableBuilder {
         );
     }
     
-    private class BuyData {
-        private Map<String, Object> params;
+    public void showBuyDialog (PositionModel pos) {
+        String symbol       = pos.getSymbol();
+        String name         = pos.getName();
+        String instrumentID = pos.getInstrumentID();
         
-        public BuyData (Map<String, Object> params) {
-            this.params = params;
-            System.out.println("BUY MARKET ORDER Dialog - Instantiating BuyData when BUY button pressed");
-        }
-        
-        public Map<String, Object> getParams () {
-            return this.params;
-        }
-    }
-    
-    
-    public void showBuyDialog (Map<String, Object> params) {
+        // TODO: Scheduled service to get ASK price => get market Data / get instrument
+        Double askPrice = null;
 
-        String symbol       = params.get("symbol").toString();
-        String name         = params.get("name").toString();
-        String instrumentID = params.get("instrumentID").toString();
-        Double askPrice     = (Double) params.get("askPrice");
-
-        String accountID = params.get("accountID").toString();
-        String accountNo = params.get("accountNo").toString();
-        String userID = params.get("userID").toString();
-
-        
-        // Create the custom dialog.
-        Dialog<BuyData> dialog = new Dialog<>();
+        Dialog<Map<String, Object>> dialog = new Dialog<>();
         dialog.setTitle("Buy Order");
         dialog.setHeaderText("Buy " + symbol + " - " + name);
 
         // Set the icon (must be included in the project).
         //dialog.setGraphic(new ImageView(this.getClass().getResource("login.png").toString()));
 
-        // Set the button types.
-        ButtonType buyButtonType = new ButtonType("Buy", ButtonData.OK_DONE);
+        ButtonType buyButtonType    = new ButtonType("Buy", ButtonData.OK_DONE);
         ButtonType cancelButtonType = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
         dialog.getDialogPane().getButtonTypes().addAll(buyButtonType, cancelButtonType);
 
-        // Create the username and password labels and fields.
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
@@ -229,18 +157,22 @@ public class PositionsTableBuilder {
 
         // Symbol
         TextField symbolText = new TextField(symbol);
+        symbolText.setPromptText("Symbol");
         symbolText.setEditable(false);
-        
+
         // Order Type: Market, Stop, Limit
-        ChoiceBox<String> orderType = new ChoiceBox<>();
-        orderType.getItems().addAll("Market", "Stop", "Limit");
+        ChoiceBox<OrderManager.OrderType> orderChoice = new ChoiceBox<>();
+        orderChoice.getItems().setAll( OrderManager.OrderType.values() );
+        orderChoice.setValue(OrderManager.OrderType.MARKET);
 
         // Ask price
-        TextField askText = new TextField(askPrice.toString());
+        // TODO: bind value to Task - update ask price
+        TextField askText = new TextField();
         askText.setPromptText("Ask Price");
         askText.setEditable(false);
 
         // Qty
+        // TODO: get Instrument gives: orderSizeMax, orderSizeMin, orderSizeStep
         TextField qtyText = new TextField();
         qtyText.setPromptText("Units");
         
@@ -248,7 +180,7 @@ public class PositionsTableBuilder {
         grid.add(symbolText, 1, 0);
         
         grid.add(new Label("Order Type:"), 0, 1);
-        grid.add(orderType, 1, 1);
+        grid.add(orderChoice, 1, 1);
 
         grid.add(new Label("Ask Price:"), 0, 2);
         grid.add(askText, 1, 2);
@@ -256,57 +188,80 @@ public class PositionsTableBuilder {
         grid.add(new Label("Quantity:"), 0, 3);
         grid.add(qtyText, 1, 3);
 
-        // Enable/Disable login button depending on whether a username was entered.
+        // Enable/Disable buy button depending on whether qty was entered.
         Node buyButton = dialog.getDialogPane().lookupButton(buyButtonType);
         buyButton.setDisable(true);
 
-        // Do some validation (using the Java 8 lambda syntax).
-        qtyText.textProperty().addListener((observable, oldValue, newValue) -> {
-            buyButton.setDisable(Double.parseDouble(newValue) <= 0);
+        // Validate Qty is number format
+        qtyText.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+            boolean disable = true;
+            String newQty = newValue.trim();
+            
+            if (!newQty.isEmpty()) {
+                try {
+                    if (Double.parseDouble(newQty) > 0) {
+                        disable = false;
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Qty is not number format: " + newQty);
+                }
+            }
+
+            buyButton.setDisable(disable);
         });
 
         dialog.getDialogPane().setContent(grid);
 
-        // Request focus on the username field by default.
+        // Request focus on the Qty field by default.
         Platform.runLater(() -> qtyText.requestFocus());
 
-        // Convert the result to a username-password-pair when the login button is clicked.
+        // Convert the result when the BUY button is clicked.
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == buyButtonType) {
-                
-                Map<String, Object> _params = new HashMap<>();
-                
-                _params.put("symbol", symbolText.getText());
-                _params.put("instrumentID", instrumentID);
-                _params.put("accountID", accountID);
-                _params.put("accountNo", accountNo);
-                _params.put("userID", userID);
 
-                // 1: practice a/c, 2: live a/c
-                _params.put("accountType", 1);
-                // 1: market order
-                _params.put("ordType", 1);
-                _params.put("side", "B");
-                _params.put("orderQty", Double.parseDouble(qtyText.getText()));                
-                _params.put("comment", "SY Testing");
+                SessionManager.User user   = DriveWealth.getUser();
+                SessionManager.Account acc = user.getActiveAccount();
+
+                String userID    = user.getUserID();
+                String accountID = acc.getAccountID();
+                String accountNo = acc.getAccountNo();
                 
-                BuyData buyData = new BuyData(_params);
-                return buyData;
+                Map<String, Object> params = new HashMap<>();
+
+                params.put("symbol",        symbolText.getText());
+                params.put("instrumentID",  instrumentID);
+                params.put("accountID",     accountID);
+                params.put("accountNo",     accountNo);
+                params.put("userID",        userID);
+
+                // 1: practice a/c
+                // 2: live a/c
+                params.put("accountType", acc.getAccountType().getValue());
+                
+                // 1: Market order
+                // 2: Limit order
+                // 3: Stop order
+                params.put("ordType", orderChoice.getValue().getValue());
+                
+                params.put("side", "B");
+                params.put("orderQty", Double.parseDouble(qtyText.getText()));                
+                params.put("comment", "SY Sunday Test - Market Order BUY");
+
+                return params;
             }
             return null;
         });
         
-        Optional<BuyData> result = dialog.showAndWait();
+        Optional<Map<String, Object>> result = dialog.showAndWait();
 
-        result.ifPresent(buyData -> {
-            Transaction.buy(Portfolio.portfolioService, buyData.getParams());
+        result.ifPresent(buyParams -> {
+            Transaction.buy(Portfolio.portfolioService, buyParams);
             
-            System.out.println("Buy Order SYMBOL : " + buyData.getParams().get("symbol").toString());
+            System.out.println("Buy Order SYMBOL : " + buyParams.get("symbol").toString());
         });
         
     }
-    
-    
+
     public TableView build () {
         // Open Positions table
         TableColumn<PositionModel, String> symbolCol = new TableColumn<>("Symbol");
