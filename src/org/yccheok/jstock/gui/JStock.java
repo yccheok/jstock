@@ -418,8 +418,7 @@ public class JStock extends javax.swing.JFrame {
         jComboBox1.setEditable(true);
         jComboBox1.setPreferredSize(new java.awt.Dimension(150, 24));
         ((AutoCompleteJComboBox)this.jComboBox1).attachStockInfoObserver(getStockInfoObserver());
-        ((AutoCompleteJComboBox)this.jComboBox1).attachResultObserver(getResultObserver());
-        ((AutoCompleteJComboBox)this.jComboBox1).attachMatchObserver(getMatchObserver());
+        ((AutoCompleteJComboBox)this.jComboBox1).attachDispObserver(getDispObserver());
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
@@ -3100,31 +3099,14 @@ public class JStock extends javax.swing.JFrame {
         JTableUtilities.scrollToVisible(this.jTable1, row, 0);
     }
 
-    private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, MatchType> getMatchObserver() {
-        return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, MatchType>() {
+    private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, DispType> getDispObserver() {
+        return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, DispType>() {
 
             @Override
-            public void update(AutoCompleteJComboBox subject, MatchType matchType) {
-                assert(matchType != null);
-                Code code = matchType.getCode();
-                final Symbol symbol = Symbol.newInstance(matchType.n);
-                final StockInfo stockInfo = StockInfo.newInstance(code, symbol);
-
-                addStockInfoFromAutoCompleteJComboBox(stockInfo);
-            }
-        };
-    }
-    
-    private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, ResultType> getResultObserver() {
-        return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, ResultType>() {
-
-            @Override
-            public void update(AutoCompleteJComboBox subject, ResultType resultType) {
-                assert(resultType != null);
-                // Symbol from Yahoo means Code in JStock.
-                final Code code = Code.newInstance(resultType.symbol);
-                // Name from Yahoo means Symbol in JStock.
-                final Symbol symbol = Symbol.newInstance(resultType.name);
+            public void update(AutoCompleteJComboBox subject, DispType dispType) {
+                assert(dispType != null);
+                Code code = Code.newInstance(dispType.getDispCode());
+                final Symbol symbol = Symbol.newInstance(dispType.getDispName());
                 final StockInfo stockInfo = StockInfo.newInstance(code, symbol);
 
                 addStockInfoFromAutoCompleteJComboBox(stockInfo);
@@ -4108,8 +4090,6 @@ public class JStock extends javax.swing.JFrame {
 
         if (country == Country.India) {
             autoCompleteJComboBox.setGreedyEnabled(true, Arrays.asList("N", "B"));
-        } else if (country == Country.Japan) {
-            autoCompleteJComboBox.setGreedyEnabled(false, java.util.Collections.<String>emptyList());
         } else {
             autoCompleteJComboBox.setGreedyEnabled(false, java.util.Collections.<String>emptyList());
         }

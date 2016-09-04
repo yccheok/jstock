@@ -136,18 +136,15 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
                 if ((e.getModifiers() & java.awt.event.InputEvent.BUTTON1_MASK) == java.awt.event.InputEvent.BUTTON1_MASK) {
                     final Object object = AutoCompleteJComboBox.this.getEditor().getItem();
                     /* Let us be extra paranoid. */
-                    if (object instanceof ResultType) {
-                        // From Yahoo! Ajax result.
-                        ResultType lastEnteredResult = (ResultType)object;
-                        AutoCompleteJComboBox.this.resultSubject.notify(AutoCompleteJComboBox.this, lastEnteredResult);
+                    if (object instanceof DispType) {
+                        DispType lastEnteredDisp = (DispType)object;
+                        AutoCompleteJComboBox.this.dispSubject.notify(AutoCompleteJComboBox.this, lastEnteredDisp);
                     } else if (object instanceof StockInfo) {
                         // From our offline database.
                         StockInfo lastEnteredStockInfo = (StockInfo)object;
                         AutoCompleteJComboBox.this.stockInfoSubject.notify(AutoCompleteJComboBox.this, lastEnteredStockInfo);
                     } else {
-                        assert(object instanceof MatchType);
-                        MatchType lastEnteredMatch = (MatchType)object;
-                        AutoCompleteJComboBox.this.matchSubject.notify(AutoCompleteJComboBox.this, lastEnteredMatch);
+                        assert(false);
                     }
 
                     SwingUtilities.invokeLater(new Runnable() {
@@ -354,8 +351,7 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
                     busySubject.notify(AutoCompleteJComboBox.this, false);
                     
                     StockInfo lastEnteredStockInfo = null;
-                    ResultType lastEnteredResultType = null;
-                    MatchType lastEnteredMatchType = null;
+                    DispType lastEnteredDispType = null;
                     
                     if (AutoCompleteJComboBox.this.getItemCount() > 0) {
                         int index = AutoCompleteJComboBox.this.getSelectedIndex();
@@ -363,22 +359,16 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
                             Object object = AutoCompleteJComboBox.this.getItemAt(0);
                             if (object instanceof StockInfo) {
                                 lastEnteredStockInfo = (StockInfo)object;
-                            } else if (object instanceof ResultType) {
-                                lastEnteredResultType = (ResultType)object;
-                            } else {
-                                assert(object instanceof MatchType);
-                                lastEnteredMatchType = (MatchType)object;
+                            } else if (object instanceof DispType) {
+                                lastEnteredDispType = (DispType)object;
                             }
                         }
                         else {
                             Object object = AutoCompleteJComboBox.this.getItemAt(index);
                             if (object instanceof StockInfo) {
                                 lastEnteredStockInfo = (StockInfo)object;
-                            } else if (object instanceof ResultType) {
-                                lastEnteredResultType = (ResultType)object;
-                            } else {
-                                assert(object instanceof MatchType);
-                                lastEnteredMatchType = (MatchType)object;
+                            } else if (object instanceof DispType) {
+                                lastEnteredDispType = (DispType)object;
                             }
                         }
                     }
@@ -403,10 +393,8 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
                     AutoCompleteJComboBox.this.removeAllItems();
                     if (lastEnteredStockInfo != null) {
                         AutoCompleteJComboBox.this.stockInfoSubject.notify(AutoCompleteJComboBox.this, lastEnteredStockInfo);
-                    } else if (lastEnteredResultType != null) {
-                        AutoCompleteJComboBox.this.resultSubject.notify(AutoCompleteJComboBox.this, lastEnteredResultType);
-                    } else if (lastEnteredMatchType != null) {
-                        AutoCompleteJComboBox.this.matchSubject.notify(AutoCompleteJComboBox.this, lastEnteredMatchType);
+                    } else if (lastEnteredDispType != null) {
+                        AutoCompleteJComboBox.this.dispSubject.notify(AutoCompleteJComboBox.this, lastEnteredDispType);
                     } else {
                         // Do nothing.
                     }
@@ -559,7 +547,7 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
                 if (arg.Match.isEmpty()) {
                     StockInfo stockInfo = ajaxStockInfoSearchEngine.search(arg.Query);
                     if (stockInfo != null) {
-                        MatchType matchType = new MatchType(stockInfo.code.toString(), stockInfo.symbol.toString(), null, null);
+                        MatchType matchType = new MatchType(stockInfo.code.toString().toUpperCase(), stockInfo.symbol.toString(), null, null);
                         List<MatchType> matchTypes = new ArrayList<>();
                         matchTypes.add(matchType);
                         MatchSetType matchSetType = MatchSetType.newInstance(arg.Query, matchTypes);
@@ -652,7 +640,7 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
                 if (arg.Result.isEmpty()) {
                     StockInfo stockInfo = ajaxStockInfoSearchEngine.search(arg.Query);
                     if (stockInfo != null) {
-                        ResultType resultType = new ResultType(stockInfo.code.toString(), stockInfo.symbol.toString());
+                        ResultType resultType = new ResultType(stockInfo.code.toString().toUpperCase(), stockInfo.symbol.toString());
                         List<ResultType> resultTypes = new ArrayList<>();
                         resultTypes.add(resultType);
                         // Overwrite!
@@ -736,8 +724,7 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
         };
     }
 
-    private final SubjectEx<AutoCompleteJComboBox, ResultType> resultSubject = new SubjectEx<AutoCompleteJComboBox, ResultType>();
-    private final SubjectEx<AutoCompleteJComboBox, MatchType> matchSubject = new SubjectEx<AutoCompleteJComboBox, MatchType>();
+    private final SubjectEx<AutoCompleteJComboBox, DispType> dispSubject = new SubjectEx<AutoCompleteJComboBox, DispType>();
     private final SubjectEx<AutoCompleteJComboBox, StockInfo> stockInfoSubject = new SubjectEx<AutoCompleteJComboBox, StockInfo>();
     private final SubjectEx<AutoCompleteJComboBox, Boolean> busySubject = new SubjectEx<AutoCompleteJComboBox, Boolean>();
 
@@ -755,12 +742,8 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
      *
      * @param observer an observer to listen to ResultType available event
      */
-    public void attachResultObserver(Observer<AutoCompleteJComboBox, ResultType> observer) {
-        resultSubject.attach(observer);
-    }
-
-    public void attachMatchObserver(Observer<AutoCompleteJComboBox, MatchType> observer) {
-        matchSubject.attach(observer);
+    public void attachDispObserver(Observer<AutoCompleteJComboBox, DispType> observer) {
+        dispSubject.attach(observer);
     }
     
     /**
@@ -779,8 +762,7 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
         // For offline database feature.
         stockInfoSubject.dettachAll();
         // For online database feature.
-        resultSubject.dettachAll();
-        matchSubject.dettachAll();
+        dispSubject.dettachAll();
         busySubject.dettachAll();
     }
     
@@ -845,7 +827,7 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
     private List<String> codeExtensionSortingOption = java.util.Collections.emptyList();
     
     private final ListCellRenderer offlineModeCellRenderer = new StockInfoCellRenderer();
-    private final ListCellRenderer onlineModeCellRenderer = new MatchSetOrResultSetCellRenderer();
+    private final ListCellRenderer onlineModeCellRenderer = new DispTypeCellRenderer();
     private final ListCellRenderer oldListCellRenderer;
     private ListCellRenderer currentListCellRenderer;
 

@@ -91,6 +91,7 @@ public class Utils {
     private static final List<String> paidNewsUrls = new ArrayList<String>();
 
     static {
+        defaultNewsSources.put(Country.Argentina, NewsSource.Yahoo);
         defaultNewsSources.put(Country.Australia, NewsSource.Yahoo);
         defaultNewsSources.put(Country.Austria, NewsSource.Yahoo);
         defaultNewsSources.put(Country.Belgium, NewsSource.Yahoo);
@@ -99,6 +100,7 @@ public class Utils {
         defaultNewsSources.put(Country.China, NewsSource.Yahoo);
         //defaultNewsSources.put(Country.Czech, NewsSource.Yahoo);
         defaultNewsSources.put(Country.Denmark, NewsSource.Yahoo);
+        defaultNewsSources.put(Country.Finland, NewsSource.Google);
         defaultNewsSources.put(Country.France, NewsSource.Yahoo);
         defaultNewsSources.put(Country.Germany, NewsSource.Yahoo);
         defaultNewsSources.put(Country.HongKong, NewsSource.Yahoo);
@@ -114,11 +116,16 @@ public class Utils {
         defaultNewsSources.put(Country.NewZealand, NewsSource.Yahoo);
         defaultNewsSources.put(Country.Norway, NewsSource.Yahoo);
         defaultNewsSources.put(Country.Portugal, NewsSource.Yahoo);
+        defaultNewsSources.put(Country.Russia, NewsSource.Google);
+        defaultNewsSources.put(Country.SaudiArabia, NewsSource.Google);
         defaultNewsSources.put(Country.Singapore, NewsSource.Yahoo);
+        defaultNewsSources.put(Country.SouthAfrica, NewsSource.Google);
         defaultNewsSources.put(Country.Spain, NewsSource.Yahoo);
         defaultNewsSources.put(Country.Sweden, NewsSource.Yahoo);
         defaultNewsSources.put(Country.Switzerland, NewsSource.Yahoo);
         defaultNewsSources.put(Country.Taiwan, NewsSource.Yahoo);
+        defaultNewsSources.put(Country.Thailand, NewsSource.Google);
+        defaultNewsSources.put(Country.Turkey, NewsSource.Google);
         defaultNewsSources.put(Country.UnitedKingdom, NewsSource.Yahoo);
         defaultNewsSources.put(Country.UnitedState, NewsSource.Yahoo);
 

@@ -24,19 +24,18 @@ import java.awt.Component;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import javax.swing.UIManager;
-import org.yccheok.jstock.engine.MatchType;
-import org.yccheok.jstock.engine.ResultType;
+import org.yccheok.jstock.engine.DispType;
 
 /**
  *
  * @author yccheok
  */
-public class MatchSetOrResultSetCellRenderer extends javax.swing.JPanel implements ListCellRenderer {
+public class DispTypeCellRenderer extends javax.swing.JPanel implements ListCellRenderer {
 
     /**
      * Creates new form MatchSetOrResultSetCellRenderer
      */
-    public MatchSetOrResultSetCellRenderer() {
+    public DispTypeCellRenderer() {
         initComponents();
     }
 
@@ -121,33 +120,19 @@ public class MatchSetOrResultSetCellRenderer extends javax.swing.JPanel implemen
         jLabel3.setBackground(isSelected ? _csbc : cbc);
         jLabel3.setForeground(cdfc);
 
-        if (value instanceof MatchType) {
-            final MatchType result = (MatchType)value;
-            jLabel1.setText(result.getCode().toString());
-            
-            jLabel2.setText(result.n);
-            
-            if (result.e == null) {
-                jLabel3.setVisible(false);
-            } else {
-                jLabel3.setVisible(true);
-                jLabel3.setText(result.e);
-            }
-        } else if (value instanceof ResultType) {
-            final ResultType result = (ResultType)value;
-            jLabel1.setText(result.symbol);
-            jLabel2.setText(result.name);
-            final String type = result.typeDisp != null ? result.typeDisp : result.type;
-            final String exch = result.exchDisp != null ? result.exchDisp : result.exch;
-            if (type == null || exch == null) {
-                jLabel3.setVisible(false);
-            } else {
-                jLabel3.setVisible(true);
-                jLabel3.setText(type  + " - " + exch);    
-            }
+        final DispType result = (DispType)value;
+        jLabel1.setText(result.getDispCode());
+
+        jLabel2.setText(result.getDispName());
+
+        final String dispExchange = result.getDispExchange();
+        if (dispExchange == null) {
+            jLabel3.setVisible(false);
         } else {
-            assert(false);
+            jLabel3.setVisible(true);
+            jLabel3.setText(dispExchange);
         }
+        
         return this;
     }
 }

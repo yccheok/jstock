@@ -89,6 +89,7 @@ public class NewsServerFactory {
         final Set<Class<? extends NewsServer>> googleSearchSet = new HashSet<>();
         final Set<Class<? extends NewsServer>> yahooSet = new HashSet<>();
 
+        final List<NewsServer> argentinaList = new CopyOnWriteArrayList<>();
         final List<NewsServer> australiaList = new CopyOnWriteArrayList<>();
         final List<NewsServer> austriaList = new CopyOnWriteArrayList<>();
         final List<NewsServer> belgiumList = new CopyOnWriteArrayList<>();
@@ -96,6 +97,7 @@ public class NewsServerFactory {
         final List<NewsServer> canadaList = new CopyOnWriteArrayList<>();
         final List<NewsServer> chinaList = new CopyOnWriteArrayList<>();
         final List<NewsServer> denmarkList = new CopyOnWriteArrayList<>();
+        final List<NewsServer> finlandList = new CopyOnWriteArrayList<>();
         final List<NewsServer> franceList = new CopyOnWriteArrayList<>();
         final List<NewsServer> germanyList = new CopyOnWriteArrayList<>();
         final List<NewsServer> hongkongList = new CopyOnWriteArrayList<>();
@@ -110,11 +112,16 @@ public class NewsServerFactory {
         final List<NewsServer> newZealandList = new CopyOnWriteArrayList<>();
         final List<NewsServer> norwayList = new CopyOnWriteArrayList<>();
         final List<NewsServer> portugalList = new CopyOnWriteArrayList<>();
+        final List<NewsServer> russiaList = new CopyOnWriteArrayList<>();
+        final List<NewsServer> saudiArabiaList = new CopyOnWriteArrayList<>();
         final List<NewsServer> singaporeList = new CopyOnWriteArrayList<>();
+        final List<NewsServer> southAfricaList = new CopyOnWriteArrayList<>();
         final List<NewsServer> spainList = new CopyOnWriteArrayList<>();
         final List<NewsServer> swedenList = new CopyOnWriteArrayList<>();
         final List<NewsServer> switzerlandList = new CopyOnWriteArrayList<>();
         final List<NewsServer> taiwanList = new CopyOnWriteArrayList<>();
+        final List<NewsServer> thailandList = new CopyOnWriteArrayList<>();
+        final List<NewsServer> turkeyList = new CopyOnWriteArrayList<>();
         final List<NewsServer> unitedKingdomList = new CopyOnWriteArrayList<>();
         final List<NewsServer> unitedStateList = new CopyOnWriteArrayList<>();
 
@@ -122,6 +129,8 @@ public class NewsServerFactory {
         googleSearchSet.add(GoogleSearchNewsServer.class);
         yahooSet.add(YahooFinanceNewsServer.class);
 
+        argentinaList.add(new YahooFinanceNewsServer());
+        argentinaList.add(new GoogleFinanceNewsServer());
         australiaList.add(new YahooFinanceNewsServer());
         australiaList.add(new GoogleFinanceNewsServer());
         austriaList.add(new YahooFinanceNewsServer());
@@ -136,6 +145,7 @@ public class NewsServerFactory {
         chinaList.add(new GoogleFinanceNewsServer());
         denmarkList.add(new YahooFinanceNewsServer());
         denmarkList.add(new GoogleFinanceNewsServer());
+        finlandList.add(new GoogleFinanceNewsServer());
         franceList.add(new YahooFinanceNewsServer());
         franceList.add(new GoogleFinanceNewsServer());
         germanyList.add(new YahooFinanceNewsServer());
@@ -162,8 +172,11 @@ public class NewsServerFactory {
         norwayList.add(new GoogleSearchNewsServer());
         portugalList.add(new YahooFinanceNewsServer());
         portugalList.add(new GoogleFinanceNewsServer());
+        russiaList.add(new GoogleFinanceNewsServer());
+        saudiArabiaList.add(new GoogleFinanceNewsServer());
         singaporeList.add(new YahooFinanceNewsServer());
         singaporeList.add(new GoogleFinanceNewsServer());
+        southAfricaList.add(new GoogleFinanceNewsServer());
         spainList.add(new YahooFinanceNewsServer());
         spainList.add(new GoogleSearchNewsServer());
         swedenList.add(new YahooFinanceNewsServer());
@@ -172,6 +185,8 @@ public class NewsServerFactory {
         switzerlandList.add(new GoogleSearchNewsServer());
         taiwanList.add(new YahooFinanceNewsServer());
         taiwanList.add(new GoogleFinanceNewsServer());
+        thailandList.add(new GoogleFinanceNewsServer());
+        turkeyList.add(new GoogleFinanceNewsServer());
         unitedKingdomList.add(new YahooFinanceNewsServer());
         unitedKingdomList.add(new GoogleFinanceNewsServer());
         unitedStateList.add(new YahooFinanceNewsServer());
@@ -181,6 +196,7 @@ public class NewsServerFactory {
         newsSourceMap.put(NewsSource.GoogleSearch, googleSearchSet);
         newsSourceMap.put(NewsSource.Yahoo, yahooSet);
 
+        map.put(Country.Argentina, argentinaList);
         map.put(Country.Australia, australiaList);
         map.put(Country.Austria, austriaList);
         map.put(Country.Belgium, belgiumList);
@@ -188,6 +204,7 @@ public class NewsServerFactory {
         map.put(Country.Canada, canadaList);
         map.put(Country.China, chinaList);
         map.put(Country.Denmark, denmarkList);
+        map.put(Country.Finland, finlandList);
         map.put(Country.France, franceList);
         map.put(Country.Germany, germanyList);
         map.put(Country.HongKong, hongkongList);
@@ -202,12 +219,17 @@ public class NewsServerFactory {
         map.put(Country.NewZealand, newZealandList);
         map.put(Country.Norway, norwayList);
         map.put(Country.Portugal, portugalList);
+        map.put(Country.Russia, russiaList);
+        map.put(Country.SaudiArabia, saudiArabiaList);
         map.put(Country.Singapore, singaporeList);
+        map.put(Country.SouthAfrica, southAfricaList);
         map.put(Country.Spain, spainList);
         map.put(Country.Sweden, swedenList);
         map.put(Country.Switzerland, switzerlandList);
         map.put(Country.Taiwan, taiwanList);
+        map.put(Country.Thailand, thailandList);
+        map.put(Country.Turkey, turkeyList);
         map.put(Country.UnitedKingdom, unitedKingdomList);
         map.put(Country.UnitedState, unitedStateList);
-    } 
+    }
 }
