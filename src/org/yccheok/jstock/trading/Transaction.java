@@ -21,32 +21,31 @@ public class Transaction {
 
     private Transaction () {}
 
-    public static void buy (PortfolioService portfolioService, Map<String, Object> params) {
+    public static void buy (PortfolioService portfolioService, OrderManager.OrderType orderType, Map<String, Object> params) {
         System.out.println("Buy market order...");
 
-        // temporary stop Portfolio Scheduled Service
-        // portfolioService.cancel();
-
-        Task buyTask = createBuyTask(params);
+        Task buyTask = createBuyTask(orderType, params);
         setBuySucceedHandler(buyTask, portfolioService);
 
         Thread buyThread = new Thread(buyTask);
         buyThread.start();
     }
 
-    private static Task createBuyTask (final Map<String, Object> params) {
+    private static Task createBuyTask (OrderManager.OrderType orderType, final Map<String, Object> params) {
         Task buyTask = new Task<Pair<OrderManager.Order, String>>() {
             @Override protected Pair<OrderManager.Order, String> call() throws Exception {
                 System.out.println("BuyTask call create order .....");
 
                 // Create Order
-                Pair<OrderManager.Order, String> createOrder = OrderManager.create(OrderManager.OrderSide.BUY, OrderManager.OrderType.MARKET, params);
+                Pair<OrderManager.Order, String> createOrder = OrderManager.create(OrderManager.OrderSide.BUY, orderType, params);
                 OrderManager.Order order = createOrder.first;
                 String error = createOrder.second;
 
                 if (error != null) {
-                    System.out.println("BUY market order failed....");
-                    updateMessage("Create Market Order Status FAILED !!");
+                    String ordName = orderType.getName();
+                    
+                    System.out.println("BUY " + ordName + " order failed....");
+                    updateMessage("Create " + ordName + " Order Status FAILED !!");
 
                     return new Pair<>(null, error);
                 }
@@ -115,8 +114,9 @@ public class Transaction {
                         " status: "         + status
                     );
 
-                    // resume service, reset to AccBlotter state to refresh Portfolio, as new position / order has been added
-                    portfolioService.setRefresh();
+                    // Reset service's task state to "ACCBlotter", to refresh Portfolio
+                    // Restart service
+                    portfolioService._restart();
 
                     // service restart must be called in FX application thread. Since task event handler occurs in JavaFX application thread
                     // so no need to wrap in Platfrom.runLater()
@@ -126,8 +126,6 @@ public class Transaction {
                     // Because the Task is designed for use with JavaFX GUI applications, it ensures that every change
                     // to its public properties, as well as change notifications for state, errors, and for event handlers,
                     // all occur on the main JavaFX application thread
-                    
-                    portfolioService.restart();
                 }
             }
         });

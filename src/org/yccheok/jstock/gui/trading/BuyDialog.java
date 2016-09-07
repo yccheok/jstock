@@ -45,7 +45,7 @@ public class BuyDialog {
     public static void showBuyDialog (PositionModel pos) {
         
         // temporary cancel / suspend Portfolio Scheduled Service
-        Portfolio.portfolioService.cancel();
+        Portfolio.portfolioService._cancel();
         
         String symbol       = pos.getSymbol();
         String name         = pos.getName();
@@ -74,6 +74,16 @@ public class BuyDialog {
         orderChoice.getItems().setAll( OrderManager.OrderType.values() );
         orderChoice.setValue(OrderManager.OrderType.MARKET);
 
+        //  box.getSelectionModel()
+//    .selectedItemProperty()
+//    .addListener( (ObservableValue<? extends String> observable, String oldValue, String newValue) -> System.out.println(newValue) );
+
+        
+        
+        
+        
+        
+        
         // Ask price
         TextField askText = new TextField();
         askText.setPromptText("Ask Price");
@@ -96,7 +106,7 @@ public class BuyDialog {
         grid.add(new Label("Quantity:"), 0, 3);
         grid.add(qtyText, 1, 3);
 
-        // Scheduled service to get Ask price => Get Market Data / Quote API
+        // Scheduled service - get Ask price with Get Market Data / Quote API
         final ScheduledService marketDatasrv = getMarketDataService(symbol);
         marketDatasrv.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
@@ -112,7 +122,6 @@ public class BuyDialog {
             }
         });
         marketDatasrv.start();
-        
         
         // Buy button: Enable/Disable button depends on qty entered.
         Node buyButton = dialog.getDialogPane().lookupButton(buyButtonType);
@@ -136,24 +145,10 @@ public class BuyDialog {
 
         // Cancel button
         Node cancelButton = dialog.getDialogPane().lookupButton(cancelButtonType);
-        
         cancelButton.addEventFilter(ActionEvent.ACTION, event -> {
             System.out.println("Cancel was definitely pressed");
         });
-        
 
-        
-        ///////////
-        //  TODO:
-        //      1) When show BUY Dialog => cancel PortfolioService
-        //      2) After BUY Dialog close => resume PortfolioService
-        //          a) successful buy
-        //          b) Cancel button pressed on BUY Dialog
-        //          c) Close button pressed on BUY Dialog
-        //      3) On (2), cancel & Destroy Scheduled Service for market data - Bid Ask
-        //////////
-        
-        
         dialog.getDialogPane().setContent(grid);
 
         // Request focus on the Qty field by default.
@@ -199,22 +194,20 @@ public class BuyDialog {
         if (result.isPresent()) {
             Map<String, Object> buyParams = result.get();
             
-            Transaction.buy(Portfolio.portfolioService, buyParams);
+            Transaction.buy(Portfolio.portfolioService, orderChoice.getValue(), buyParams);
             System.out.println("Buy Order SYMBOL : " + buyParams.get("symbol").toString());
             
             // cancel get market data shceduled service
             marketDatasrv.cancel();
         } else {
             // No result, probably Cancel button or Close has been pressed
+            
             // resume Portfolio Scheduled Service
+            Portfolio.portfolioService._restart();
             
-            // resume service, reset to AccBlotter state to refresh Portfolio, as new position / order has been added
-            Portfolio.portfolioService.setRefresh();
-            Portfolio.portfolioService.restart();
-            
+            // cancel get market data shceduled service
             marketDatasrv.cancel();
         }
-        
     }
 
     

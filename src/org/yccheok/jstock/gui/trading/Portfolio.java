@@ -18,7 +18,6 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.util.Duration;
 import org.yccheok.jstock.trading.AccountSummaryModel;
 import org.yccheok.jstock.trading.PortfolioService;
 import org.yccheok.jstock.trading.API.InstrumentManager;
@@ -89,14 +88,6 @@ public class Portfolio {
     private static void startPortfolioService () {
         Portfolio.portfolioService = new PortfolioService();
         
-        // The initial delay between when the ScheduledService is first started, and when it will begin operation.
-        // This is the amount of time the ScheduledService will remain in the SCHEDULED state, before entering the RUNNING state,
-        // following a fresh invocation of Service.start() or Service.restart().
-        portfolioService.setDelay(Portfolio.delay);
-        
-        // The minimum amount of time to allow between the start of the last run and the start of the next run.
-        portfolioService.setPeriod(Portfolio.period);
-        
         setSucceedHandler(portfolioService);
         setFailedHandler(portfolioService);
         
@@ -165,9 +156,6 @@ public class Portfolio {
     private static final AccountSummaryBuilder accSummaryBuilder = new AccountSummaryBuilder();
 
     private static final Tab PortfolioTab = new Tab();
-    
-    private static final Duration delay = new Duration(0);
-    private static final Duration period = Duration.seconds(10);
     
     public static final double TABLE_CELL_SIZE = 25;
     public static PortfolioService portfolioService;
