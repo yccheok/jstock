@@ -68,7 +68,7 @@ public class MarketDataManager {
         ));
 
         String symbols = String.join(",", symbolList);
-        System.out.println("symbols: " + symbols);
+        //System.out.println("symbols: " + symbols);
 
         // get last Traded price only, no bid & ask return
         String lastTrade = "";

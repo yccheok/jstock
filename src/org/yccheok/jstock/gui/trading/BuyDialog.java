@@ -33,7 +33,7 @@ import org.yccheok.jstock.trading.API.OrderManager;
 import org.yccheok.jstock.trading.API.SessionManager;
 import org.yccheok.jstock.trading.PositionModel;
 import org.yccheok.jstock.trading.Transaction;
-
+import static org.yccheok.jstock.trading.API.OrderManager.OrderType;
 /**
  *
  * @author shuwnyuan
@@ -69,42 +69,63 @@ public class BuyDialog {
         symbolText.setPromptText("Symbol");
         symbolText.setEditable(false);
 
-        // Order Type: Market, Stop, Limit
-        ChoiceBox<OrderManager.OrderType> orderChoice = new ChoiceBox<>();
-        orderChoice.getItems().setAll( OrderManager.OrderType.values() );
-        orderChoice.setValue(OrderManager.OrderType.MARKET);
-
-        //  box.getSelectionModel()
-//    .selectedItemProperty()
-//    .addListener( (ObservableValue<? extends String> observable, String oldValue, String newValue) -> System.out.println(newValue) );
-
-        
-        
-        
-        
-        
-        
         // Ask price
-        TextField askText = new TextField();
-        askText.setPromptText("Ask Price");
-        askText.setEditable(false);
+        Label askLabel = new Label();
+        
+        // Order Type: Market, Stop, Limit
+        ChoiceBox<OrderType> orderChoice = new ChoiceBox<>();
+        orderChoice.getItems().setAll(OrderType.values());
+        orderChoice.setValue(OrderType.MARKET);
 
         // Qty
         // TODO: get Instrument gives: orderSizeMax, orderSizeMin, orderSizeStep
         TextField qtyText = new TextField();
         qtyText.setPromptText("Units");
         
+        // Limit / Stop price
+        Label priceLabel = new Label();
+        TextField priceText = new TextField();
+
+        // set to MARKET order by default, so hide Stop / Limit Price field
+        priceLabel.setVisible(false);
+        priceText.setVisible(false);
+        
+        orderChoice.getSelectionModel().selectedItemProperty().addListener(
+            (ObservableValue<? extends OrderType> observable, OrderType oldValue, OrderType newValue) -> {
+                System.out.println("Order Type changed: " + newValue.getName());
+
+                if (newValue == OrderType.LIMIT) {
+                    priceLabel.setVisible(true);
+                    priceText.setVisible(true);
+                    
+                    priceLabel.setText("Limit Price");
+                } else if (newValue == OrderType.STOP) {
+                    priceLabel.setVisible(true);
+                    priceText.setVisible(true);
+                    
+                    priceLabel.setText("Stop Price");
+                } else if (newValue == OrderType.MARKET) {
+                    // hide price field
+                    priceLabel.setVisible(false);
+                    priceText.setVisible(false);
+                }
+            });
+
+        
         grid.add(new Label("Stock:"), 0, 0);
         grid.add(symbolText, 1, 0);
-        
-        grid.add(new Label("Order Type:"), 0, 1);
-        grid.add(orderChoice, 1, 1);
 
-        grid.add(new Label("Ask Price:"), 0, 2);
-        grid.add(askText, 1, 2);
+        grid.add(new Label("Ask Price:"), 0, 1);
+        grid.add(askLabel, 1, 1);
+        
+        grid.add(new Label("Order Type:"), 0, 2);
+        grid.add(orderChoice, 1, 2);
 
         grid.add(new Label("Quantity:"), 0, 3);
         grid.add(qtyText, 1, 3);
+        
+        grid.add(priceLabel, 0, 4);
+        grid.add(priceText, 1, 4);
 
         // Scheduled service - get Ask price with Get Market Data / Quote API
         final ScheduledService marketDatasrv = getMarketDataService(symbol);
@@ -112,13 +133,15 @@ public class BuyDialog {
             @Override
             public void handle(final WorkerStateEvent workerStateEvent) {
                 MarketDataManager.MarketData result = (MarketDataManager.MarketData) workerStateEvent.getSource().getValue();
-                
+        
+                /*
                 System.out.println("BUY dialog: Get Market Data Service, Updated price for symbol: " + symbol
                         + ", Bid: " + result.getBid()
                         + ", Ask: " + result.getAsk());
+                */
 
                 // Task's event handler is handled in JavaFX Application / UI Thread, so is ok to update UI
-                askText.setText(result.getAsk().toString());
+                askLabel.setText(result.getAsk().toString());
             }
         });
         marketDatasrv.start();
@@ -202,11 +225,11 @@ public class BuyDialog {
         } else {
             // No result, probably Cancel button or Close has been pressed
             
-            // resume Portfolio Scheduled Service
-            Portfolio.portfolioService._restart();
-            
             // cancel get market data shceduled service
             marketDatasrv.cancel();
+            
+            // resume Portfolio Scheduled Service
+            Portfolio.portfolioService._restart();
         }
     }
 
@@ -220,7 +243,7 @@ public class BuyDialog {
                         ArrayList<String> symbols = new ArrayList<>();
                         symbols.add(symbol);
 
-                        System.out.println("BUY DIALOG - Scheduled Task to get market data bid/ask");
+                        //System.out.println("BUY DIALOG - Scheduled Task to get market data bid/ask");
 
                         // call Get market Data API => bid + ask
                         List<MarketDataManager.MarketData> dataList = MarketDataManager.get(symbols, false);
