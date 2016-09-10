@@ -61,7 +61,15 @@ public class PositionModel {
         this.openQty        = new SimpleDoubleProperty((Double) pos.get("openQty"));
         this.tradingQty     = new SimpleDoubleProperty((Double) pos.get("tradingQty"));
 
-        this.averagePrice   = new SimpleDoubleProperty((Double) pos.get("averagePrice"));
+        // this averagePrice is already rounded to 2 decimal place, which is inaccurate
+        // this.averagePrice   = new SimpleDoubleProperty((Double) pos.get("averagePrice"));
+        
+        Double xxx = (Double) pos.get("averagePrice");
+        this.averagePrice   = new SimpleDoubleProperty(this.costBasis.divide(this.openQty).getValue());
+
+        System.out.println("averagePrice - calc from costBasis & Qty [" + this.getAveragePrice() +
+                "],  from AccBlotter [" + xxx + "]......");
+        
         this.marketPrice    = new SimpleDoubleProperty((Double) pos.get("marketPrice"));
         
         this.marketValue    = new SimpleDoubleProperty();
