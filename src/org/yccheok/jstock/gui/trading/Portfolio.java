@@ -122,11 +122,8 @@ public class Portfolio {
                     if (state.equals("INSTRUMENTS")) {
                         instruments = (Map<String, InstrumentManager.Instrument>) result.get("instruments");
                         
-                        // new instruments added from last call
-                        if ((boolean) result.get("updated") == true) {
-                            posTableBuilder.updateStocksName(instruments);
-                            ordTableBuilder.updateStocksName(instruments);
-                        }
+                        posTableBuilder.updateNameURL(instruments);
+                        ordTableBuilder.updateNameURL(instruments);
                     }
                     
                     posTableBuilder.updatePrices(marketPrices);
@@ -157,7 +154,7 @@ public class Portfolio {
 
     private static final Tab PortfolioTab = new Tab();
     
-    public static final double TABLE_CELL_SIZE = 25;
+    public static final double TABLE_CELL_SIZE = 30;
     public static PortfolioService portfolioService;
 }
     

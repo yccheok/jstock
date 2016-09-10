@@ -38,7 +38,7 @@ public class InstrumentManager {
         private Double rateAsk = null;
         private Double rateBid = null;
 
-        // not available for "search instrument"
+        // available for certain symbols only, for both "search instrument" & "get instrument"
         private String urlImage = null;
 
 

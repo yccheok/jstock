@@ -12,6 +12,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
@@ -21,9 +22,14 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.util.Callback;
 import org.yccheok.jstock.trading.PositionModel;
+import org.yccheok.jstock.trading.PositionModel.SymbolUrl;
+
 import org.yccheok.jstock.trading.Utils;
 import org.yccheok.jstock.trading.API.InstrumentManager;
 
@@ -40,6 +46,46 @@ public class PositionsTableBuilder {
     
     public ObservableList<PositionModel> getPosList () {
         return this.posList;
+    }
+
+    
+    private class SymbolCell extends TableCell<PositionModel, SymbolUrl> {
+        private final HBox hbox = new HBox();
+        private final Label symLabel = new Label();
+        private final ImageView imageView = new ImageView();
+
+        public SymbolCell () {
+            // So symbol icon aligns vertically for each row
+            symLabel.setPrefWidth(70);
+
+            // Set image height = table cell height
+            // defaul image size: 125x125. Set width = height so image scale proportionally
+            imageView.setFitHeight(Portfolio.TABLE_CELL_SIZE);
+            imageView.setFitWidth(Portfolio.TABLE_CELL_SIZE);
+            
+            hbox.setSpacing(10) ;
+            // align text vertically center
+            hbox.setAlignment(Pos.CENTER_LEFT);
+
+            hbox.getChildren().addAll(symLabel, imageView);
+            setGraphic(hbox);
+        }
+        
+        @Override
+        protected void updateItem (SymbolUrl item, boolean empty) {
+            if (item != null) {
+                String symbol = item.getSymbol();
+                String url = item.getUrlImage();
+
+                symLabel.setText(symbol);
+
+                if (url != null && ! url.isEmpty()) {
+                    // use background loading:  public Image(String url, boolean backgroundLoading)
+                    Image icon = new Image(url, true);
+                    imageView.setImage(icon);
+                }
+            }
+        }
     }
     
     private class FormatNumberCell extends TableCell<PositionModel, Number> {
@@ -113,13 +159,17 @@ public class PositionsTableBuilder {
             }
         );
     }
+
     
     public TableView build () {
         // Open Positions table
-        TableColumn<PositionModel, String> symbolCol = new TableColumn<>("Symbol");
-        symbolCol.setCellValueFactory(new PropertyValueFactory("symbol"));
+        
+        // Symbol column: show symbol name + stock's icon 
+        TableColumn<PositionModel, SymbolUrl> symbolCol = new TableColumn<>("Symbol");
+        symbolCol.setCellValueFactory(new PropertyValueFactory<>("symbolObj"));
+        symbolCol.setCellFactory((TableColumn<PositionModel, SymbolUrl> col) -> new SymbolCell());
         symbolCol.getStyleClass().add("left");
-
+        
         TableColumn<PositionModel, String> nameCol = new TableColumn<>("Company");
         nameCol.setCellValueFactory(new PropertyValueFactory("name"));
         nameCol.getStyleClass().add("left");
@@ -192,17 +242,20 @@ public class PositionsTableBuilder {
         this.posList.addAll(positions);
 
         if (! instruments.isEmpty()) {
-            updateStocksName(instruments);
+            updateNameURL(instruments);
         }
     }
 
-    public void updateStocksName (Map<String, InstrumentManager.Instrument> instruments) {
+    public void updateNameURL (Map<String, InstrumentManager.Instrument> instruments) {
         for (PositionModel pos : this.posList) {
             final String symbol = pos.getSymbol();
             
             if (instruments.containsKey(symbol)) {
                 InstrumentManager.Instrument ins = instruments.get(symbol);
                 pos.setName(ins.getName());
+                
+                // update Stock's icon URL
+                pos.setUrlImage(ins.getUrlImage());
             }
         }
     }

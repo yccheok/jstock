@@ -53,8 +53,10 @@ public final class AccountManager {
 
                 Map<String, Object> data = new HashMap<>();
 
-                // position only has symbol, but no stock name
+                // position has NO stock name, icon URL. Will get this via "Search Instrument" in PortfolioService
                 data.put("name",            "");
+                data.put("urlImage",        "");
+
                 data.put("symbol",          symbol);
                 data.put("instrumentID",    pos.get("instrumentID"));
                 data.put("openQty",         pos.get("openQty"));
@@ -84,8 +86,9 @@ public final class AccountManager {
 
                 Map<String, Object> data = new HashMap<>();
 
-                // orders from accBlotter don't have stock name & market price
+                // orders from accBlotter don't have stock name, icon URL & market price
                 data.put("name",        "");
+                data.put("urlImage",    "");
                 data.put("marketPrice", 0.0);
 
                 data.put("symbol",      symbol);

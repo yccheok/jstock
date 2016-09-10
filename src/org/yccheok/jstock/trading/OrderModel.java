@@ -8,14 +8,16 @@ package org.yccheok.jstock.trading;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import java.util.Map;
+import javafx.beans.property.SimpleObjectProperty;
 import org.yccheok.jstock.trading.API.OrderManager;
+import org.yccheok.jstock.trading.PositionModel.SymbolUrl;
 
 /**
  *
  * @author shuwnyuan
  */
 public class OrderModel {
-    private final SimpleStringProperty symbol;
+    private final SimpleObjectProperty symbolObj;
     private final SimpleStringProperty name;
     private final SimpleStringProperty type;
     private final SimpleStringProperty side;
@@ -26,7 +28,6 @@ public class OrderModel {
     private final SimpleDoubleProperty stopPrice;
     
     public OrderModel(Map<String, Object> ord) {
-        this.symbol = new SimpleStringProperty(ord.get("symbol").toString());
         this.name   = new SimpleStringProperty(ord.get("name").toString());
         
         Double _stopPrice = 0.0;
@@ -47,17 +48,39 @@ public class OrderModel {
         this.marketPrice = new SimpleDoubleProperty((Double) ord.get("marketPrice"));
         this.limitPrice  = new SimpleDoubleProperty(_limitPrice);
         this.stopPrice   = new SimpleDoubleProperty(_stopPrice);
+        
+        // symbolObj to represent symbol + icon URL
+        String symbolStr    = ord.get("symbol").toString();
+        String urlStr       = ord.get("urlImage").toString();
+        this.symbolObj      = new SimpleObjectProperty();
+        symbolObj.set(new SymbolUrl(symbolStr, urlStr));
     }
 
+    // symbol + Image URL
+    public void setSymbolObj (SymbolUrl sym) {
+        symbolObj.set(sym);
+    }
+
+    public Object getSymbolObj () {
+        return symbolObj.get();
+    }
+
+    public SimpleObjectProperty symbolObjProperty () {
+        return symbolObj;
+    }
+    
+    // get symbol from symbolObj
     public final String getSymbol() {
-        return symbol.get();
+        SymbolUrl symbolUrl = (SymbolUrl) this.symbolObj.get();
+        return symbolUrl.getSymbol();
     }
-    public final void setSymbol(String v) {
-        symbol.set(v);
+    
+    // Icon's URL is updated, after Get Instrument call. Reinitialize symbolObj with new URL
+    public final void setUrlImage (String v) {
+        SymbolUrl symbolUrl = new SymbolUrl(getSymbol(), v);
+        this.symbolObj.set(symbolUrl);
     }
-    public SimpleStringProperty symbolProperty () {
-        return symbol;
-    }
+    
     
     public final String getName() {
         return name.get();

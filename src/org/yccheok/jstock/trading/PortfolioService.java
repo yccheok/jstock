@@ -32,7 +32,7 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
     private List<OrderModel> ordList = new ArrayList<>();
     private AccountSummaryModel accModel;
     
-    private final Map<String, InstrumentManager.Instrument> instruments = new HashMap<>();
+    private Map<String, InstrumentManager.Instrument> instruments = new HashMap<>();
     private Set symbolsSet;
     private TaskState taskState = TaskState.ACC_BLOTTER;
     private boolean refresh = false;
@@ -121,15 +121,19 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
             System.out.println("calling account Blotter DONE...");
         }
         
-        private boolean getInstruments () {
+        private void getInstruments () {
             // call "search instrument" to get stocks name for all symbols
-            boolean updated = false;
             Iterator<String> itr = symbolsSet.iterator();
+
+            Map<String, InstrumentManager.Instrument> oldIns = instruments;
+            instruments.clear();
 
             while (itr.hasNext()) {
                 String symbol = itr.next();
-                
-                if (instruments.containsKey(symbol)) {
+
+                if (oldIns.containsKey(symbol)) {
+                    // avoid Get Instrument call if already did in previous iteration
+                    instruments.put(symbol, oldIns.get("symbol"));
                     continue;
                 }
 
@@ -141,11 +145,8 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
                 if (insList.size() > 0) {
                     InstrumentManager.Instrument ins = insList.get(0);
                     instruments.put(symbol, ins);
-                    updated = true;
                 }
             }
-            
-            return updated;
         }
         
         private Map<String, Double> getMarketPrices () {
@@ -209,10 +210,8 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
 
                 System.out.println("DONE calling accBlotter...");
             } else if (taskState == TaskState.INSTRUMENTS) {
-                final boolean updated = getInstruments();
-
+                getInstruments();
                 result.put("instruments", instruments);
-                result.put("updated", updated);
 
                 System.out.println("DONE calling get instruments...");
             }

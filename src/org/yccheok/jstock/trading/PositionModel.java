@@ -8,6 +8,7 @@ package org.yccheok.jstock.trading;
 import java.util.Map;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
 
 /**
  *
@@ -15,7 +16,32 @@ import javafx.beans.property.SimpleDoubleProperty;
  */
 
 public class PositionModel {
-    private final SimpleStringProperty symbol;
+    
+    public static class SymbolUrl {
+        private String symbol;
+        private String urlImage;
+
+        public SymbolUrl (String symbol, String url) {
+            this.symbol = symbol;
+            this.urlImage = url;
+        }
+
+        public String getSymbol () {
+            return symbol;
+        }
+        public void setSymbol (String symbol) {
+            this.symbol = symbol;
+        }
+        
+        public String getUrlImage () {
+            return urlImage;
+        }
+        public void setUrlImage (String url) {
+            this.urlImage = url;
+        }
+    }
+    
+    private final SimpleObjectProperty symbolObj;
     private final SimpleStringProperty name;
     private final SimpleStringProperty instrumentID;
     
@@ -27,9 +53,7 @@ public class PositionModel {
     private final SimpleDoubleProperty marketValue;
     private final SimpleDoubleProperty unrealizedPL;
 
-    
     public PositionModel(Map<String, Object> pos) {
-        this.symbol         = new SimpleStringProperty(pos.get("symbol").toString());
         this.name           = new SimpleStringProperty(pos.get("name").toString());
         this.instrumentID   = new SimpleStringProperty(pos.get("instrumentID").toString());
         
@@ -45,17 +69,38 @@ public class PositionModel {
         
         this.unrealizedPL   = new SimpleDoubleProperty();
         this.unrealizedPL.bind(this.openQty.multiply(this.marketPrice.subtract(this.averagePrice)));
+
+        String symbolStr    = pos.get("symbol").toString();
+        String urlStr       = pos.get("urlImage").toString();
+        this.symbolObj      = new SimpleObjectProperty();
+        symbolObj.set(new SymbolUrl(symbolStr, urlStr));
     }
 
-    public final String getSymbol() {
-        return symbol.get();
+    // symbol + Image URL
+    public void setSymbolObj (SymbolUrl sym) {
+        symbolObj.set(sym);
     }
-    public final void setSymbol(String v) {
-        symbol.set(v);
+
+    public Object getSymbolObj () {
+        return symbolObj.get();
     }
-    public SimpleStringProperty symbolProperty() {
-        return symbol;
+
+    public SimpleObjectProperty symbolObjProperty () {
+        return symbolObj;
     }
+
+    // get symbol from symbolObj
+    public final String getSymbol () {
+        SymbolUrl symbolUrl = (SymbolUrl) this.symbolObj.get();
+        return symbolUrl.getSymbol();
+    }
+
+    // Icon's URL is updated, after Get Instrument call. Reinitialize symbolObj with new URL
+    public final void setUrlImage (String v) {
+        SymbolUrl symbolUrl = new SymbolUrl(getSymbol(), v);
+        this.symbolObj.set(symbolUrl);
+    }
+    
     
     public final String getName() {
         return name.get();

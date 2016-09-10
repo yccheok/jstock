@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;
@@ -25,11 +27,13 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.ImageViewBuilder;
 import javafx.scene.layout.GridPane;
 import javafx.util.Duration;
 import org.yccheok.jstock.trading.API.DriveWealth;
 import org.yccheok.jstock.trading.API.MarketDataManager;
-import org.yccheok.jstock.trading.API.OrderManager;
 import org.yccheok.jstock.trading.API.SessionManager;
 import org.yccheok.jstock.trading.PositionModel;
 import org.yccheok.jstock.trading.Transaction;
@@ -115,6 +119,34 @@ public class BuyDialog {
         grid.add(new Label("Stock:"), 0, 0);
         grid.add(symbolText, 1, 0);
 
+        // Add symbol icon from URL
+        String imageSource = "http://syscdn.drivewealth.net/images/symbols/mcd.png";
+
+        /*
+        ImageView imageView = ImageViewBuilder.create()
+                .image(new Image(imageSource))
+                .build();
+        
+        imageView.setFitWidth(50);
+        imageView.setPreserveRatio(true);
+        
+        //imageView.setSmooth(true);
+        //imageView.setCache(true);
+*/
+        
+        SimpleStringProperty url = new SimpleStringProperty("http://syscdn.drivewealth.net/images/symbols/mcd.png");
+        
+        ImageView img = new ImageView();
+        
+        img.imageProperty().bind(Bindings.createObjectBinding(() -> {
+            return new Image(url.getValue());
+        }, url));
+        
+        
+        grid.add(img, 2, 0);
+        
+        
+        
         grid.add(new Label("Ask Price:"), 0, 1);
         grid.add(askLabel, 1, 1);
         
