@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;
@@ -29,7 +27,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.ImageViewBuilder;
 import javafx.scene.layout.GridPane;
 import javafx.util.Duration;
 import org.yccheok.jstock.trading.API.DriveWealth;
@@ -119,33 +116,29 @@ public class BuyDialog {
         grid.add(new Label("Stock:"), 0, 0);
         grid.add(symbolText, 1, 0);
 
-        // Add symbol icon from URL
-        String imageSource = "http://syscdn.drivewealth.net/images/symbols/mcd.png";
-
+        
         /*
-        ImageView imageView = ImageViewBuilder.create()
-                .image(new Image(imageSource))
-                .build();
-        
-        imageView.setFitWidth(50);
-        imageView.setPreserveRatio(true);
-        
-        //imageView.setSmooth(true);
-        //imageView.setCache(true);
-*/
-        
         SimpleStringProperty url = new SimpleStringProperty("http://syscdn.drivewealth.net/images/symbols/mcd.png");
-        
         ImageView img = new ImageView();
-        
         img.imageProperty().bind(Bindings.createObjectBinding(() -> {
             return new Image(url.getValue());
         }, url));
+        */
+
         
+        ImageView imageView = new ImageView();
+        imageView.setFitWidth(50);
+        imageView.setFitHeight(50);
+
+        String url = pos.getUrlImage();
+
+        if (url != null && ! url.isEmpty()) {
+            // use background loading
+            Image icon = new Image(url, true);
+            imageView.setImage(icon);
+        }
         
-        grid.add(img, 2, 0);
-        
-        
+        grid.add(imageView, 2, 0);
         
         grid.add(new Label("Ask Price:"), 0, 1);
         grid.add(askLabel, 1, 1);
@@ -223,7 +216,7 @@ public class BuyDialog {
 
                 // remove leading / trailing white space
                 params.put("symbol",        symbolText.getText().trim());
-                
+
                 params.put("instrumentID",  instrumentID);
                 params.put("accountID",     accountID);
                 params.put("accountNo",     accountNo);
@@ -231,13 +224,21 @@ public class BuyDialog {
 
                 // 1: practice a/c,  2: live a/c
                 params.put("accountType",   acc.getAccountType().getValue());
-                
-                // 1: Market order,  2: Limit order,  3: Stop order
-                params.put("ordType",       orderChoice.getValue().getValue());
-                
                 params.put("side",          "B");
                 params.put("orderQty",      Double.parseDouble(qtyText.getText().trim()));                
-                params.put("comment",       "SY Sunday Test - Market Order BUY");
+
+                // 1: Market order,  2: Limit order,  3: Stop order
+                OrderType ordType = orderChoice.getValue();
+                params.put("ordType", ordType.getValue());
+                
+                // Stop order
+                if (ordType == OrderType.STOP) {
+                    params.put("price", priceText.getText().trim());
+                }
+                // Limit Order
+                if (ordType == OrderType.LIMIT) {
+                    params.put("limitPrice", priceText.getText().trim());
+                }
 
                 return params;
             }

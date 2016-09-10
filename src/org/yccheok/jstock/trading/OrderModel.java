@@ -80,6 +80,11 @@ public class OrderModel {
         SymbolUrl symbolUrl = new SymbolUrl(getSymbol(), v);
         this.symbolObj.set(symbolUrl);
     }
+
+    public final String getUrlImage (String v) {
+        SymbolUrl symbolUrl = (SymbolUrl) this.symbolObj.get();
+        return symbolUrl.getUrl();
+    }
     
     
     public final String getName() {

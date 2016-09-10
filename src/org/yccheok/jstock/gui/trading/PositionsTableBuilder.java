@@ -75,7 +75,7 @@ public class PositionsTableBuilder {
         protected void updateItem (SymbolUrl item, boolean empty) {
             if (item != null) {
                 String symbol = item.getSymbol();
-                String url = item.getUrlImage();
+                String url = item.getUrl();
 
                 symLabel.setText(symbol);
 

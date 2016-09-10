@@ -19,11 +19,11 @@ public class PositionModel {
     
     public static class SymbolUrl {
         private String symbol;
-        private String urlImage;
-
+        private String url;
+        
         public SymbolUrl (String symbol, String url) {
             this.symbol = symbol;
-            this.urlImage = url;
+            this.url = url;
         }
 
         public String getSymbol () {
@@ -33,11 +33,11 @@ public class PositionModel {
             this.symbol = symbol;
         }
         
-        public String getUrlImage () {
-            return urlImage;
+        public String getUrl () {
+            return url;
         }
-        public void setUrlImage (String url) {
-            this.urlImage = url;
+        public void setUrl (String url) {
+            this.url = url;
         }
     }
     
@@ -91,14 +91,19 @@ public class PositionModel {
 
     // get symbol from symbolObj
     public final String getSymbol () {
-        SymbolUrl symbolUrl = (SymbolUrl) this.symbolObj.get();
+        SymbolUrl symbolUrl = (SymbolUrl) getSymbolObj();
         return symbolUrl.getSymbol();
     }
 
     // Icon's URL is updated, after Get Instrument call. Reinitialize symbolObj with new URL
     public final void setUrlImage (String v) {
         SymbolUrl symbolUrl = new SymbolUrl(getSymbol(), v);
-        this.symbolObj.set(symbolUrl);
+        setSymbolObj(symbolUrl);
+    }
+    
+    public final String getUrlImage () {
+        SymbolUrl symbolUrl = (SymbolUrl) this.symbolObj.get();
+        return symbolUrl.getUrl();
     }
     
     
