@@ -123,8 +123,8 @@ public class PositionsTableBuilder {
                         public void handle(ActionEvent event) {
                             PositionModel pos = row.getItem();
                             
-                            System.out.println("Buy button pressed, symbol: " + pos.getSymbol()
-                                    + ", instrumentID: " + pos.getInstrumentID());
+                            //System.out.println("Buy button pressed, symbol: " + pos.getSymbol()
+                            //        + ", instrumentID: " + pos.getInstrumentID());
                             
                             BuyDialog.showBuyDialog(pos);
                         }

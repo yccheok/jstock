@@ -45,7 +45,7 @@ public class Http {
         int statusCode = 0;
         try {
             statusCode = httpClient.executeMethod(httpMethod);
-            System.out.println("status code: " + statusCode);
+            //System.out.println("status code: " + statusCode);
         } catch (IOException ex) {
             Logger.getLogger(Http.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -69,7 +69,7 @@ public class Http {
         result.put("code", statusCode);
         result.put("respond", respond);
         
-        System.out.println("respond: " + respond);
+        //System.out.println("respond: " + respond);
         
         return result;
     }
@@ -103,7 +103,7 @@ public class Http {
                 host = DriveWealth.reportURL;
                 break;
             default:
-                System.out.println("[executePost] unknown hostType: " + server);
+                //System.out.println("[executePost] unknown hostType: " + server);
                 return null;
         }
 

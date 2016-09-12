@@ -19,6 +19,8 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
@@ -29,12 +31,16 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.util.Duration;
+import org.yccheok.jstock.engine.Pair;
 import org.yccheok.jstock.trading.API.DriveWealth;
 import org.yccheok.jstock.trading.API.MarketDataManager;
+import org.yccheok.jstock.trading.API.OrderManager;
+import org.yccheok.jstock.trading.API.OrderManager.OrdStatus;
 import org.yccheok.jstock.trading.API.SessionManager;
 import org.yccheok.jstock.trading.PositionModel;
 import org.yccheok.jstock.trading.Transaction;
 import static org.yccheok.jstock.trading.API.OrderManager.OrderType;
+
 /**
  *
  * @author shuwnyuan
@@ -52,7 +58,7 @@ public class BuyDialog {
         String name         = pos.getName();
         String instrumentID = pos.getInstrumentID();
         
-        Dialog<Map<String, Object>> dialog = new Dialog<>();
+        Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Buy Order");
         dialog.setHeaderText("Buy " + symbol + " - " + name);
 
@@ -153,8 +159,8 @@ public class BuyDialog {
         grid.add(priceText, 1, 4);
 
         // Scheduled service - get Ask price with Get Market Data / Quote API
-        final ScheduledService marketDatasrv = getMarketDataService(symbol);
-        marketDatasrv.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+        final ScheduledService marketDataSrv = getMarketDataService(symbol);
+        marketDataSrv.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(final WorkerStateEvent workerStateEvent) {
                 MarketDataManager.MarketData result = (MarketDataManager.MarketData) workerStateEvent.getSource().getValue();
@@ -169,9 +175,14 @@ public class BuyDialog {
                 askLabel.setText(result.getAsk().toString());
             }
         });
-        marketDatasrv.start();
+        marketDataSrv.start();
+
         
-        // Buy button: Enable/Disable button depends on qty entered.
+        /*
+        ** Buy button
+        */
+        
+        // Enable/Disable button depends on qty entered.
         Node buyButton = dialog.getDialogPane().lookupButton(buyButtonType);
         buyButton.setDisable(true);
 
@@ -191,79 +202,138 @@ public class BuyDialog {
             buyButton.setDisable(disable);
         });
 
-        // Cancel button
-        Node cancelButton = dialog.getDialogPane().lookupButton(cancelButtonType);
-        cancelButton.addEventFilter(ActionEvent.ACTION, event -> {
-            System.out.println("Cancel was definitely pressed");
+        // BUY button event handler
+        buyButton.addEventHandler(ActionEvent.ACTION, event -> {
+            System.out.println("22222  BUY (Node) event handler  [ActionEvent.ACTION].....");
+            
+            // prepare BUY ORDER params
+            SessionManager.User user   = DriveWealth.getUser();
+            SessionManager.Account acc = user.getActiveAccount();
+
+            String userID    = user.getUserID();
+            String accountID = acc.getAccountID();
+            String accountNo = acc.getAccountNo();
+
+            Map<String, Object> params = new HashMap<>();
+
+            // remove leading / trailing white space
+            params.put("symbol",        symbolText.getText().trim());
+
+            params.put("instrumentID",  instrumentID);
+            params.put("accountID",     accountID);
+            params.put("accountNo",     accountNo);
+            params.put("userID",        userID);
+
+            // 1: practice a/c,  2: live a/c
+            params.put("accountType",   acc.getAccountType().getValue());
+            params.put("side",          "B");
+            params.put("orderQty",      Double.parseDouble(qtyText.getText().trim()));                
+
+            // 1: Market order,  2: Limit order,  3: Stop order
+            OrderType ordType = orderChoice.getValue();
+            params.put("ordType", ordType.getValue());
+
+            // Stop order
+            if (ordType == OrderType.STOP) {
+                params.put("price", priceText.getText().trim());
+            }
+            // Limit Order
+            if (ordType == OrderType.LIMIT) {
+                params.put("limitPrice", priceText.getText().trim());
+            }
+
+
+            // show Dialog: Forwarding Order in Progress ....
+            Alert alert = new Alert(AlertType.INFORMATION);
+            alert.setTitle("Forwarding Order");
+            alert.setHeaderText("Forwarding your order");
+            alert.setContentText("Forwarding your order, please wait ....");
+            
+            // disable OK button, until BUY ORDER finish
+            alert.getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
+            alert.show();
+
+
+            // Execute BUY Order
+            Task buyTask = Transaction.startBuyThread(orderChoice.getValue(), params);
+            String ordName = orderChoice.getValue().getName();
+            
+            buyTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+                @Override
+                public void handle(final WorkerStateEvent workerStateEvent) {
+                    Pair<OrderManager.Order, String> result = (Pair) workerStateEvent.getSource().getValue();
+
+                    OrderManager.Order order = result.first;
+                    String error = result.second;
+
+                    System.out.println("Buy Task Succeed Handler ....");
+                    String msg;
+                    
+                    if (error != null) {
+                        msg = "BUY " + ordName + " order ERROR: " + error;
+                    } else {
+                        OrdStatus ordStatus     = order.getOrdStatusEnum();
+                        String instrumentID     = order.getInstrumentID();
+                        String orderID          = order.getOrderID();
+                        Double grossTradeAmt    = order.getGrossTradeAmt();
+                        String orderNo          = order.getOrderNo();
+                        String status           = order.getOrdStatus();
+                        String ordType          = order.getOrdType();
+                        String side             = order.getSide();
+                        Double accountType      = order.getAccountType();
+                        Double orderQty         = order.getOrderQty();
+                        Double commission       = order.getCommission();
+                        String rejReason        = order.getOrdRejReason();
+
+                        if (ordStatus == OrdStatus.REJECTED) {
+                            msg = "BUY " + ordName + " order REJECTED, reason: " + rejReason;
+                        } else {
+                            msg = "Successfully BUY " + ordName + " order " +
+                                "\n instrumentID: "   + instrumentID + 
+                                "\n orderID: "        + orderID +
+                                "\n orderNo: "        + orderNo +
+                                "\n orderQty: "       + orderQty + 
+                                "\n orderType: "      + ordType +
+                                "\n side: "           + side +
+                                "\n accountType: "    + accountType + 
+                                "\n grossTradeAmt: "  + grossTradeAmt +
+                                "\n commission: "     + commission + 
+                                "\n status: "         + status;
+                        }
+                    }
+                    
+                    System.out.println(msg);
+                    
+                    // enable Dialog - OK / Close  buton
+                    // Update status: Success / Failure with error message
+                    alert.setContentText(msg);
+                    alert.getDialogPane().lookupButton(ButtonType.OK).setDisable(false);
+                    
+                    // refresh Portfolio
+                    Portfolio.portfolioService._restart();
+                }
+            });
+            
+            System.out.println("33333  BUY (Node) event handler   DONE .....");
         });
 
+        
         dialog.getDialogPane().setContent(grid);
 
         // Request focus on the Qty field by default.
         Platform.runLater(() -> qtyText.requestFocus());
 
-        // Convert the result when the BUY button is clicked.
-        dialog.setResultConverter(dialogButton -> {
-            if (dialogButton == buyButtonType) {
-                SessionManager.User user   = DriveWealth.getUser();
-                SessionManager.Account acc = user.getActiveAccount();
+        Optional<ButtonType> result = dialog.showAndWait();
 
-                String userID    = user.getUserID();
-                String accountID = acc.getAccountID();
-                String accountNo = acc.getAccountNo();
-                
-                Map<String, Object> params = new HashMap<>();
-
-                // remove leading / trailing white space
-                params.put("symbol",        symbolText.getText().trim());
-
-                params.put("instrumentID",  instrumentID);
-                params.put("accountID",     accountID);
-                params.put("accountNo",     accountNo);
-                params.put("userID",        userID);
-
-                // 1: practice a/c,  2: live a/c
-                params.put("accountType",   acc.getAccountType().getValue());
-                params.put("side",          "B");
-                params.put("orderQty",      Double.parseDouble(qtyText.getText().trim()));                
-
-                // 1: Market order,  2: Limit order,  3: Stop order
-                OrderType ordType = orderChoice.getValue();
-                params.put("ordType", ordType.getValue());
-                
-                // Stop order
-                if (ordType == OrderType.STOP) {
-                    params.put("price", priceText.getText().trim());
-                }
-                // Limit Order
-                if (ordType == OrderType.LIMIT) {
-                    params.put("limitPrice", priceText.getText().trim());
-                }
-
-                return params;
-            }
-            return null;
-        });
-        
-        Optional<Map<String, Object>> result = dialog.showAndWait();
-
-        if (result.isPresent()) {
-            Map<String, Object> buyParams = result.get();
-            
-            Transaction.buy(Portfolio.portfolioService, orderChoice.getValue(), buyParams);
-            System.out.println("Buy Order SYMBOL : " + buyParams.get("symbol").toString());
-            
-            // cancel get market data shceduled service
-            marketDatasrv.cancel();
-        } else {
-            // No result, probably Cancel button or Close has been pressed
-            
-            // cancel get market data shceduled service
-            marketDatasrv.cancel();
-            
-            // resume Portfolio Scheduled Service
-            Portfolio.portfolioService._restart();
+        ButtonType buttonType = result.get();
+        if (buttonType == buyButtonType) {
+            System.out.println("AFTER BUY Button Pressed ......");
+        } else if (buttonType == cancelButtonType) {
+            System.out.println("AFTER CANCEL Button Pressed ......");
         }
+        
+        // cancel get market data scheduled service
+        marketDataSrv.cancel();
     }
 
     

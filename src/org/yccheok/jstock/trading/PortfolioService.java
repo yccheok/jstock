@@ -18,8 +18,9 @@ import javafx.util.Duration;
 import org.yccheok.jstock.trading.API.DriveWealth;
 import org.yccheok.jstock.trading.API.AccountManager;
 import org.yccheok.jstock.trading.API.SessionManager;
-import org.yccheok.jstock.trading.API.InstrumentManager;
 import org.yccheok.jstock.trading.API.MarketDataManager;
+import org.yccheok.jstock.trading.API.InstrumentManager;
+import org.yccheok.jstock.trading.API.InstrumentManager.Instrument;
 
 /**
  *
@@ -32,7 +33,7 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
     private List<OrderModel> ordList = new ArrayList<>();
     private AccountSummaryModel accModel;
     
-    private Map<String, InstrumentManager.Instrument> instruments = new HashMap<>();
+    private Map<String, Instrument> instruments = new HashMap<>();
     private Set symbolsSet;
     private TaskState taskState = TaskState.ACC_BLOTTER;
     private boolean refresh = false;
@@ -125,25 +126,21 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
             // call "search instrument" to get stocks name for all symbols
             Iterator<String> itr = symbolsSet.iterator();
 
-            Map<String, InstrumentManager.Instrument> oldIns = instruments;
-            instruments.clear();
-
             while (itr.hasNext()) {
                 String symbol = itr.next();
 
-                if (oldIns.containsKey(symbol)) {
+                if (instruments.containsKey(symbol)) {
                     // avoid Get Instrument call if already did in previous iteration
-                    instruments.put(symbol, oldIns.get("symbol"));
                     continue;
                 }
 
                 Map<String, String> param = new HashMap<>();
                 // only search for exact symbol match
                 param.put("symbols", symbol);
-                List<InstrumentManager.Instrument> insList = InstrumentManager.search(param);
+                List<Instrument> insList = InstrumentManager.search(param);
 
                 if (insList.size() > 0) {
-                    InstrumentManager.Instrument ins = insList.get(0);
+                    Instrument ins = insList.get(0);
                     instruments.put(symbol, ins);
                 }
             }

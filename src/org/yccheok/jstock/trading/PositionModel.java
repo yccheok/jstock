@@ -61,14 +61,9 @@ public class PositionModel {
         this.openQty        = new SimpleDoubleProperty((Double) pos.get("openQty"));
         this.tradingQty     = new SimpleDoubleProperty((Double) pos.get("tradingQty"));
 
-        // this averagePrice is already rounded to 2 decimal place, which is inaccurate
-        // this.averagePrice   = new SimpleDoubleProperty((Double) pos.get("averagePrice"));
-        
-        Double xxx = (Double) pos.get("averagePrice");
+        // averagePrice from Account Blotter call is rounded to 2 decimal place, which is inaccurate
+        // So calc from costBasis to preseve all decimals
         this.averagePrice   = new SimpleDoubleProperty(this.costBasis.divide(this.openQty).getValue());
-
-        System.out.println("averagePrice - calc from costBasis & Qty [" + this.getAveragePrice() +
-                "],  from AccBlotter [" + xxx + "]......");
         
         this.marketPrice    = new SimpleDoubleProperty((Double) pos.get("marketPrice"));
         
@@ -103,7 +98,7 @@ public class PositionModel {
         return symbolUrl.getSymbol();
     }
 
-    // Icon's URL is updated, after Get Instrument call. Reinitialize symbolObj with new URL
+    // Icon's URL is updated, after Get Instrument call. Create new symbolObj with new URL
     public final void setUrlImage (String v) {
         SymbolUrl symbolUrl = new SymbolUrl(getSymbol(), v);
         setSymbolObj(symbolUrl);
