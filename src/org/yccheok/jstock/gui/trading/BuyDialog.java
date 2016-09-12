@@ -29,6 +29,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.util.Duration;
 import org.yccheok.jstock.engine.Pair;
@@ -70,7 +71,13 @@ public class BuyDialog {
         grid.setHgap(10);
         grid.setVgap(10);
         grid.setPadding(new Insets(20, 150, 10, 10));
+        
+        ColumnConstraints col1 = new ColumnConstraints(120);
+        ColumnConstraints col2 = new ColumnConstraints(150);
+        grid.getColumnConstraints().add(col1);
+        grid.getColumnConstraints().add(col2);
 
+        
         // Symbol
         TextField symbolText = new TextField(symbol);
         symbolText.setPromptText("Symbol");
@@ -97,24 +104,34 @@ public class BuyDialog {
         priceLabel.setVisible(false);
         priceText.setVisible(false);
         
+        // Limit / Stop price Note
+        Label priceNote = new Label();
+        priceNote.setVisible(false);
+        
         orderChoice.getSelectionModel().selectedItemProperty().addListener(
             (ObservableValue<? extends OrderType> observable, OrderType oldValue, OrderType newValue) -> {
                 System.out.println("Order Type changed: " + newValue.getName());
 
                 if (newValue == OrderType.LIMIT) {
-                    priceLabel.setVisible(true);
-                    priceText.setVisible(true);
-                    
                     priceLabel.setText("Limit Price");
-                } else if (newValue == OrderType.STOP) {
+                    priceNote.setText("Enter limit price > " + askLabel.getText().trim());
+
                     priceLabel.setVisible(true);
                     priceText.setVisible(true);
-                    
+                    priceNote.setVisible(true);
+                } else if (newValue == OrderType.STOP) {
                     priceLabel.setText("Stop Price");
+                    
+                    Double stopPrice = Double.parseDouble(askLabel.getText().trim()) + 0.05;
+                    priceNote.setText("Enter stop price > " + stopPrice);
+                    
+                    priceLabel.setVisible(true);
+                    priceText.setVisible(true);
                 } else if (newValue == OrderType.MARKET) {
                     // hide price field
                     priceLabel.setVisible(false);
                     priceText.setVisible(false);
+                    priceNote.setVisible(false);
                 }
             });
 
@@ -158,6 +175,9 @@ public class BuyDialog {
         grid.add(priceLabel, 0, 4);
         grid.add(priceText, 1, 4);
 
+        grid.add(priceNote, 0, 5);
+        GridPane.setColumnSpan(priceNote, 2);
+        
         // Scheduled service - get Ask price with Get Market Data / Quote API
         final ScheduledService marketDataSrv = getMarketDataService(symbol);
         marketDataSrv.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
@@ -298,7 +318,7 @@ public class BuyDialog {
                                 "\n accountType: "    + accountType + 
                                 "\n grossTradeAmt: "  + grossTradeAmt +
                                 "\n commission: "     + commission + 
-                                "\n status: "         + status;
+                                "\n status: "         + status + " - " + ordStatus.getName();
                         }
                     }
                     
