@@ -335,8 +335,9 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
                     amount += (activity.getAmount() * exchangeRate);
                 } else if (type == Activity.Type.Dividend) {
                     double dividend = (activity.getAmount() * exchangeRate);
-                    if (org.yccheok.jstock.portfolio.Utils.getStockCurrency(this.portfolioManagementJPanel.getPortfolioRealTimeInfo(), stockInfo.code).isGBX()) {
-                        // Use will input dividend cash in GBP instead of GBX.
+                    final Currency stockCurrency = org.yccheok.jstock.portfolio.Utils.getStockCurrency(this.portfolioManagementJPanel.getPortfolioRealTimeInfo(), stockInfo.code);
+                    if (stockCurrency.isGBX() || stockCurrency.isZAC()) {
+                        // Use will input dividend cash in GBP/ZAR instead of GBX/ZAC.
                         dividend = dividend * 100.0;
                     }
 

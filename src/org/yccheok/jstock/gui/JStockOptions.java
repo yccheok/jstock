@@ -23,9 +23,11 @@ import java.awt.Color;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.NTCredentials;
 import org.yccheok.jstock.engine.Country;
@@ -111,6 +113,8 @@ public class JStockOptions {
 
     private static final int DEFAULT_HISTORY_DURATION =  10;
 
+    private static final int DEFAULT_RECENT_COUNTRY_SIZE = 5;
+    
     /** Creates a new instance of JStockOptions */
     public JStockOptions() {
         this.popupMessage = true;
@@ -320,6 +324,8 @@ public class JStockOptions {
         
     private boolean isDynamicChartVisible = false;
     
+    private List<Country> recentCountries = new ArrayList<>();
+    
     public boolean isAutoBrokerFeeCalculationEnabled() {
         return this.isAutoBrokerFeeCalculationEnabled;
     }
@@ -471,14 +477,45 @@ public class JStockOptions {
         
         /* For backward compatible */
         if (brokingFirms == null) {
-            brokingFirms = new ArrayList<BrokingFirm>();
+            brokingFirms = new ArrayList<>();
         }
         
         /* For backward compatible */
         if (country == null) {
-            country = Country.Malaysia;
+            country = Country.UnitedState;
+        } else {
+            List<Country> countries = Utils.getSupportedStockMarketCountries();
+            if (!countries.contains(country)) {
+                country = Country.UnitedState;
+            }
         }
 
+        if (this.recentCountries == null) {
+            this.recentCountries = new ArrayList<>();            
+        }
+        
+        Country[] countries = {
+            Country.UnitedState, 
+            Country.Canada,
+            Country.Malaysia,
+            Country.UnitedKingdom,
+            Country.Singapore
+        };
+    
+        if (recentCountries.size() != DEFAULT_RECENT_COUNTRY_SIZE) {
+            if (recentCountries.size() < DEFAULT_RECENT_COUNTRY_SIZE) {
+                for (Country country : countries) {
+                    recentCountries.add(country);
+                }
+            }
+            Set<Country> c = new HashSet<>(recentCountries);
+            recentCountries = new ArrayList<>(c);
+            int k = recentCountries.size();
+            if (k > DEFAULT_RECENT_COUNTRY_SIZE) {
+                recentCountries.subList(DEFAULT_RECENT_COUNTRY_SIZE, k).clear();
+            }
+        }
+        
         if (historyDuration <= 0) {
             historyDuration = DEFAULT_HISTORY_DURATION;
         }
@@ -1413,5 +1450,23 @@ public class JStockOptions {
      */    
     public void setDynamicChartVisible(boolean isDynamicChartVisible) {
         this.isDynamicChartVisible = isDynamicChartVisible;
+    }
+    
+    public List<Country> getRecentCountries() {
+        List<Country> countries = new ArrayList<>(recentCountries);
+        java.util.Collections.sort(countries);
+        return countries;
+    }
+    
+    public void addRecentCountry(Country country) {
+        if (recentCountries.contains(country)) {
+            return;
+        }
+        
+        if (recentCountries.size() >= DEFAULT_RECENT_COUNTRY_SIZE) {
+            recentCountries.remove(0);
+        }
+        
+        recentCountries.add(country);
     }
 }

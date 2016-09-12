@@ -350,9 +350,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                                     ((JLabel)c).setText(content);
                                 } else {
                                     String prefix = currency.toString();
-                                    if (prefix.equals("GBX")) {
+                                    if (Currency.GBX.equals(prefix)) {
                                         // Special handling.
-                                        prefix = "GBP";
+                                        prefix = Currency.GBP;
+                                    } else if (Currency.ZAC.equals(prefix)) {
+                                        // Special handling.
+                                        prefix = Currency.ZAR;
                                     }
                                     
                                     ((JLabel)c).setText(prefix + " " + content);
@@ -2468,7 +2471,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         Set<CurrencyPair> currencyPairs = this.getCurrencyPairs();
         // Special handling for GBX.
-        currencyPairs.remove(CurrencyPair.create("GBX", "GBP"));
+        currencyPairs.remove(CurrencyPair.create(Currency.GBX, Currency.GBP));
+        // Special handling for ZAC.
+        currencyPairs.remove(CurrencyPair.create(Currency.ZAC, Currency.ZAR));
         
         if (currencyPairs.isEmpty()) {
             mainFrame.setStatusBarExchangeRateVisible(false);
@@ -2497,9 +2502,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             Double rate = this.portfolioRealTimeInfo.exchangeRates.get(currencyPair);
             
             if (rate != null) {
-                // Special handling for GBX. User would prefer to see the currency
-                // exchange in GBP.
-                if (currencyPair.from().isGBX()) {
+                // Special handling for GBX/ZAC. User would prefer to see the 
+                // currency exchange in GBP/ZAR.
+                if (currencyPair.from().isGBX() || currencyPair.from().isZAC()) {
                     rate = rate * 100.0;
                 }
             
@@ -2922,8 +2927,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 buyPortfolioTreeTableModel.getNetPurchaseValue(localCurrency);
             
             double deposit = this.getDepositSummary().getTotal() * exchangeRate;
-            if (country.stockCurrency.isGBX()) {
-                // Use will input cash in GBP instead of GBX.
+            if (country.stockCurrency.isGBX() || country.stockCurrency.isZAC()) {
+                // Use will input cash in GBP/ZAR instead of GBX/ZAC.
                 deposit = deposit * 100.0;
             }
             
@@ -2944,8 +2949,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 buyPortfolioTreeTableModel.getPurchaseValue(localCurrency);
             
             double deposit = this.getDepositSummary().getTotal() * exchangeRate;
-            if (country.stockCurrency.isGBX()) {
-                // Use will input cash in GBP instead of GBX.
+            if (country.stockCurrency.isGBX() || country.stockCurrency.isZAC()) {
+                // Use will input cash in GBP/ZAR instead of GBX/ZAC.
                 deposit = deposit * 100.0;
             }
             

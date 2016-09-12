@@ -37,10 +37,9 @@ import net.sf.nachocalendar.CalendarFactory;
 import net.sf.nachocalendar.components.DateField;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.yccheok.jstock.engine.ResultType;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.Country;
-import org.yccheok.jstock.engine.MatchType;
+import org.yccheok.jstock.engine.DispType;
 import org.yccheok.jstock.engine.SimpleDate;
 import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.StockInfo;
@@ -113,8 +112,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         jComboBox1.setEditable(true);
         jComboBox1.setPreferredSize(new java.awt.Dimension(110, 24));
         ((AutoCompleteJComboBox)jComboBox1).attachStockInfoObserver(this.getStockInfoObserver());
-        ((AutoCompleteJComboBox)jComboBox1).attachResultObserver(this.getResultObserver());
-        ((AutoCompleteJComboBox)jComboBox1).attachMatchObserver(this.getMatchObserver());
+        ((AutoCompleteJComboBox)jComboBox1).attachDispObserver(this.getDispObserver());
 
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
         jLabel7.setText(bundle.getString("NewBuyTransactionJDialog_Broker")); // NOI18N
@@ -344,8 +342,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         jComboBox1.setEditable(true);
         jComboBox1.setPreferredSize(new java.awt.Dimension(110, 24));
         ((AutoCompleteJComboBox)jComboBox1).attachStockInfoObserver(this.getStockInfoObserver());
-        ((AutoCompleteJComboBox)jComboBox1).attachResultObserver(this.getResultObserver());
-        ((AutoCompleteJComboBox)jComboBox1).attachMatchObserver(this.getMatchObserver());
+        ((AutoCompleteJComboBox)jComboBox1).attachDispObserver(this.getDispObserver());
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
@@ -361,7 +358,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
 
         jLabel2.setText(bundle.getString("NewSellTransactionJDialog_Symbol")); // NOI18N
 
-        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(Double.valueOf(100.0d), Double.valueOf(0.0010d), null, Double.valueOf(100.0d)));
+        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(100.0d, 0.001d, null, 100.0d));
         JSpinner.NumberEditor numberEditor = (JSpinner.NumberEditor)jSpinner1.getEditor();
         final DecimalFormat decimalFormat = numberEditor.getFormat();
         decimalFormat.setMaximumFractionDigits(4);
@@ -888,13 +885,10 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         final AutoCompleteJComboBox autoCompleteJComboBox = ((AutoCompleteJComboBox)this.jComboBox1);
 
         if (country == Country.India) {
-            autoCompleteJComboBox.setAjaxProvider(AjaxServiceProvider.Google, Arrays.asList("NSE", "BOM"));
             autoCompleteJComboBox.setGreedyEnabled(true, Arrays.asList("N", "B"));
         } else if (country == Country.Japan) {
-            autoCompleteJComboBox.setAjaxProvider(AjaxServiceProvider.Google, Arrays.asList("TYO"));
             autoCompleteJComboBox.setGreedyEnabled(false, java.util.Collections.<String>emptyList());
         } else {
-            autoCompleteJComboBox.setAjaxProvider(AjaxServiceProvider.Yahoo, java.util.Collections.<String>emptyList());
             autoCompleteJComboBox.setGreedyEnabled(false, java.util.Collections.<String>emptyList());
         }
     }
@@ -907,30 +901,14 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         return this.transaction;
     }
 
-    private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, MatchType> getMatchObserver() {
-        return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, MatchType>() {
-            @Override
-            public void update(AutoCompleteJComboBox subject, MatchType matchType) {
-                assert(matchType != null);
-                Code code = matchType.getCode();
-                final Symbol symbol = Symbol.newInstance(matchType.n);
-                final StockInfo stockInfo = StockInfo.newInstance(code, symbol);
-
-                addStockInfoFromAutoCompleteJComboBox(stockInfo);
-            }
-        };
-    }
-    
-    private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, ResultType> getResultObserver() {
-        return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, ResultType>() {
+    private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, DispType> getDispObserver() {
+        return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, DispType>() {
 
             @Override
-            public void update(AutoCompleteJComboBox subject, ResultType resultType) {
-                assert(resultType != null);
-                // Symbol from Yahoo means Code in JStock.
-                final Code code = Code.newInstance(resultType.symbol);
-                // Name from Yahoo means Symbol in JStock.
-                final Symbol symbol = Symbol.newInstance(resultType.name);
+            public void update(AutoCompleteJComboBox subject, DispType dispType) {
+                assert(dispType != null);
+                final Code code = Code.newInstance(dispType.getDispCode());
+                final Symbol symbol = Symbol.newInstance(dispType.getDispName());
                 final StockInfo stockInfo = StockInfo.newInstance(code, symbol);
 
                 addStockInfoFromAutoCompleteJComboBox(stockInfo);

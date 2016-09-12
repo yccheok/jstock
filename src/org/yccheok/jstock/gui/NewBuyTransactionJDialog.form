@@ -14,7 +14,7 @@
       </Properties>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new AutoCompleteJComboBox();"/>
-        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="((AutoCompleteJComboBox)jComboBox1).attachStockInfoObserver(this.getStockInfoObserver());&#xd;&#xa;((AutoCompleteJComboBox)jComboBox1).attachResultObserver(this.getResultObserver());&#xd;&#xa;((AutoCompleteJComboBox)jComboBox1).attachMatchObserver(this.getMatchObserver());"/>
+        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="((AutoCompleteJComboBox)jComboBox1).attachStockInfoObserver(this.getStockInfoObserver());&#xd;&#xa;((AutoCompleteJComboBox)jComboBox1).attachDispObserver(this.getDispObserver());"/>
       </AuxValues>
     </Component>
   </NonVisualComponents>
@@ -180,7 +180,7 @@
         <Component class="javax.swing.JSpinner" name="jSpinner1">
           <Properties>
             <Property name="model" type="javax.swing.SpinnerModel" editor="org.netbeans.modules.form.editors2.SpinnerModelEditor">
-              <SpinnerModel initial="100.0" minimum="0.0010" numberType="java.lang.Double" stepSize="100.0" type="number"/>
+              <SpinnerModel initial="100.0" minimum="0.001" numberType="java.lang.Double" stepSize="100.0" type="number"/>
             </Property>
           </Properties>
           <Events>

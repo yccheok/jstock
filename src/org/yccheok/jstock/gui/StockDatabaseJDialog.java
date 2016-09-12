@@ -54,10 +54,8 @@ import javax.swing.table.TableRowSorter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jdesktop.jxlayer.JXLayer;
-import org.yccheok.jstock.engine.ResultType;
 import org.yccheok.jstock.engine.Code;
-import org.yccheok.jstock.engine.Country;
-import org.yccheok.jstock.engine.MatchType;
+import org.yccheok.jstock.engine.DispType;
 import org.yccheok.jstock.engine.Observer;
 import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.engine.StockInfoDatabase;
@@ -81,24 +79,7 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
 
         // Focus on our Ajax auto complete JComboBox.
         this.jComboBox1.requestFocus();
-        ((AjaxAutoCompleteJComboBox)this.jComboBox1).attachResultObserver(getResultObserver());
-        ((AjaxAutoCompleteJComboBox)this.jComboBox1).attachMatchObserver(getMatchObserver());
-        
-        initAjaxProvider();
-    }
-
-    private void initAjaxProvider() {
-        JStockOptions jStockOptions = JStock.instance().getJStockOptions();
-        
-        Country country = jStockOptions.getCountry();
-        AjaxAutoCompleteJComboBox autoCompleteJComboBox = ((AjaxAutoCompleteJComboBox)this.jComboBox1);
-        if (country == Country.India) {
-            autoCompleteJComboBox.setAjaxProvider(AjaxServiceProvider.Google, Arrays.asList("NSE", "BOM"));
-        } else if (country == Country.Japan) {
-            ((AjaxAutoCompleteJComboBox)this.jComboBox1).setAjaxProvider(AjaxServiceProvider.Google, Arrays.asList("TYO"));
-        } else {
-            ((AjaxAutoCompleteJComboBox)this.jComboBox1).setAjaxProvider(AjaxServiceProvider.Yahoo, java.util.Collections.<String>emptyList());
-        }
+        ((AjaxAutoCompleteJComboBox)this.jComboBox1).attachDispObserver(getDispObserver());
     }
     
     // Install JXLayer around JComboBox.
@@ -491,32 +472,20 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         selectUserDefinedDatabaseTable(selectedModelIndex);        
     }
 
-    private void addNewStockInfo(ResultType result) {
+    private void addNewStockInfo(DispType result) {
         final StockInfoTableModel model = (StockInfoTableModel)jTable2.getModel();
         final int selectedModelIndex = model.addNewStockInfo(result);
         selectUserDefinedDatabaseTable(selectedModelIndex);
     }
-
-    private org.yccheok.jstock.engine.Observer<AjaxAutoCompleteJComboBox, MatchType> getMatchObserver() {
-        return new org.yccheok.jstock.engine.Observer<AjaxAutoCompleteJComboBox, MatchType>() {
-
-            @Override
-            public void update(AjaxAutoCompleteJComboBox subject, MatchType arg) {
-                ResultType resultType = new ResultType(arg.getCode().toString(), arg.n);
-                
-                getResultObserver().update(subject, resultType);
-            }                
-        };
-    }
     
-    private Observer<AjaxAutoCompleteJComboBox, ResultType> getResultObserver() {
-        return new Observer<AjaxAutoCompleteJComboBox, ResultType>() {
+    private Observer<AjaxAutoCompleteJComboBox, DispType> getDispObserver() {
+        return new Observer<AjaxAutoCompleteJComboBox, DispType>() {
             @Override
-            public void update(AjaxAutoCompleteJComboBox subject, ResultType arg) {
+            public void update(AjaxAutoCompleteJComboBox subject, DispType arg) {
                 assert(arg != null);
                 assert(SwingUtilities.isEventDispatchThread());
                 // Ensure arg is in the correct format.
-                final ResultType result = org.yccheok.jstock.engine.Utils.rectifyResult(arg);
+                final DispType result = org.yccheok.jstock.engine.Utils.rectifyDisp(arg);
                 if (result == null) {
                     // Invalid format. Nothing we can do about it. Returns
                     // early.
@@ -524,8 +493,8 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
                 }
                 // Check for duplication.
                 // Symbol from Yahoo means Code in JStock.
-                String message_string = result.symbol;
-                IndexEx indexEx = getIndexEx(result.symbol, Code.class);
+                String message_string = result.getDispCode();
+                IndexEx indexEx = getIndexEx(result.getDispCode(), Code.class);
 
                 if (indexEx != null) {
                     if (indexEx.table == jTable1) {
@@ -784,11 +753,9 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
             return index;
         }
 
-        public int addNewStockInfo(ResultType result) {
-            // Symbol from Yahoo means Code in JStock.
-            final Code code = Code.newInstance(result.symbol);
-            // Name from Yahoo means Symbol in JStock.
-            final Symbol symbol = Symbol.newInstance(result.name);
+        public int addNewStockInfo(DispType result) {
+            final Code code = Code.newInstance(result.getDispCode());
+            final Symbol symbol = Symbol.newInstance(result.getDispName());
             this.stockInfos.add(StockInfo.newInstance(code, symbol));
 
             final int index = this.stockInfos.size() - 1;

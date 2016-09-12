@@ -21,7 +21,6 @@ package org.yccheok.jstock.gui;
 
 import org.yccheok.jstock.engine.Pair;
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.googleapis.json.GoogleJsonError.ErrorInfo;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -111,8 +110,8 @@ public class JStock extends javax.swing.JFrame {
     private void init() {        
         initComponents();
 
-        createLookAndFeelMenuItem();
-        createCountryMenuItem();
+        createLookAndFeelMenuItems();
+        createCountryMenuItems();
 
         createStockIndicatorEditor();
         createIndicatorScannerJPanel();
@@ -367,6 +366,7 @@ public class JStock extends javax.swing.JFrame {
         buttonGroup1 = new javax.swing.ButtonGroup();
         buttonGroup2 = new javax.swing.ButtonGroup();
         buttonGroup3 = new javax.swing.ButtonGroup();
+        buttonGroup4 = new javax.swing.ButtonGroup();
         jComboBox1 = new AutoCompleteJComboBox();
         jPanel6 = new javax.swing.JPanel();
         jTabbedPane1 = new javax.swing.JTabbedPane();
@@ -422,8 +422,7 @@ public class JStock extends javax.swing.JFrame {
         jComboBox1.setEditable(true);
         jComboBox1.setPreferredSize(new java.awt.Dimension(150, 24));
         ((AutoCompleteJComboBox)this.jComboBox1).attachStockInfoObserver(getStockInfoObserver());
-        ((AutoCompleteJComboBox)this.jComboBox1).attachResultObserver(getResultObserver());
-        ((AutoCompleteJComboBox)this.jComboBox1).attachMatchObserver(getMatchObserver());
+        ((AutoCompleteJComboBox)this.jComboBox1).attachDispObserver(getDispObserver());
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
@@ -594,6 +593,15 @@ public class JStock extends javax.swing.JFrame {
         jMenuBar2.add(jMenu5);
 
         jMenu6.setText(bundle.getString("MainFrame_Country")); // NOI18N
+        jMenu6.addMenuListener(new javax.swing.event.MenuListener() {
+            public void menuCanceled(javax.swing.event.MenuEvent evt) {
+            }
+            public void menuDeselected(javax.swing.event.MenuEvent evt) {
+            }
+            public void menuSelected(javax.swing.event.MenuEvent evt) {
+                jMenu6MenuSelected(evt);
+            }
+        });
         jMenuBar2.add(jMenu6);
 
         jMenu10.setText(bundle.getString("MainFrame_Language")); // NOI18N
@@ -1643,6 +1651,10 @@ public class JStock extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_jRadioButtonMenuItem6ActionPerformed
+
+    private void jMenu6MenuSelected(javax.swing.event.MenuEvent evt) {//GEN-FIRST:event_jMenu6MenuSelected
+        initRecentCountryMenuItems();
+    }//GEN-LAST:event_jMenu6MenuSelected
     
     /**
      * Activate specified watchlist.
@@ -2101,16 +2113,55 @@ public class JStock extends javax.swing.JFrame {
         this.jTabbedPane1.setToolTipTextAt(3, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_ManageYourRealTimePortfolioWhichEnableYouToTrackBuyAndSellRecords"));
     }
       
-    public void createCountryMenuItem() {
-        java.util.List<Country> countries = new ArrayList<Country>(Arrays.asList(Country.values()));
-        // Czech and Hungary are only for currency exchange purpose.
-        countries.remove(Country.Czech);
-        countries.remove(Country.Hungary);
+    private void initRecentCountryMenuItems() {
+        Enumeration<AbstractButton> e = buttonGroup4.getElements();
+        boolean hasSeperator = false;
+        while (e.hasMoreElements()) {
+            jMenu6.remove(e.nextElement());  
+            hasSeperator = true;
+        }
+        if (hasSeperator) {
+            // Seperator.
+            jMenu6.remove(0);
+        }
+        
+        buttonGroup4 = new ButtonGroup();
+        
+        int index = 0;
+        for (final Country country : jStockOptions.getRecentCountries()) {
+            final JMenuItem mi = (JRadioButtonMenuItem) jMenu6.add(new JRadioButtonMenuItem(country.humanString, country.icon), index++);
 
+            buttonGroup4.add(mi);
+            mi.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JStock.this.changeCountry(country);
+                }                
+            });
+            
+            if (jStockOptions.getCountry() == country) {
+                ((JRadioButtonMenuItem) mi).setSelected(true);
+            }
+        }
+        
+        jMenu6.add(new javax.swing.JPopupMenu.Separator(), index++);
+    }
+    
+    public void createCountryMenuItems() {        
+        final java.util.List<Country> countries = Utils.getSupportedStockMarketCountries();
+
+        Map<Continent, JMenu> menus = new EnumMap<>(Continent.class);
+        for (final Continent continent : Continent.values()) {
+            JMenu jMenu = new JMenu(continent.name());
+            jMenu6.add(jMenu);
+            menus.put(continent, jMenu);
+        }
+        
         for (final Country country : countries) {
+            JMenu jMenu = menus.get(Continent.toContinent(country));
+            
             // Ugly fix on spelling mistake.
-            final JMenuItem mi;
-            mi = (JRadioButtonMenuItem) jMenu6.add(new JRadioButtonMenuItem(country.humanString, country.icon));
+            final JMenuItem mi = (JRadioButtonMenuItem) jMenu.add(new JRadioButtonMenuItem(country.humanString, country.icon));
 
             buttonGroup2.add(mi);
             mi.addActionListener(new ActionListener() {
@@ -2126,7 +2177,7 @@ public class JStock extends javax.swing.JFrame {
         }
     }
             
-    public void createLookAndFeelMenuItem() {
+    public void createLookAndFeelMenuItems() {
         LookAndFeel currentlaf = UIManager.getLookAndFeel();
 
         UIManager.LookAndFeelInfo[] lafInfo = UIManager.getInstalledLookAndFeels();
@@ -2691,6 +2742,7 @@ public class JStock extends javax.swing.JFrame {
             );
         }        
         jStockOptions.setCountry(country);
+        jStockOptions.addRecentCountry(country);
         JStock.this.statusBar.setCountryIcon(country.icon, country.humanString);
 
         // Here is the dirty trick here. We let our the 'child' panels perform
@@ -3067,31 +3119,14 @@ public class JStock extends javax.swing.JFrame {
         JTableUtilities.scrollToVisible(this.jTable1, row, 0);
     }
 
-    private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, MatchType> getMatchObserver() {
-        return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, MatchType>() {
+    private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, DispType> getDispObserver() {
+        return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, DispType>() {
 
             @Override
-            public void update(AutoCompleteJComboBox subject, MatchType matchType) {
-                assert(matchType != null);
-                Code code = matchType.getCode();
-                final Symbol symbol = Symbol.newInstance(matchType.n);
-                final StockInfo stockInfo = StockInfo.newInstance(code, symbol);
-
-                addStockInfoFromAutoCompleteJComboBox(stockInfo);
-            }
-        };
-    }
-    
-    private org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, ResultType> getResultObserver() {
-        return new org.yccheok.jstock.engine.Observer<AutoCompleteJComboBox, ResultType>() {
-
-            @Override
-            public void update(AutoCompleteJComboBox subject, ResultType resultType) {
-                assert(resultType != null);
-                // Symbol from Yahoo means Code in JStock.
-                final Code code = Code.newInstance(resultType.symbol);
-                // Name from Yahoo means Symbol in JStock.
-                final Symbol symbol = Symbol.newInstance(resultType.name);
+            public void update(AutoCompleteJComboBox subject, DispType dispType) {
+                assert(dispType != null);
+                Code code = Code.newInstance(dispType.getDispCode());
+                final Symbol symbol = Symbol.newInstance(dispType.getDispName());
                 final StockInfo stockInfo = StockInfo.newInstance(code, symbol);
 
                 addStockInfoFromAutoCompleteJComboBox(stockInfo);
@@ -4074,13 +4109,8 @@ public class JStock extends javax.swing.JFrame {
         final AutoCompleteJComboBox autoCompleteJComboBox = ((AutoCompleteJComboBox)this.jComboBox1);
 
         if (country == Country.India) {
-            autoCompleteJComboBox.setAjaxProvider(AjaxServiceProvider.Google, Arrays.asList("NSE", "BOM"));
             autoCompleteJComboBox.setGreedyEnabled(true, Arrays.asList("N", "B"));
-        } else if (country == Country.Japan) {
-            autoCompleteJComboBox.setAjaxProvider(AjaxServiceProvider.Google, Arrays.asList("TYO"));
-            autoCompleteJComboBox.setGreedyEnabled(false, java.util.Collections.<String>emptyList());
         } else {
-            autoCompleteJComboBox.setAjaxProvider(AjaxServiceProvider.Yahoo, java.util.Collections.<String>emptyList());
             autoCompleteJComboBox.setGreedyEnabled(false, java.util.Collections.<String>emptyList());
         }
         
@@ -5009,6 +5039,7 @@ public class JStock extends javax.swing.JFrame {
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.ButtonGroup buttonGroup3;
+    private javax.swing.ButtonGroup buttonGroup4;
     private javax.swing.JComboBox jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JMenu jMenu1;

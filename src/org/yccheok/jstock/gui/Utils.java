@@ -2458,6 +2458,16 @@ public class Utils {
         return gson;
     }
     
+    public static List<Country> getSupportedStockMarketCountries() {
+        java.util.List<Country> countries = new ArrayList<>(Arrays.asList(Country.values()));
+        // Czech and Hungary are only for currency exchange purpose.
+        countries.remove(Country.Czech);
+        countries.remove(Country.Hungary);
+        // Spain are no longer supported.
+        countries.remove(Country.Spain);
+        return countries;
+    }
+    
     public static Map<Country, Long> loadStockInfoDatabaseMeta(String json) {
         final Gson gson = getGsonForStockInfoDatabaseMeta();
         
@@ -2677,11 +2687,11 @@ public class Utils {
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7.15";
+    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7.16";
 
-    // 1.0.7.15
+    // 1.0.7.16
     // For About box comparision on latest version purpose.
-    private static final int APPLICATION_VERSION_ID = 1144;
+    private static final int APPLICATION_VERSION_ID = 1145;
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     

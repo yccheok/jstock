@@ -26,7 +26,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
@@ -50,6 +52,7 @@ import org.yccheok.jstock.engine.AjaxStockInfoSearchEngine;
 import org.yccheok.jstock.engine.ResultSetType;
 import org.yccheok.jstock.engine.ResultType;
 import org.yccheok.jstock.engine.AjaxYahooSearchEngineMonitor;
+import org.yccheok.jstock.engine.DispType;
 import org.yccheok.jstock.engine.MatchSetType;
 import org.yccheok.jstock.engine.MatchType;
 import org.yccheok.jstock.engine.Observer;
@@ -72,8 +75,7 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
         }
     }
 
-    private final SubjectEx<AjaxAutoCompleteJComboBox, ResultType> resultSubject = new SubjectEx<AjaxAutoCompleteJComboBox, ResultType>();
-    private final SubjectEx<AjaxAutoCompleteJComboBox, MatchType> matchSubject = new SubjectEx<AjaxAutoCompleteJComboBox, MatchType>();
+    private final SubjectEx<AjaxAutoCompleteJComboBox, DispType> dispSubject = new SubjectEx<AjaxAutoCompleteJComboBox, DispType>();
     private final SubjectEx<AjaxAutoCompleteJComboBox, Boolean> busySubject = new SubjectEx<AjaxAutoCompleteJComboBox, Boolean>();
 
     /**
@@ -81,13 +83,10 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
      *
      * @param observer An observer to listen to ResultType available event
      */
-    public void attachResultObserver(Observer<AjaxAutoCompleteJComboBox, ResultType> observer) {
-        resultSubject.attach(observer);
+    public void attachDispObserver(Observer<AjaxAutoCompleteJComboBox, DispType> observer) {
+        dispSubject.attach(observer);
     }
 
-    public void attachMatchObserver(Observer<AjaxAutoCompleteJComboBox, MatchType> observer) {
-        matchSubject.attach(observer);
-    }
     
     /**
      * Attach an observer to listen to busy state event.
@@ -102,8 +101,7 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
      * Dettach all observers.
      */
     public void dettachAll() {
-        resultSubject.dettachAll();
-        matchSubject.dettachAll();
+        dispSubject.dettachAll();
         busySubject.dettachAll();
     }
 
@@ -113,6 +111,8 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
     public AjaxAutoCompleteJComboBox() {
         super();
 
+        this.setModel(new SortedComboBoxModel());
+        
         this.setEditable(true);
 
         this.keyAdapter = this.getEditorComponentKeyAdapter();
@@ -136,6 +136,8 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
             log.error("Unable to attach DocumentListener to AjaxAutoCompleteJComboBox.");
         }
 
+        this.setRenderer(new DispTypeCellRenderer());
+        
         ajaxYahooSearchEngineMonitor.attach(getYahooMonitorObserver());
         ajaxGoogleSearchEngineMonitor.attach(getGoogleMonitorObserver());
 
@@ -163,12 +165,9 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
                     // If user keys in the item, editor's item will be String.
                     // If user clicks on the drop down list, editor's item will be
                     // AjaxYahooSearchEngine.ResultType.
-                    if (object instanceof ResultType) {
-                        ResultType lastEnteredResult = (ResultType)object;
-                        AjaxAutoCompleteJComboBox.this.resultSubject.notify(AjaxAutoCompleteJComboBox.this, lastEnteredResult);
-                    } else if (object instanceof MatchType) {
-                        MatchType lastEnteredMatch = (MatchType)object;
-                        AjaxAutoCompleteJComboBox.this.matchSubject.notify(AjaxAutoCompleteJComboBox.this, lastEnteredMatch);
+                    if (object instanceof DispType) {
+                        DispType lastEnteredResult = (DispType)object;
+                        AjaxAutoCompleteJComboBox.this.dispSubject.notify(AjaxAutoCompleteJComboBox.this, lastEnteredResult);
                     }
 
                     SwingUtilities.invokeLater(new Runnable() {
@@ -272,11 +271,10 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
 
                 // We are busy contacting server right now.
                 busySubject.notify(AjaxAutoCompleteJComboBox.this, true);
-                if (ajaxServiceProvider == org.yccheok.jstock.gui.AjaxServiceProvider.Yahoo) {
-                    ajaxYahooSearchEngineMonitor.clearAndPut(string);
-                } else if (ajaxServiceProvider == org.yccheok.jstock.gui.AjaxServiceProvider.Google) {
-                    ajaxGoogleSearchEngineMonitor.clearAndPut(string);
-                }
+                
+                canRemoveAllItems = true;
+                ajaxYahooSearchEngineMonitor.clearAndPut(string);
+                ajaxGoogleSearchEngineMonitor.clearAndPut(string);
             }
        };
     }
@@ -291,29 +289,22 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
                     // We are no longer busy.
                     busySubject.notify(AjaxAutoCompleteJComboBox.this, false);
 
-                    ResultType lastEnteredResultType = null;
-                    MatchType lastEnteredMatchType = null;
+                    DispType lastEnteredDispType = null;
 
                     if (AjaxAutoCompleteJComboBox.this.getItemCount() > 0) {
                         int index = AjaxAutoCompleteJComboBox.this.getSelectedIndex();
 
                         if (index == -1) {
                             Object object = AjaxAutoCompleteJComboBox.this.getItemAt(0);
-                            if (object instanceof ResultType) {
-                                lastEnteredResultType = (ResultType)object;
-                            } else {
-                                assert(object instanceof MatchType);
-                                lastEnteredMatchType = (MatchType)object;
+                            if (object instanceof DispType) {
+                                lastEnteredDispType = (DispType)object;
                             }
                         }
                         else {
                             Object object = AjaxAutoCompleteJComboBox.this.getItemAt(index);
-                            if (object instanceof ResultType) {
-                                lastEnteredResultType = (ResultType)object;
-                            } else {
-                                assert(object instanceof MatchType);
-                                lastEnteredMatchType = (MatchType)object;
-                            }                            
+                            if (object instanceof DispType) {
+                                lastEnteredDispType = (DispType)object;
+                            }                         
                         }
                     }
                     else {
@@ -323,17 +314,15 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
                             // All upper-case, if the result is not coming from server.
                             final String string = ((String)object).trim().toUpperCase();
                             if (string.length() > 0) {
-                                lastEnteredResultType = new ResultType(string, string);
+                                lastEnteredDispType = new ResultType(string, string);
                             }
                         }
                     }
 
                     AjaxAutoCompleteJComboBox.this.removeAllItems();
-                    if (lastEnteredResultType != null) {
-                        AjaxAutoCompleteJComboBox.this.resultSubject.notify(AjaxAutoCompleteJComboBox.this, lastEnteredResultType);
-                    } else if (lastEnteredMatchType != null) {
-                        AjaxAutoCompleteJComboBox.this.matchSubject.notify(AjaxAutoCompleteJComboBox.this, lastEnteredMatchType);
-                    } 
+                    if (lastEnteredDispType != null) {
+                        AjaxAutoCompleteJComboBox.this.dispSubject.notify(AjaxAutoCompleteJComboBox.this, lastEnteredDispType);
+                    }
                     return;
                 }   /* if(KeyEvent.VK_ENTER == e.getKeyCode()) */
 
@@ -358,7 +347,7 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
                 if (arg.Match.isEmpty()) {
                     StockInfo stockInfo = ajaxStockInfoSearchEngine.search(arg.Query);
                     if (stockInfo != null) {
-                        MatchType matchType = new MatchType(stockInfo.code.toString(), stockInfo.symbol.toString(), null, null);
+                        MatchType matchType = new MatchType(stockInfo.code.toString().toUpperCase(), stockInfo.symbol.toString(), null, null);
                         List<MatchType> matchTypes = new ArrayList<>();
                         matchTypes.add(matchType);
                         MatchSetType matchSetType = MatchSetType.newInstance(arg.Query, matchTypes);
@@ -404,15 +393,31 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
 
                 // Must hide popup. If not, the pop up windows will not be
                 // resized. But this causes flickering. :(
-                AjaxAutoCompleteJComboBox.this.hidePopup();
-                AjaxAutoCompleteJComboBox.this.removeAllItems();
-
-                boolean shouldShowPopup = false;
-                for (MatchType match : arg.Match) {
-                    AjaxAutoCompleteJComboBox.this.addItem(match);
-                    shouldShowPopup = true;
+                boolean isPopupHide = false;
+                if (canRemoveAllItems) {
+                    canRemoveAllItems = false;
+                    
+                    isPopupHide = true;
+                    AjaxAutoCompleteJComboBox.this.hidePopup();
+                    AjaxAutoCompleteJComboBox.this.removeAllItems();
+                    
+                    codes.clear();
                 }
-                if (shouldShowPopup) {
+
+                for (MatchType match : arg.Match) {
+                    if (codes.contains(match.getCode().toString())) {
+                        continue;
+                    }
+                    
+                    if (!isPopupHide) {
+                        isPopupHide = true;
+                        AjaxAutoCompleteJComboBox.this.hidePopup();
+                    }
+                    
+                    codes.add(match.getCode().toString());
+                    AjaxAutoCompleteJComboBox.this.addItem(match);
+                }
+                if (isPopupHide && AjaxAutoCompleteJComboBox.this.getItemCount() > 0) {
                     AjaxAutoCompleteJComboBox.this.showPopup();
                 }
 
@@ -430,7 +435,7 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
                 if (arg.Result.isEmpty()) {
                     StockInfo stockInfo = ajaxStockInfoSearchEngine.search(arg.Query);
                     if (stockInfo != null) {
-                        ResultType resultType = new ResultType(stockInfo.code.toString(), stockInfo.symbol.toString());
+                        ResultType resultType = new ResultType(stockInfo.code.toString().toUpperCase(), stockInfo.symbol.toString());
                         List<ResultType> resultTypes = new ArrayList<>();
                         resultTypes.add(resultType);
                         // Overwrite!
@@ -475,15 +480,33 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
 
                 // Must hide popup. If not, the pop up windows will not be
                 // resized. But this causes flickering. :(
-                AjaxAutoCompleteJComboBox.this.hidePopup();
-                AjaxAutoCompleteJComboBox.this.removeAllItems();
+                boolean isPopupHide = false;
+                
+                if (canRemoveAllItems) {
+                    canRemoveAllItems = false;
+                    
+                    isPopupHide = true;
+                    AjaxAutoCompleteJComboBox.this.hidePopup();
+                    AjaxAutoCompleteJComboBox.this.removeAllItems();
+                    
+                    codes.clear();
+                }
 
                 boolean shouldShowPopup = false;
                 for (ResultType result : arg.Result) {
+                    if (codes.contains(result.symbol)) {
+                        continue;
+                    }
+                    
+                    if (!isPopupHide) {
+                        isPopupHide = true;
+                        AjaxAutoCompleteJComboBox.this.hidePopup();
+                    }
+                    
+                    codes.add(result.symbol);
                     AjaxAutoCompleteJComboBox.this.addItem(result);
-                    shouldShowPopup = true;
                 }
-                if (shouldShowPopup) {
+                if (isPopupHide && AjaxAutoCompleteJComboBox.this.getItemCount() > 0) {
                     AjaxAutoCompleteJComboBox.this.showPopup();
                 }
 
@@ -491,17 +514,6 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
                 AjaxAutoCompleteJComboBox.this.jComboBoxEditor.setReadOnly(false);
             }
         };
-    }
-    
-    public void setAjaxProvider(AjaxServiceProvider ajaxServiceProvider, List<String> exchs) {
-        this.ajaxServiceProvider = ajaxServiceProvider;
-        if (this.ajaxServiceProvider == AjaxServiceProvider.Google) {
-            this.ajaxGoogleSearchEngineMonitor.setExchs(exchs);
-            this.setRenderer(new MatchSetCellRenderer());
-        } else {
-            assert(this.ajaxServiceProvider == AjaxServiceProvider.Yahoo);
-            this.setRenderer(new ResultSetCellRenderer());
-        }
     }
     
     private void adjustScrollBar() {
@@ -587,8 +599,7 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
         ajaxGoogleSearchEngineMonitor.stop();
     }
 
-    // Online database.
-    private AjaxServiceProvider ajaxServiceProvider;    
+    // Online database. 
     private final AjaxYahooSearchEngineMonitor ajaxYahooSearchEngineMonitor = new AjaxYahooSearchEngineMonitor();
     private final AjaxGoogleSearchEngineMonitor ajaxGoogleSearchEngineMonitor = new AjaxGoogleSearchEngineMonitor();
     private final AjaxStockInfoSearchEngine ajaxStockInfoSearchEngine = new AjaxStockInfoSearchEngine();
@@ -655,6 +666,9 @@ public class AjaxAutoCompleteJComboBox extends JComboBox implements JComboBoxPop
      * Keep track of whether layout is happening.
      */
     private boolean layingOut = false;
+    
+    private volatile boolean canRemoveAllItems = false;
+    private final Set<String> codes = new HashSet<>();
     
     /*
      * 

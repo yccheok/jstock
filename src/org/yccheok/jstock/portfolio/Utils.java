@@ -85,9 +85,10 @@ public class Utils {
         return Pair.create(stockPrices, _timestamp);
     }
 
+    // Perhaps we should have a better naming.
     public static boolean shouldConvertPenceToPound(PortfolioRealTimeInfo portfolioRealTimeInfo, Code code) {
         final Currency stockCurrency = getStockCurrency(portfolioRealTimeInfo, code);
-        return stockCurrency.isGBX();
+        return stockCurrency.isGBX() || stockCurrency.isZAC();
     }
     
     public static Currency getLocalCurrency() {
@@ -124,7 +125,7 @@ public class Utils {
     public static double getExchangeRate(PortfolioRealTimeInfo portfolioRealTimeInfo, Currency localCurrency, Currency stockCurrency) {
         // Possible null.
         if (localCurrency == null) {
-            if (stockCurrency.isGBX()) {
+            if (stockCurrency.isGBX() || stockCurrency.isZAC()) {
                 return 0.01;
             }
             return 1.0;
@@ -138,7 +139,7 @@ public class Utils {
             if (rate != null) {
                 exchangeRate = rate;
             } else {
-                if (stockCurrency.isGBX()) {
+                if (stockCurrency.isGBX() || stockCurrency.isZAC()) {
                     exchangeRate = 0.01;    
                 } else {
                     exchangeRate = 1.0;
