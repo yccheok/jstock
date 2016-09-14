@@ -26,11 +26,13 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.util.Duration;
 import org.yccheok.jstock.engine.Pair;
 import org.yccheok.jstock.trading.API.DriveWealth;
@@ -41,6 +43,7 @@ import org.yccheok.jstock.trading.API.SessionManager;
 import org.yccheok.jstock.trading.PositionModel;
 import org.yccheok.jstock.trading.Transaction;
 import static org.yccheok.jstock.trading.API.OrderManager.OrderType;
+import org.yccheok.jstock.trading.Utils;
 
 /**
  *
@@ -63,7 +66,7 @@ public class BuyDialog {
         dialog.setTitle("Buy Order");
         dialog.setHeaderText("Buy " + symbol + " - " + name);
 
-        ButtonType buyButtonType    = new ButtonType("Buy", ButtonBar.ButtonData.OK_DONE);
+        ButtonType buyButtonType    = new ButtonType("Submit Order", ButtonBar.ButtonData.OK_DONE);
         ButtonType cancelButtonType = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
         dialog.getDialogPane().getButtonTypes().addAll(buyButtonType, cancelButtonType);
 
@@ -175,7 +178,7 @@ public class BuyDialog {
         grid.add(priceLabel, 0, 4);
         grid.add(priceText, 1, 4);
 
-        grid.add(priceNote, 0, 5);
+        grid.add(priceNote, 1, 5);
         GridPane.setColumnSpan(priceNote, 2);
         
         // Scheduled service - get Ask price with Get Market Data / Quote API
@@ -224,8 +227,6 @@ public class BuyDialog {
 
         // BUY button event handler
         buyButton.addEventHandler(ActionEvent.ACTION, event -> {
-            System.out.println("22222  BUY (Node) event handler  [ActionEvent.ACTION].....");
-            
             // prepare BUY ORDER params
             SessionManager.User user   = DriveWealth.getUser();
             SessionManager.Account acc = user.getActiveAccount();
@@ -237,8 +238,9 @@ public class BuyDialog {
             Map<String, Object> params = new HashMap<>();
 
             // remove leading / trailing white space
-            params.put("symbol",        symbolText.getText().trim());
+            String sym = symbolText.getText().trim();
 
+            params.put("symbol",        sym);
             params.put("instrumentID",  instrumentID);
             params.put("accountID",     accountID);
             params.put("accountNo",     accountNo);
@@ -273,7 +275,7 @@ public class BuyDialog {
             alert.getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
             alert.show();
 
-
+            
             // Execute BUY Order
             Task buyTask = Transaction.startBuyThread(orderChoice.getValue(), params);
             String ordName = orderChoice.getValue().getName();
@@ -288,9 +290,11 @@ public class BuyDialog {
 
                     System.out.println("Buy Task Succeed Handler ....");
                     String msg;
-                    
+                    String details;
+
                     if (error != null) {
-                        msg = "BUY " + ordName + " order ERROR: " + error;
+                        msg = "Buy " + ordName + " order failed.";
+                        details = "Error : " + error;
                     } else {
                         OrdStatus ordStatus     = order.getOrdStatusEnum();
                         String instrumentID     = order.getInstrumentID();
@@ -306,35 +310,59 @@ public class BuyDialog {
                         String rejReason        = order.getOrdRejReason();
 
                         if (ordStatus == OrdStatus.REJECTED) {
-                            msg = "BUY " + ordName + " order REJECTED, reason: " + rejReason;
+                            msg = "Buy " + ordName + " order rejected.";
+                            details = "Reason: " + rejReason;
                         } else {
-                            msg = "Successfully BUY " + ordName + " order " +
-                                "\n instrumentID: "   + instrumentID + 
-                                "\n orderID: "        + orderID +
-                                "\n orderNo: "        + orderNo +
-                                "\n orderQty: "       + orderQty + 
-                                "\n orderType: "      + ordType +
-                                "\n side: "           + side +
-                                "\n accountType: "    + accountType + 
-                                "\n grossTradeAmt: "  + grossTradeAmt +
-                                "\n commission: "     + commission + 
-                                "\n status: "         + status + " - " + ordStatus.getName();
+                            msg = "Buy " + ordName + " order successful.";
+                            
+                            // Product: symbol, stock name, logo
+                            // Action: Buy
+                            // Quantity
+                            // Price
+                            // Subtotal
+                            // commission
+                            // Total
+                            
+                            String unitPrice = Utils.formatNumber(grossTradeAmt / orderQty, 2);
+                            String total = Utils.formatNumber(grossTradeAmt + commission, 2);
+                            
+                            details =   " Product : " + sym +
+                                        "\n Action : Buy" +
+                                        "\n Quantity : " + orderQty +
+                                        "\n Price : " + unitPrice +
+                                        "\n Subtotal : " + grossTradeAmt +
+                                        "\n Commission : " + commission +
+                                        "\n Total : " + total;
                         }
                     }
                     
-                    System.out.println(msg);
+                    System.out.println(msg + details);
+                    alert.setContentText(msg);
+                    
+                    // Show Buy Success / Error message
+                    TextArea buyText = new TextArea(details);
+                    buyText.setEditable(false);
+                    buyText.setWrapText(true);
+
+                    buyText.setMaxWidth(Double.MAX_VALUE);
+                    buyText.setMaxHeight(Double.MAX_VALUE);
+                    GridPane.setVgrow(buyText, Priority.ALWAYS);
+                    GridPane.setHgrow(buyText, Priority.ALWAYS);
+
+                    GridPane buyGrid = new GridPane();
+                    buyGrid.setMaxWidth(Double.MAX_VALUE);
+                    buyGrid.add(buyText, 0, 0);
+
+                    alert.getDialogPane().setExpandableContent(buyGrid);
+                    alert.getDialogPane().setExpanded(true);
                     
                     // enable Dialog - OK / Close  buton
-                    // Update status: Success / Failure with error message
-                    alert.setContentText(msg);
                     alert.getDialogPane().lookupButton(ButtonType.OK).setDisable(false);
                     
                     // refresh Portfolio
                     Portfolio.portfolioService._restart();
                 }
             });
-            
-            System.out.println("33333  BUY (Node) event handler   DONE .....");
         });
 
         
