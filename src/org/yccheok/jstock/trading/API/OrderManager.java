@@ -44,9 +44,9 @@ public class OrderManager {
     }
     
     public static enum OrderType {
-        MARKET(1, "market"),
-        LIMIT(2, "limit"),
-        STOP(3, "stop");
+        MARKET(1, "Market"),
+        LIMIT(2, "Limit"),
+        STOP(3, "Stop");
         
         private final int value;
         private final String name;

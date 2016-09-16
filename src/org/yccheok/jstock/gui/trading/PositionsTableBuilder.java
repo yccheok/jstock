@@ -217,10 +217,6 @@ public class PositionsTableBuilder {
 
         this.posTable.setEditable(false);
 
-        // limit Table height, based on row number
-        this.posTable.setFixedCellSize(Portfolio.TABLE_CELL_SIZE);
-        this.posTable.prefHeightProperty().bind(Bindings.size(this.posTable.getItems()).multiply(this.posTable.getFixedCellSize()).add(30));
-
         // set all columns having equal width
         this.posTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         
@@ -232,6 +228,9 @@ public class PositionsTableBuilder {
         
         // set Data Model
         this.posTable.setItems(this.posList);
+        
+        // limit Table height, based on row number
+        this.posTable.setFixedCellSize(Portfolio.TABLE_CELL_SIZE);
         this.posTable.prefHeightProperty().bind(Bindings.size(this.posTable.getItems()).multiply(this.posTable.getFixedCellSize()).add(30));
         
         return this.posTable;

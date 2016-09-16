@@ -13,7 +13,10 @@ import java.util.Optional;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
@@ -28,8 +31,11 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
@@ -55,6 +61,154 @@ public class BuyDialog {
     
     private BuyDialog () {}
     
+    public static class Result {
+        private final SimpleStringProperty product;
+        private final SimpleStringProperty action;
+        private final SimpleStringProperty qty;
+        private final SimpleStringProperty price;
+        private final SimpleStringProperty subtotal;
+        private final SimpleStringProperty commission;
+        private final SimpleStringProperty total;
+
+        public Result (String product, String action, Double qty, Double price, Double subtotal, Double commission, Double total) {
+            this.product    = new SimpleStringProperty(product);
+            this.action     = new SimpleStringProperty(action);
+            
+            // convert Double to String, avoid display 8.55 as 8.549999999
+            
+            String qtyStr = Utils.monetaryFormat(qty);
+            System.out.println("Result constructor, qty Double: " + qty.toString() + ", qty String (Utils.monetaryFormat): " + qtyStr);
+            
+            
+            this.qty        = new SimpleStringProperty(Utils.monetaryFormat(qty));
+            this.price      = new SimpleStringProperty(Utils.monetaryFormat(price));
+            this.subtotal   = new SimpleStringProperty(Utils.monetaryFormat(subtotal));
+            this.commission = new SimpleStringProperty(Utils.monetaryFormat(commission));
+            this.total      = new SimpleStringProperty(Utils.monetaryFormat(total));
+        }
+
+        public String getProduct () {
+            return product.get();
+        }
+        public void setProduct (String v) {
+            product.set(v);
+        }
+        public SimpleStringProperty productProperty() {
+            return product;
+        }
+        
+        public String getAction () {
+            return action.get();
+        }
+        public void setAction (String v) {
+            action.set(v);
+        }
+        public SimpleStringProperty actionProperty() {
+            return action;
+        }
+        
+        public String getQty () {
+            return qty.get();
+        }
+        public void setQty (String v) {
+            qty.set(v);
+        }
+        public SimpleStringProperty qtyProperty() {
+            return qty;
+        }
+        
+        public String getPrice () {
+            return price.get();
+        }
+        public void setPrice (String v) {
+            price.set(v);
+        }
+        public SimpleStringProperty priceProperty() {
+            return price;
+        }
+        
+        public String getSubtotal () {
+            return subtotal.get();
+        }
+        public void setSubtotal (String v) {
+            subtotal.set(v);
+        }
+        public SimpleStringProperty subtotalProperty() {
+            return subtotal;
+        }
+        
+        public String getCommission () {
+            return commission.get();
+        }
+        public void setCommission (String v) {
+            commission.set(v);
+        }
+        public SimpleStringProperty commissionProperty() {
+            return commission;
+        }
+        
+        public String getTotal () {
+            return total.get();
+        }
+        public void setTotal (String v) {
+            total.set(v);
+        }
+        public SimpleStringProperty totalProperty() {
+            return total;
+        }
+    }
+
+    private static TableView buildResultTable (String product, String action, Double qty,
+            Double price, Double subtotal, Double commission, Double total) {
+        
+        // table columns
+        TableColumn<Result, String> productCol  = new TableColumn<>("Product");
+        productCol.setCellValueFactory(new PropertyValueFactory("product"));
+
+        TableColumn<Result, String> actionCol   = new TableColumn<>("Action");
+        actionCol.setCellValueFactory(new PropertyValueFactory("action"));
+
+        TableColumn<Result, String> qtyCol      = new TableColumn<>("Quantity");
+        qtyCol.setCellValueFactory(new PropertyValueFactory("qty"));
+
+        TableColumn<Result, String> priceCol    = new TableColumn<>("Price");
+        priceCol.setCellValueFactory(new PropertyValueFactory("price"));
+
+        TableColumn<Result, String> subtotalCol = new TableColumn<>("Subtotal");
+        subtotalCol.setCellValueFactory(new PropertyValueFactory("subtotal"));
+
+        TableColumn<Result, String> commCol     = new TableColumn<>("Commission");
+        commCol.setCellValueFactory(new PropertyValueFactory("commission"));
+
+        TableColumn<Result, String> totalCol    = new TableColumn<>("Total");
+        totalCol.setCellValueFactory(new PropertyValueFactory("total"));
+
+        // add columns to table
+        TableView table = new TableView();
+        table.getColumns().addAll(productCol, actionCol, qtyCol, priceCol, subtotalCol, commCol, totalCol);
+        table.setEditable(false);
+
+        // set table data
+        Result resultRow = new Result(product, action, qty, price, subtotal, commission, total);
+        ObservableList<Result> resultList = FXCollections.observableArrayList(resultRow);
+        table.setItems(resultList);
+
+        // set all columns having equal width
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        // set table cell height
+        table.setFixedCellSize(30);
+
+        // limit table height to show 1 row, avoid showing empty rows
+        table.setPrefHeight(80);
+        table.setMaxHeight(80);
+
+        table.setPrefWidth(800);
+        table.setMaxWidth(800);
+        
+        return table;
+    }
+
     public static void showBuyDialog (PositionModel pos) {
         
         // temporary cancel / suspend Portfolio Scheduled Service
@@ -78,7 +232,7 @@ public class BuyDialog {
         grid.setPadding(new Insets(20, 150, 10, 10));
         
         ColumnConstraints col1 = new ColumnConstraints(120);
-        ColumnConstraints col2 = new ColumnConstraints(150);
+        ColumnConstraints col2 = new ColumnConstraints(200);
         grid.getColumnConstraints().add(col1);
         grid.getColumnConstraints().add(col2);
 
@@ -247,6 +401,9 @@ public class BuyDialog {
                     priceLabel.setVisible(true);
                     priceText.setVisible(true);
                 } else if (newVal == OrderType.MARKET) {
+                    // clear price
+                    priceText.clear();
+                    
                     // hide price field
                     priceLabel.setVisible(false);
                     priceText.setVisible(false);
@@ -325,16 +482,15 @@ public class BuyDialog {
             }
 
 
-            // show Dialog: Forwarding Order in Progress ....
+            // show Dialog: Buy Order In progress
             Alert alert = new Alert(AlertType.INFORMATION);
-            alert.setTitle("Forwarding Order");
-            alert.setHeaderText("Forwarding your order");
+            alert.setTitle("Buy Order");
+            alert.setHeaderText("Buy " + ordType.getName() + " Order: " + sym);
             alert.setContentText("Forwarding your order, please wait ....");
             
             // disable OK button, until BUY ORDER finish
             alert.getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
             alert.show();
-
             
             // Execute BUY Order
             Task buyTask = Transaction.startBuyThread(orderChoice.getValue(), params);
@@ -352,70 +508,57 @@ public class BuyDialog {
                     String msg;
                     String details;
 
-                    if (error != null) {
-                        msg = "Buy " + ordName + " order failed.";
-                        details = "Error : " + error;
-                    } else {
-                        OrdStatus ordStatus     = order.getOrdStatusEnum();
-                        String instrumentID     = order.getInstrumentID();
-                        String orderID          = order.getOrderID();
-                        Double grossTradeAmt    = order.getGrossTradeAmt();
-                        String orderNo          = order.getOrderNo();
-                        String status           = order.getOrdStatus();
-                        String ordType          = order.getOrdType();
-                        String side             = order.getSide();
-                        Double accountType      = order.getAccountType();
-                        Double orderQty         = order.getOrderQty();
-                        Double commission       = order.getCommission();
-                        String rejReason        = order.getOrdRejReason();
-
-                        if (ordStatus == OrdStatus.REJECTED) {
-                            msg = "Buy " + ordName + " order rejected.";
-                            details = "Reason: " + rejReason;
-                        } else {
-                            msg = "Buy " + ordName + " order successful.";
-                            
-                            // Product: symbol, stock name, logo
-                            // Action: Buy
-                            // Quantity
-                            // Price
-                            // Subtotal
-                            // commission
-                            // Total
-                            
-                            String unitPrice = Utils.formatNumber(grossTradeAmt / orderQty, 2);
-                            String total = Utils.formatNumber(grossTradeAmt + commission, 2);
-                            
-                            details =   " Product : " + sym +
-                                        "\n Action : Buy" +
-                                        "\n Quantity : " + orderQty +
-                                        "\n Price : " + unitPrice +
-                                        "\n Subtotal : " + grossTradeAmt +
-                                        "\n Commission : " + commission +
-                                        "\n Total : " + total;
-                        }
-                    }
-                    
-                    System.out.println(msg + details);
-                    alert.setContentText(msg);
-                    
-                    // Show Buy Success / Error message
-                    TextArea buyText = new TextArea(details);
+                    // Grid & TextArea to show Buy Error message
+                    TextArea buyText = new TextArea();
                     buyText.setEditable(false);
                     buyText.setWrapText(true);
-
-                    buyText.setMaxWidth(Double.MAX_VALUE);
-                    buyText.setMaxHeight(Double.MAX_VALUE);
                     GridPane.setVgrow(buyText, Priority.ALWAYS);
                     GridPane.setHgrow(buyText, Priority.ALWAYS);
-
+                    
                     GridPane buyGrid = new GridPane();
                     buyGrid.setMaxWidth(Double.MAX_VALUE);
                     buyGrid.add(buyText, 0, 0);
 
-                    alert.getDialogPane().setExpandableContent(buyGrid);
+                    if (error != null) {
+                        msg = "Buy " + ordName + " order failed.";
+                        details = "Error : " + error;
+                        
+                        buyText.setText(details);
+                        alert.getDialogPane().setExpandableContent(buyGrid);
+                    } else {
+                        OrdStatus ordStatus = order.getOrdStatusEnum();
+
+                        if (ordStatus == OrdStatus.REJECTED) {
+                            msg = "Buy " + ordName + " order rejected.";
+                            String rejReason = order.getOrdRejReason();
+                            details = "Reason: " + rejReason;
+
+                            buyText.setText(details);
+                            alert.getDialogPane().setExpandableContent(buyGrid);
+                        } else {
+                            msg = "Buy " + ordName + " order successful.";
+
+                            String instrumentID     = order.getInstrumentID();
+                            String orderID          = order.getOrderID();
+                            Double grossTradeAmt    = order.getGrossTradeAmt();
+                            String orderNo          = order.getOrderNo();
+                            String status           = order.getOrdStatus();
+                            String ordType          = order.getOrdType();
+                            String side             = order.getSide();
+                            Double accountType      = order.getAccountType();
+                            Double orderQty         = order.getOrderQty();
+                            Double commission       = order.getCommission();
+                            Double unitPrice        = grossTradeAmt / orderQty;
+                            Double total            = grossTradeAmt + commission;
+
+                            TableView resultTable = buildResultTable(sym, "Buy", orderQty, unitPrice, grossTradeAmt, commission, total);
+                            alert.getDialogPane().setExpandableContent(resultTable);
+                        }
+                    }
+
+                    alert.setContentText(msg);
                     alert.getDialogPane().setExpanded(true);
-                    
+
                     // enable Dialog - OK / Close  buton
                     alert.getDialogPane().lookupButton(ButtonType.OK).setDisable(false);
                     
