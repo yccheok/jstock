@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;
@@ -110,48 +112,8 @@ public class BuyDialog {
         // Limit / Stop price Note
         Label priceNote = new Label();
         priceNote.setVisible(false);
-        
-        orderChoice.getSelectionModel().selectedItemProperty().addListener(
-            (ObservableValue<? extends OrderType> observable, OrderType oldValue, OrderType newValue) -> {
-                System.out.println("Order Type changed: " + newValue.getName());
 
-                if (newValue == OrderType.LIMIT) {
-                    priceLabel.setText("Limit Price");
-                    priceNote.setText("Enter limit price > " + askLabel.getText().trim());
-
-                    priceLabel.setVisible(true);
-                    priceText.setVisible(true);
-                    priceNote.setVisible(true);
-                } else if (newValue == OrderType.STOP) {
-                    priceLabel.setText("Stop Price");
-                    
-                    Double stopPrice = Double.parseDouble(askLabel.getText().trim()) + 0.05;
-                    priceNote.setText("Enter stop price > " + stopPrice);
-                    
-                    priceLabel.setVisible(true);
-                    priceText.setVisible(true);
-                } else if (newValue == OrderType.MARKET) {
-                    // hide price field
-                    priceLabel.setVisible(false);
-                    priceText.setVisible(false);
-                    priceNote.setVisible(false);
-                }
-            });
-
-        
-        grid.add(new Label("Stock:"), 0, 0);
-        grid.add(symbolText, 1, 0);
-
-        
-        /*
-        SimpleStringProperty url = new SimpleStringProperty("http://syscdn.drivewealth.net/images/symbols/mcd.png");
-        ImageView img = new ImageView();
-        img.imageProperty().bind(Bindings.createObjectBinding(() -> {
-            return new Image(url.getValue());
-        }, url));
-        */
-
-        
+        // Stock icon
         ImageView imageView = new ImageView();
         imageView.setFitWidth(50);
         imageView.setFitHeight(50);
@@ -163,7 +125,10 @@ public class BuyDialog {
             Image icon = new Image(url, true);
             imageView.setImage(icon);
         }
-        
+
+        // add all to grid
+        grid.add(new Label("Stock:"), 0, 0);
+        grid.add(symbolText, 1, 0);
         grid.add(imageView, 2, 0);
         
         grid.add(new Label("Ask Price:"), 0, 1);
@@ -179,8 +144,122 @@ public class BuyDialog {
         grid.add(priceText, 1, 4);
 
         grid.add(priceNote, 1, 5);
-        GridPane.setColumnSpan(priceNote, 2);
         
+        
+        // disable BUY button by default
+        Node buyButton = dialog.getDialogPane().lookupButton(buyButtonType);
+        buyButton.setDisable(true);
+
+        // validate Qty
+        BooleanBinding qtyValid = Bindings.createBooleanBinding(() -> {
+            boolean valid = false;
+            String qty = qtyText.getText().trim();
+
+            if (qty == null || qty.isEmpty()) {
+                return valid;
+            }
+            
+            try {
+                if (Double.parseDouble(qty) > 0) {
+                    valid = true;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("[Bindings.Qty]  Qty is NOT number format: " + qty);
+            }
+
+            return valid;
+        }, qtyText.textProperty());
+
+
+        // validate LIMIT / STOP price
+        BooleanBinding priceValid = Bindings.createBooleanBinding(() -> {
+            boolean valid = false;
+
+            String ask = askLabel.getText().trim();
+            // NO ask price yet, return invalid so BUY button is disabled
+            if (ask == null || ask.isEmpty()) {
+                return valid;
+            }
+
+            Double askPrice;
+            try {
+                askPrice = Double.parseDouble(ask);
+            } catch (NumberFormatException e) {
+                System.out.println("[Binding.PriceValid]  CATCH ask price NOT NUMBER: " + ask);
+                return valid;
+            }
+            
+            OrderType ordType = orderChoice.getValue();
+
+            // Market Order doesn't specify price
+            if (ordType == OrderType.MARKET) {
+                return true;
+            }
+
+            String price = priceText.getText().trim();
+            if (price == null || price.isEmpty()) {
+                return valid;
+            }
+            
+            Double min = (double) 0;
+
+            // LIMIT price is just suggestion, not enforce anything
+            // STOP price must be > ask + 0.05
+            if (ordType == OrderType.STOP) {
+                min = askPrice + 0.05;
+            }
+
+            try {
+                if (Double.parseDouble(price) > min) {
+                    valid = true;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("[Binding.PriceValid]  CATCH price NOT NUMBER: " + price);
+            }
+
+            return valid;
+        }, priceText.textProperty());
+
+        // set BUY button disable property
+        BooleanBinding buyEnabled = orderChoice.valueProperty().isNotNull().and(qtyValid).and(priceValid);
+        buyButton.disableProperty().bind(buyEnabled.not());
+
+        
+        orderChoice.valueProperty().addListener(
+            (ObservableValue<? extends OrderType> observable, OrderType oldVal, OrderType newVal) -> {
+                System.out.println("Order Type changed: " + newVal.getName());
+
+                Double askPrice = Double.parseDouble(askLabel.getText().trim());
+                
+                if (newVal == OrderType.LIMIT) {
+                    priceLabel.setText("Limit Price");
+                    priceNote.setText("Enter limit price <= " + askPrice);
+
+                    priceLabel.setVisible(true);
+                    priceText.setVisible(true);
+                    priceNote.setVisible(true);
+                } else if (newVal == OrderType.STOP) {
+                    priceLabel.setText("Stop Price");
+                    
+                    Double stopPrice = askPrice + 0.05;
+                    priceNote.setText("Enter stop price > " + stopPrice);
+                    
+                    priceLabel.setVisible(true);
+                    priceText.setVisible(true);
+                } else if (newVal == OrderType.MARKET) {
+                    // hide price field
+                    priceLabel.setVisible(false);
+                    priceText.setVisible(false);
+                    priceNote.setVisible(false);
+                }
+                
+                // invalidate all, to recalculate BUY button disable property
+                buyEnabled.invalidate();
+                qtyValid.invalidate();
+                priceValid.invalidate();
+            });
+
+
         // Scheduled service - get Ask price with Get Market Data / Quote API
         final ScheduledService marketDataSrv = getMarketDataService(symbol);
         marketDataSrv.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
@@ -196,35 +275,16 @@ public class BuyDialog {
 
                 // Task's event handler is handled in JavaFX Application / UI Thread, so is ok to update UI
                 askLabel.setText(result.getAsk().toString());
+
+                // invalidate all, to recalculate BUY button disable property
+                priceValid.invalidate();
+                qtyValid.invalidate();
+                buyEnabled.invalidate();
             }
         });
         marketDataSrv.start();
-
         
-        /*
-        ** Buy button
-        */
         
-        // Enable/Disable button depends on qty entered.
-        Node buyButton = dialog.getDialogPane().lookupButton(buyButtonType);
-        buyButton.setDisable(true);
-
-        // Validate Qty is number format
-        qtyText.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
-            boolean disable = true;
-            String newQty = newValue.trim();
-            if (!newQty.isEmpty()) {
-                try {
-                    if (Double.parseDouble(newQty) > 0) {
-                        disable = false;
-                    }
-                } catch (NumberFormatException e) {
-                    System.out.println("Qty is not number format: " + newQty);
-                }
-            }
-            buyButton.setDisable(disable);
-        });
-
         // BUY button event handler
         buyButton.addEventHandler(ActionEvent.ACTION, event -> {
             // prepare BUY ORDER params
