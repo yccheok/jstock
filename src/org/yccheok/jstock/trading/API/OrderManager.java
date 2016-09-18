@@ -23,8 +23,8 @@ public class OrderManager {
     private OrderManager () {}
 
     public static enum OrderSide {
-        BUY("B", "buy"),
-        SELL("S", "sell");
+        BUY("B", "Buy"),
+        SELL("S", "Sell");
         
         private final String value;
         private final String name;

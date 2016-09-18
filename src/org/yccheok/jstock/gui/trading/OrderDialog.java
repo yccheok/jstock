@@ -47,6 +47,7 @@ import org.yccheok.jstock.trading.API.DriveWealth;
 import org.yccheok.jstock.trading.API.MarketDataManager;
 import org.yccheok.jstock.trading.API.OrderManager;
 import org.yccheok.jstock.trading.API.OrderManager.OrdStatus;
+import org.yccheok.jstock.trading.API.OrderManager.OrderSide;
 import org.yccheok.jstock.trading.API.SessionManager;
 import org.yccheok.jstock.trading.PositionModel;
 import org.yccheok.jstock.trading.Transaction;
@@ -57,11 +58,11 @@ import org.yccheok.jstock.trading.Utils;
  *
  * @author shuwnyuan
  */
-public class BuyDialog {
+public class OrderDialog {
     
-    private BuyDialog () {}
+    private OrderDialog () {}
     
-    public static class OrderModel {
+    public static class OrdSummary {
         private final SimpleStringProperty product;
         private final SimpleStringProperty action;
         private final SimpleStringProperty ordType;
@@ -71,12 +72,13 @@ public class BuyDialog {
         private final SimpleStringProperty commission;
         private final SimpleStringProperty total;
 
-        public OrderModel (String product, String action, String ordType, Double qty, Double price, Double subtotal, Double commission, Double total) {
+        
+        public OrdSummary (String product, OrderSide side, OrderType ordType, Double qty, Double price, Double subtotal, Double commission, Double total) {
             this.product    = new SimpleStringProperty(product);
-            this.action     = new SimpleStringProperty(action);
-            this.ordType    = new SimpleStringProperty(ordType);
+            this.action     = new SimpleStringProperty(side.getName());
+            this.ordType    = new SimpleStringProperty(ordType.getName());
 
-            // convert Double to String, avoid display 8.55 as 8.549999999
+            // convert Double to String, avoid display 8.55 as 8.5499999
             this.qty        = new SimpleStringProperty(Utils.monetaryFormat(qty));
             this.price      = new SimpleStringProperty(Utils.monetaryFormat(price));
             this.subtotal   = new SimpleStringProperty(Utils.monetaryFormat(subtotal));
@@ -163,36 +165,57 @@ public class BuyDialog {
         public SimpleStringProperty totalProperty() {
             return total;
         }
+
+        public static OrdSummary buildFromDialog (String product, Double qty, Double price, OrderType ordType, OrderSide side) {
+            Double subtotal = qty * price;
+
+            // calc commission
+            Double commRate = DriveWealth.getUser().getCommissionRate();
+            Double commission = ((subtotal * commRate / 100) < 1) ? 0.99 : commRate;
+            
+            Double total = subtotal + commission;
+
+            return new OrdSummary(product, side, ordType, qty, price, subtotal, commission, total);
+        }
+        
+        public static OrdSummary buildFromOrder (String product, OrderType ordType, OrderSide side, OrderManager.Order order) {
+            Double qty        = order.getOrderQty();
+            Double subtotal   = order.getGrossTradeAmt();
+            Double commission = order.getCommission();
+            Double price      = subtotal / qty;
+            Double total      = subtotal + commission;
+
+            return new OrdSummary(product, side, ordType, qty, price, subtotal, commission, total);
+        }
     }
 
-    private static TableView buildOrderTable (boolean estimated, String product, String action, String ordType,
-            Double qty, Double price, Double subtotal, Double commission, Double total) {
+    private static TableView OrdSummaryTable (boolean estimated, OrdSummary ordSummary) {
         
         String est = estimated ? "Est. " : "";
-        
+
         // table columns
-        TableColumn<OrderModel, String> productCol  = new TableColumn<>("Product");
+        TableColumn<OrdSummary, String> productCol  = new TableColumn<>("Product");
         productCol.setCellValueFactory(new PropertyValueFactory("product"));
 
-        TableColumn<OrderModel, String> actionCol   = new TableColumn<>("Action");
+        TableColumn<OrdSummary, String> actionCol   = new TableColumn<>("Action");
         actionCol.setCellValueFactory(new PropertyValueFactory("action"));
 
-        TableColumn<OrderModel, String> ordTypeCol   = new TableColumn<>("Order Type");
+        TableColumn<OrdSummary, String> ordTypeCol   = new TableColumn<>("Order Type");
         ordTypeCol.setCellValueFactory(new PropertyValueFactory("ordType"));
 
-        TableColumn<OrderModel, String> qtyCol      = new TableColumn<>("Quantity");
+        TableColumn<OrdSummary, String> qtyCol      = new TableColumn<>("Quantity");
         qtyCol.setCellValueFactory(new PropertyValueFactory("qty"));
 
-        TableColumn<OrderModel, String> priceCol    = new TableColumn<>("Price");
+        TableColumn<OrdSummary, String> priceCol    = new TableColumn<>("Price");
         priceCol.setCellValueFactory(new PropertyValueFactory("price"));
 
-        TableColumn<OrderModel, String> subtotalCol = new TableColumn<>(est + "Subtotal");
+        TableColumn<OrdSummary, String> subtotalCol = new TableColumn<>(est + "Subtotal");
         subtotalCol.setCellValueFactory(new PropertyValueFactory("subtotal"));
 
-        TableColumn<OrderModel, String> commCol     = new TableColumn<>(est + "Commission");
+        TableColumn<OrdSummary, String> commCol     = new TableColumn<>(est + "Commission");
         commCol.setCellValueFactory(new PropertyValueFactory("commission"));
 
-        TableColumn<OrderModel, String> totalCol    = new TableColumn<>(est + "Total");
+        TableColumn<OrdSummary, String> totalCol    = new TableColumn<>(est + "Total");
         totalCol.setCellValueFactory(new PropertyValueFactory("total"));
 
         // add columns to table
@@ -201,8 +224,7 @@ public class BuyDialog {
         table.setEditable(false);
 
         // set table data
-        OrderModel resultRow = new OrderModel(product, action, ordType, qty, price, subtotal, commission, total);
-        ObservableList<OrderModel> resultList = FXCollections.observableArrayList(resultRow);
+        ObservableList<OrdSummary> resultList = FXCollections.observableArrayList(ordSummary);
         table.setItems(resultList);
 
         // set all columns having equal width
@@ -221,9 +243,88 @@ public class BuyDialog {
         return table;
     }
 
-    public static void showBuyDialog (PositionModel pos) {
-        String action = "Buy";
+    public static class PriceValidator {
+        private final OrderSide side;
+        private final Double bidAsk;
+        private Double stopBarrier;
 
+        // For Buy, bidAsk = Ask. For Sell, bidAsk = Bid
+        public PriceValidator (Double bidAsk, OrderSide side) {
+            this.side = side;
+            this.bidAsk = bidAsk;
+            
+            if (side == OrderSide.BUY) {
+                this.stopBarrier = bidAsk + 0.05;
+            }
+            // TODO: add for Sell
+        }
+
+        public Double getStopBarrier () {
+            return this.stopBarrier;
+        }
+
+        public String getLimitTxt () {
+            if (this.side == OrderSide.BUY) {
+                return "Enter Limit Price <= " + Utils.monetaryFormat(this.bidAsk);
+            }
+
+            // TODO: add for Sell
+            
+            return null;
+        }
+        
+        public String getStopTxt () {
+            if (this.side == OrderSide.BUY) {
+                return "Enter Stop Price > " + Utils.monetaryFormat(this.stopBarrier);
+            }
+
+            // TODO: add for Sell
+
+            return null;
+        }
+
+        public boolean validateStop (String price) {
+            boolean valid = false;
+
+            if (price == null || price.isEmpty()) {
+                return valid;
+            }
+
+            if (this.side == OrderSide.BUY) {
+                try {
+                    if (Double.parseDouble(price) > this.stopBarrier) {
+                        valid = true;
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("[validateStop]  CATCH price NOT NUMBER: " + price);
+                }
+            }
+            
+            // TODO: add for Sell
+            
+            return valid;
+        }
+
+        public static boolean validateNumber (String numberS) {
+            boolean valid = false;
+
+            if (numberS == null || numberS.isEmpty()) {
+                return valid;
+            }
+
+            try {
+                if (Double.parseDouble(numberS) > 0) {
+                    valid = true;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("[validateNumber]  NOT number format: " + numberS);
+            }
+
+            return valid;
+        }
+    }
+    
+    public static void newOrderDlg (PositionModel pos, OrderSide side) {
         // temporary cancel / suspend Portfolio Scheduled Service
         Portfolio.portfolioService._cancel();
         
@@ -232,7 +333,7 @@ public class BuyDialog {
         String instrumentID = pos.getInstrumentID();
         
         Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("Buy");
+        dialog.setTitle(side.getName());
         dialog.setHeaderText(symbol + " - " + name);
 
         ButtonType reviewButtonType = new ButtonType("Review Order", ButtonBar.ButtonData.OK_DONE);
@@ -258,13 +359,13 @@ public class BuyDialog {
         // Ask price
         Label askLabel = new Label();
         
-        // OrderModel Type: Market, Stop, Limit
+        // Order Type: Market, Stop, Limit
         ChoiceBox<OrderType> orderChoice = new ChoiceBox<>();
         orderChoice.getItems().setAll(OrderType.values());
         orderChoice.setValue(OrderType.MARKET);
 
         // Qty
-        // TODO: get Instrument gives: orderSizeMax, orderSizeMin, orderSizeStep
+        // TODO: Suggest : orderSizeMax, orderSizeMin, orderSizeStep (get Instrument)
         TextField qtyText = new TextField();
         qtyText.setPromptText("Units");
         
@@ -275,7 +376,7 @@ public class BuyDialog {
         // set to MARKET order by default, so hide Stop / Limit Price field
         priceLabel.setVisible(false);
         priceText.setVisible(false);
-        
+
         // Limit / Stop price Note
         Label priceNote = new Label();
         priceNote.setVisible(false);
@@ -318,75 +419,39 @@ public class BuyDialog {
         
         // validate Qty
         BooleanBinding qtyValid = Bindings.createBooleanBinding(() -> {
-            boolean valid = false;
-            String qty = qtyText.getText().trim();
-
-            if (qty == null || qty.isEmpty()) {
-                return valid;
-            }
-            
-            try {
-                if (Double.parseDouble(qty) > 0) {
-                    valid = true;
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("[Bindings.Qty]  Qty is NOT number format: " + qty);
-            }
-
-            return valid;
+            return PriceValidator.validateNumber(qtyText.getText().trim());
         }, qtyText.textProperty());
-
 
         // validate LIMIT / STOP price
         BooleanBinding priceValid = Bindings.createBooleanBinding(() -> {
-            boolean valid = false;
+            String bidAskS = askLabel.getText().trim();
 
-            String ask = askLabel.getText().trim();
-            // NO ask price yet, return invalid so BUY button is disabled
-            if (ask == null || ask.isEmpty()) {
-                return valid;
+            // No bidAsk price yet, disable "Review Order" button
+            if (! PriceValidator.validateNumber(bidAskS)) {
+                return false;
             }
 
-            Double askPrice;
-            try {
-                askPrice = Double.parseDouble(ask);
-            } catch (NumberFormatException e) {
-                System.out.println("[Binding.PriceValid]  CATCH ask price NOT NUMBER: " + ask);
-                return valid;
-            }
-            
+            Double bidAsk = Double.parseDouble(bidAskS);
             OrderType ordType = orderChoice.getValue();
-
-            // Market OrderModel doesn't specify price
-            if (ordType == OrderType.MARKET) {
-                return true;
-            }
-
             String price = priceText.getText().trim();
-            if (price == null || price.isEmpty()) {
-                return valid;
-            }
+
+            boolean valid = false;
             
-            Double min = (double) 0;
-
-            // LIMIT price is just suggestion, not enforce anything
-            // STOP price must be > ask + 0.05
-            if (ordType == OrderType.STOP) {
-                min = askPrice + 0.05;
-            }
-
-            try {
-                if (Double.parseDouble(price) > min) {
-                    valid = true;
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("[Binding.PriceValid]  CATCH price NOT NUMBER: " + price);
+            if (ordType == OrderType.MARKET) {
+                // Market Order doesn't specify price
+                valid = true;
+            } else if (ordType == OrderType.LIMIT) {
+                // LIMIT price just suggestion, not enforcing price limit. So just validate number is valid
+                valid = PriceValidator.validateNumber(price);
+            } else if (ordType == OrderType.STOP) {
+                PriceValidator validator = new PriceValidator(bidAsk, side);
+                valid = validator.validateStop(price);
             }
 
             return valid;
         }, priceText.textProperty());
 
-        // set BUY button disable property
+        // only enable "Review Order" button if Qty & price valid
         BooleanBinding reviewEnabled = orderChoice.valueProperty().isNotNull().and(qtyValid).and(priceValid);
         reviewButton.disableProperty().bind(reviewEnabled.not());
 
@@ -395,33 +460,32 @@ public class BuyDialog {
             (ObservableValue<? extends OrderType> observable, OrderType oldVal, OrderType newVal) -> {
                 System.out.println("Order Type changed: " + newVal.getName());
 
-                Double askPrice = Double.parseDouble(askLabel.getText().trim());
-                
+                Double bidAsk = Double.parseDouble(askLabel.getText().trim());
+                PriceValidator validator = new PriceValidator(bidAsk, side);
+
                 if (newVal == OrderType.LIMIT) {
                     priceLabel.setText("Limit Price ($)");
-                    priceNote.setText("Enter limit price <= " + askPrice);
+                    priceNote.setText(validator.getLimitTxt());
 
                     priceLabel.setVisible(true);
                     priceText.setVisible(true);
                     priceNote.setVisible(true);
                 } else if (newVal == OrderType.STOP) {
                     priceLabel.setText("Stop Price ($)");
-                    
-                    Double stopPrice = askPrice + 0.05;
-                    priceNote.setText("Enter stop price > " + stopPrice);
+                    priceNote.setText(validator.getStopTxt());
                     
                     priceLabel.setVisible(true);
                     priceText.setVisible(true);
                 } else if (newVal == OrderType.MARKET) {
                     // clear price
                     priceText.clear();
-                    
+
                     // hide price field
                     priceLabel.setVisible(false);
                     priceText.setVisible(false);
                     priceNote.setVisible(false);
                 }
-                
+
                 // invalidate all, to recalculate BUY button disable property
                 reviewEnabled.invalidate();
                 qtyValid.invalidate();
@@ -453,9 +517,25 @@ public class BuyDialog {
         });
         marketDataSrv.start();
 
-        
+
         // review button event handler
         reviewButton.addEventHandler(ActionEvent.ACTION, event -> {
+            
+            String sym = symbolText.getText().trim();
+            Double qty = Double.parseDouble(qtyText.getText().trim());
+
+            OrderType ordType = orderChoice.getValue();
+            String ordName = ordType.getName();
+
+            String priceS = priceText.getText().trim();
+            String bidAskS = askLabel.getText().trim();
+            Double price = (ordType == OrderType.MARKET) ? Double.parseDouble(bidAskS) : Double.parseDouble(priceS);
+
+            OrdSummary order = OrdSummary.buildFromDialog(sym, qty, price, ordType, side);
+            TableView orderTable = OrdSummaryTable(true, order);
+
+            
+/*
             String sym = symbolText.getText().trim();
             Double qty = Double.parseDouble(qtyText.getText().trim());
             
@@ -479,14 +559,23 @@ public class BuyDialog {
             Double commission = ((subtotal * commRate / 100) < 1) ? 0.99 : commRate;
             
             Double total = subtotal + commission;
-            
+
             // Review Order Dialog
             Alert reviewDlg = new Alert(AlertType.CONFIRMATION);
             reviewDlg.setTitle("Review Order");
             reviewDlg.setHeaderText(sym + " - " + name);
 
             // build Order summary table
-            TableView orderTable = buildOrderTable(true, sym, "Buy", ordType.getName(), qty, price, subtotal, commission, total);
+            TableView orderTable = OrdSummaryTable(true, sym, "Buy", ordType.getName(), qty, price, subtotal, commission, total);
+        
+*/
+
+            
+            // Review Order Dialog
+            Alert reviewDlg = new Alert(AlertType.CONFIRMATION);
+            reviewDlg.setTitle("Review Order");
+            reviewDlg.setHeaderText(sym + " - " + name);
+
             reviewDlg.getDialogPane().setContent(orderTable);
 
             ButtonType submitButtonType = new ButtonType("Submit Order", ButtonData.OK_DONE);
@@ -522,14 +611,14 @@ public class BuyDialog {
                 params.put("accountNo",     accountNo);
                 params.put("userID",        userID);
                 params.put("accountType",   acc.getAccountType().getValue());
-                params.put("side",          "B");
+                params.put("side",          side.getValue());
                 params.put("orderQty",      qty);             
                 params.put("ordType",       ordType.getValue());
 
                 // Stop / Limit price
-                if (ordType != OrderType.MARKET) {
+                if (ordType == OrderType.LIMIT || ordType == OrderType.STOP) {
                     String key = (ordType == OrderType.STOP) ? "price" : "limitPrice";
-                    params.put(key, stopLimitPrice);    
+                    params.put(key, price);    
                 }
 
                 // Create Order
@@ -570,13 +659,9 @@ public class BuyDialog {
                             } else {
                                 header = "Congratulations! Your order was successfully filled. We emailed you a trade notification.";
 
-                                Double orderQty         = order.getOrderQty();
-                                Double grossTradeAmt    = order.getGrossTradeAmt();
-                                Double commission       = order.getCommission();
-                                Double unitPrice        = grossTradeAmt / orderQty;
-                                Double total            = grossTradeAmt + commission;
-
-                                TableView resultTable = buildOrderTable(false, sym, "Buy", ordType.getName(), orderQty, unitPrice, grossTradeAmt, commission, total);
+                                OrdSummary ordSummary = OrdSummary.buildFromOrder (sym, ordType, side, order);
+                                TableView resultTable = OrdSummaryTable(false, ordSummary);
+                                
                                 resultDlg.getDialogPane().setContent(resultTable);
                             }
                         }
@@ -626,7 +711,7 @@ public class BuyDialog {
 
                         //System.out.println("BUY DIALOG - Scheduled Task to get market data bid/ask");
 
-                        // call Get market Data API => bid + ask
+                        // call Get market Data API => bid + bidAskS
                         List<MarketDataManager.MarketData> dataList = MarketDataManager.get(symbols, false);
                         MarketDataManager.MarketData marketData = null;
 

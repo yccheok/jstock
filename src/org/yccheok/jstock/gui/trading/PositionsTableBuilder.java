@@ -32,6 +32,8 @@ import org.yccheok.jstock.trading.PositionModel.SymbolUrl;
 
 import org.yccheok.jstock.trading.Utils;
 import org.yccheok.jstock.trading.API.InstrumentManager;
+import org.yccheok.jstock.trading.API.OrderManager;
+import org.yccheok.jstock.trading.API.OrderManager.OrderSide;
 
 /**
  *
@@ -125,8 +127,8 @@ public class PositionsTableBuilder {
                             
                             //System.out.println("Buy button pressed, symbol: " + pos.getSymbol()
                             //        + ", instrumentID: " + pos.getInstrumentID());
-                            
-                            BuyDialog.showBuyDialog(pos);
+
+                            OrderDialog.newOrderDlg(pos, OrderSide.BUY);
                         }
                     });
                     
