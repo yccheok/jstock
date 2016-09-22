@@ -128,10 +128,11 @@ public class PositionsTableBuilder {
                             //System.out.println("Buy button pressed, symbol: " + pos.getSymbol()
                             //        + ", instrumentID: " + pos.getInstrumentID());
 
-                            OrderDialog.newOrderDlg(pos, OrderSide.BUY);
+                            OrderDialog dlg = new OrderDialog(pos, OrderSide.BUY);
+                            dlg.initDlgAndWait();
                         }
                     });
-                    
+
                     final MenuItem sellItem = new MenuItem("Sell");
                     sellItem.setOnAction(new EventHandler<ActionEvent>() {
                         @Override

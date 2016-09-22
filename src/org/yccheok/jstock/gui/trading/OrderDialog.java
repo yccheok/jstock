@@ -60,7 +60,39 @@ import org.yccheok.jstock.trading.Utils;
  */
 public class OrderDialog {
     
-    private OrderDialog () {}
+    private final PositionModel pos;
+    private final OrderSide side;
+    private final String symbol;
+    private final String name;
+    private final String instrumentID;
+
+    // UI components
+    private final Dialog<ButtonType> newOrdDlg     = new Dialog<>();
+    private final TextField symbolText             = new TextField();
+    private final Label bidAskLabel                = new Label();
+    private final ChoiceBox<OrderType> orderChoice = new ChoiceBox<>();
+    private final TextField qtyText                = new TextField();
+    private final Label priceLabel                 = new Label();
+    private final TextField priceText              = new TextField();
+    private final Label priceNote                  = new Label();
+    private final ButtonType reviewButtonType      = new ButtonType("Review Order", ButtonBar.ButtonData.OK_DONE);
+    private final ButtonType cancelButtonType      = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+    
+    // fields validator
+    private BooleanBinding qtyValid;
+    private BooleanBinding priceValid;
+    private BooleanBinding reviewEnabled;
+
+    // Service to update bid ask
+    private ScheduledService<MarketDataManager.MarketData> marketDataSrv;
+
+    public OrderDialog (PositionModel pos, OrderSide side) {
+        this.pos            = pos;
+        this.side           = side;
+        this.symbol         = pos.getSymbol();
+        this.name           = pos.getName();
+        this.instrumentID   = pos.getInstrumentID();
+    }
     
     public static class OrdSummary {
         private final SimpleStringProperty symbol;
@@ -365,20 +397,36 @@ public class OrderDialog {
         }
     }
     
-    private static Dialog initDialogUI (PositionModel pos, OrderSide side, TextField symbolText,
-            Label bidAskLabel, ChoiceBox<OrderType> orderChoice, TextField qtyText,
-            Label priceLabel, TextField priceText, Label priceNote, ButtonType reviewButtonType) {
+    
+    public void initDlgAndWait () {
+        // temporary cancel / suspend Portfolio Scheduled Service
+        Portfolio.portfolioService._cancel();
+        
+        initNewDlgUI();
+        qtyPriceValidator();
+        orderChangeListener();
+        reviewBtnHandler();
+        startMarketDataSrv();
 
-        String symbol = pos.getSymbol();
-        String name   = pos.getName();
+        Optional<ButtonType> result = newOrdDlg.showAndWait();
+        ButtonType buttonType = result.get();
+        
+        if (buttonType == reviewButtonType) {
+            System.out.println("AFTER Review Order Button Pressed ......");
+        } else if (buttonType == ButtonType.CANCEL) {
+            System.out.println("AFTER CANCEL Button Pressed ......");
+        }
+        
+        // cancel get market data scheduled service
+        marketDataSrv.cancel();
+    }
 
+        
+    private void initNewDlgUI () {
         // UI components
-        Dialog<ButtonType> newOrdDlg = new Dialog<>();
         newOrdDlg.setTitle(side.getName());
         newOrdDlg.setHeaderText(symbol + " - " + name);
-
-        //ButtonType reviewButtonType = new ButtonType("Review Order", ButtonBar.ButtonData.OK_DONE);
-        ButtonType cancelButtonType = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+        
         newOrdDlg.getDialogPane().getButtonTypes().addAll(reviewButtonType, cancelButtonType);
 
         GridPane grid = new GridPane();
@@ -393,6 +441,7 @@ public class OrderDialog {
 
         // Symbol
         symbolText.setPromptText("Symbol");
+        symbolText.setText(symbol);
         symbolText.setEditable(false);
 
         // default to Market Order
@@ -445,42 +494,21 @@ public class OrderDialog {
         // disable Review button by default
         Node reviewButton = newOrdDlg.getDialogPane().lookupButton(reviewButtonType);
         reviewButton.setDisable(true);
-
-        return newOrdDlg;
+        
+        // Request focus on the Qty field by default.
+        Platform.runLater(() -> qtyText.requestFocus());
     }
-    
-    public static void newOrderDlg (PositionModel pos, OrderSide side) {
-        // temporary cancel / suspend Portfolio Scheduled Service
-        Portfolio.portfolioService._cancel();
-        
-        String symbol       = pos.getSymbol();
-        String name         = pos.getName();
-        String instrumentID = pos.getInstrumentID();
 
-        // init Dialog UI
-        TextField symbolText             = new TextField(symbol);
-        Label bidAskLabel                = new Label();
-        ChoiceBox<OrderType> orderChoice = new ChoiceBox<>();
-        TextField qtyText                = new TextField();
-        Label priceLabel                 = new Label();
-        TextField priceText              = new TextField();
-        Label priceNote                  = new Label();
-        ButtonType reviewButtonType      = new ButtonType("Review Order", ButtonBar.ButtonData.OK_DONE);
 
-        Dialog newOrdDlg = initDialogUI(pos, side, symbolText, bidAskLabel, orderChoice,
-                qtyText, priceLabel, priceText, priceNote, reviewButtonType);
-
-        Node reviewButton = newOrdDlg.getDialogPane().lookupButton(reviewButtonType);
-
-        
+    public void qtyPriceValidator () {
         // validate Qty
-        BooleanBinding qtyValid = Bindings.createBooleanBinding(() -> {
+        qtyValid = Bindings.createBooleanBinding(() -> {
             return PriceValidator.validateNumber(qtyText.getText().trim());
         }, qtyText.textProperty());
 
         
         // validate LIMIT / STOP price
-        BooleanBinding priceValid = Bindings.createBooleanBinding(() -> {
+        priceValid = Bindings.createBooleanBinding(() -> {
             String bidAskS = bidAskLabel.getText().trim();
 
             // No bidAsk price yet, disable "Review Order" button
@@ -509,48 +537,77 @@ public class OrderDialog {
         }, priceText.textProperty());
 
         // only enable "Review Order" button if Qty & price valid
-        BooleanBinding reviewEnabled = orderChoice.valueProperty().isNotNull().and(qtyValid).and(priceValid);
+        reviewEnabled = orderChoice.valueProperty().isNotNull().and(qtyValid).and(priceValid);
+
+        Node reviewButton = newOrdDlg.getDialogPane().lookupButton(reviewButtonType);
         reviewButton.disableProperty().bind(reviewEnabled.not());
+    }
 
-        
+    
+    public void orderChangeListener () {
         orderChoice.valueProperty().addListener((ObservableValue<? extends OrderType> observable, OrderType oldVal, OrderType newVal) -> {
-                System.out.println("Order Type changed: " + newVal.getName());
+            System.out.println("Order Type changed: " + newVal.getName());
 
-                Double bidAsk = Double.parseDouble(bidAskLabel.getText().trim());
-                PriceValidator validator = new PriceValidator(bidAsk, side);
+            Double bidAsk = Double.parseDouble(bidAskLabel.getText().trim());
+            PriceValidator validator = new PriceValidator(bidAsk, side);
 
-                if (newVal == OrderType.LIMIT) {
-                    priceLabel.setText("Limit Price ($)");
-                    priceNote.setText(validator.getLimitTxt());
+            if (newVal == OrderType.LIMIT) {
+                priceLabel.setText("Limit Price ($)");
+                priceNote.setText(validator.getLimitTxt());
 
-                    priceLabel.setVisible(true);
-                    priceText.setVisible(true);
-                    priceNote.setVisible(true);
-                } else if (newVal == OrderType.STOP) {
-                    priceLabel.setText("Stop Price ($)");
-                    priceNote.setText(validator.getStopTxt());
-                    
-                    priceLabel.setVisible(true);
-                    priceText.setVisible(true);
-                } else if (newVal == OrderType.MARKET) {
-                    // clear price
-                    priceText.clear();
+                priceLabel.setVisible(true);
+                priceText.setVisible(true);
+                priceNote.setVisible(true);
+            } else if (newVal == OrderType.STOP) {
+                priceLabel.setText("Stop Price ($)");
+                priceNote.setText(validator.getStopTxt());
 
-                    // hide price field
-                    priceLabel.setVisible(false);
-                    priceText.setVisible(false);
-                    priceNote.setVisible(false);
-                }
+                priceLabel.setVisible(true);
+                priceText.setVisible(true);
+            } else if (newVal == OrderType.MARKET) {
+                // clear price
+                priceText.clear();
 
-                // invalidate all, to recalculate BUY button disable property
-                reviewEnabled.invalidate();
-                qtyValid.invalidate();
-                priceValid.invalidate();
-            });
+                // hide price field
+                priceLabel.setVisible(false);
+                priceText.setVisible(false);
+                priceNote.setVisible(false);
+            }
+
+            // invalidate all, to recalculate BUY button disable property
+            reviewEnabled.invalidate();
+            qtyValid.invalidate();
+            priceValid.invalidate();
+        });
+    }
 
 
+    public void startMarketDataSrv () {
         // Scheduled service - get Ask price with Get Market Data / Quote API
-        final ScheduledService marketDataSrv = getMarketDataService(symbol);
+        marketDataSrv = new ScheduledService<MarketDataManager.MarketData>() {
+            @Override
+            protected Task<MarketDataManager.MarketData> createTask() {
+                return new Task<MarketDataManager.MarketData>() {
+                    protected MarketDataManager.MarketData call() {
+                        ArrayList<String> symbols = new ArrayList<>();
+                        symbols.add(symbol);
+
+                        //System.out.println("BUY DIALOG - Scheduled Task to get market data bid/ask");
+
+                        // call Get market Data API => bid + bidAskS
+                        List<MarketDataManager.MarketData> dataList = MarketDataManager.get(symbols, false);
+                        MarketDataManager.MarketData marketData = null;
+
+                        if (!dataList.isEmpty()) {
+                            marketData = dataList.get(0);
+                        }
+                        return marketData;
+                    }
+                };
+            }
+        };
+        marketDataSrv.setPeriod(Duration.seconds(1));
+        
         marketDataSrv.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(final WorkerStateEvent workerStateEvent) {
@@ -572,11 +629,14 @@ public class OrderDialog {
             }
         });
         marketDataSrv.start();
+    }
 
 
+    public void reviewBtnHandler () {
         // review button event handler
+        Node reviewButton = newOrdDlg.getDialogPane().lookupButton(reviewButtonType);
+        
         reviewButton.addEventHandler(ActionEvent.ACTION, event -> {
-            String sym        = symbolText.getText().trim();
             Double qty        = Double.parseDouble(qtyText.getText().trim());
             OrderType ordType = orderChoice.getValue();
 
@@ -587,10 +647,10 @@ public class OrderDialog {
             // Review Order Dialog
             Alert reviewDlg = new Alert(AlertType.CONFIRMATION);
             reviewDlg.setTitle("Review Order");
-            reviewDlg.setHeaderText(sym + " - " + name);
+            reviewDlg.setHeaderText(symbol + " - " + name);
 
             // Review Order Summary Table
-            OrdSummary order = OrdSummary.buildFromDialog(sym, name, instrumentID, qty, price, ordType, side);
+            OrdSummary order = OrdSummary.buildFromDialog(symbol, name, instrumentID, qty, price, ordType, side);
             TableView orderTable = OrdSummaryTable(order);
             reviewDlg.getDialogPane().setContent(orderTable);
 
@@ -601,21 +661,6 @@ public class OrderDialog {
             
             reviewDlg.show();
         });
-
-        // Request focus on the Qty field by default.
-        Platform.runLater(() -> qtyText.requestFocus());
-
-        Optional<ButtonType> result = newOrdDlg.showAndWait();
-        ButtonType buttonType = result.get();
-        
-        if (buttonType == reviewButtonType) {
-            System.out.println("AFTER Review Order Button Pressed ......");
-        } else if (buttonType == ButtonType.CANCEL) {
-            System.out.println("AFTER CANCEL Button Pressed ......");
-        }
-        
-        // cancel get market data scheduled service
-        marketDataSrv.cancel();
     }
 
     public static void submitOrderHandler (Alert reviewDlg, ButtonType submitButtonType) {
@@ -723,33 +768,4 @@ public class OrderDialog {
             });
         });
     }
-    
-    public static ScheduledService getMarketDataService (String symbol) {
-        ScheduledService<MarketDataManager.MarketData> svc = new ScheduledService<MarketDataManager.MarketData>() {
-            @Override
-            protected Task<MarketDataManager.MarketData> createTask() {
-                return new Task<MarketDataManager.MarketData>() {
-                    protected MarketDataManager.MarketData call() {
-                        ArrayList<String> symbols = new ArrayList<>();
-                        symbols.add(symbol);
-
-                        //System.out.println("BUY DIALOG - Scheduled Task to get market data bid/ask");
-
-                        // call Get market Data API => bid + bidAskS
-                        List<MarketDataManager.MarketData> dataList = MarketDataManager.get(symbols, false);
-                        MarketDataManager.MarketData marketData = null;
-
-                        if (!dataList.isEmpty()) {
-                            marketData = dataList.get(0);
-                        }
-                        return marketData;
-                    }
-                };
-            }
-        };
-        
-        svc.setPeriod(Duration.seconds(1));
-        return svc;
-    }
-    
 }
