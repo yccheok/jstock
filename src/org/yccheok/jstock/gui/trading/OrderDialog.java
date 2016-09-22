@@ -78,7 +78,7 @@ public class OrderDialog {
     private final ButtonType reviewButtonType      = new ButtonType("Review Order", ButtonBar.ButtonData.OK_DONE);
     private final ButtonType cancelButtonType      = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
     
-    // fields validator
+    // input fields validator
     private BooleanBinding qtyValid;
     private BooleanBinding priceValid;
     private BooleanBinding reviewEnabled;
@@ -94,7 +94,7 @@ public class OrderDialog {
         this.instrumentID   = pos.getInstrumentID();
     }
     
-    public static class OrdSummary {
+    private static class OrdSummary {
         private final SimpleStringProperty symbol;
         private final SimpleStringProperty action;
         private final SimpleStringProperty ordName;
@@ -316,7 +316,7 @@ public class OrderDialog {
         return table;
     }
 
-    public static class PriceValidator {
+    private static class PriceValidator {
         private final OrderSide side;
         private final Double bidAsk;
         private Double stopBarrier;
@@ -500,7 +500,7 @@ public class OrderDialog {
     }
 
 
-    public void qtyPriceValidator () {
+    private void qtyPriceValidator () {
         // validate Qty
         qtyValid = Bindings.createBooleanBinding(() -> {
             return PriceValidator.validateNumber(qtyText.getText().trim());
@@ -544,7 +544,7 @@ public class OrderDialog {
     }
 
     
-    public void orderChangeListener () {
+    private void orderChangeListener () {
         orderChoice.valueProperty().addListener((ObservableValue<? extends OrderType> observable, OrderType oldVal, OrderType newVal) -> {
             System.out.println("Order Type changed: " + newVal.getName());
 
@@ -582,7 +582,7 @@ public class OrderDialog {
     }
 
 
-    public void startMarketDataSrv () {
+    private void startMarketDataSrv () {
         // Scheduled service - get Ask price with Get Market Data / Quote API
         marketDataSrv = new ScheduledService<MarketDataManager.MarketData>() {
             @Override
@@ -632,7 +632,7 @@ public class OrderDialog {
     }
 
 
-    public void reviewBtnHandler () {
+    private void reviewBtnHandler () {
         // review button event handler
         Node reviewButton = newOrdDlg.getDialogPane().lookupButton(reviewButtonType);
         
@@ -663,7 +663,7 @@ public class OrderDialog {
         });
     }
 
-    public static void submitOrderHandler (Alert reviewDlg, ButtonType submitButtonType) {
+    private static void submitOrderHandler (Alert reviewDlg, ButtonType submitButtonType) {
         Node submitButton = reviewDlg.getDialogPane().lookupButton(submitButtonType);
 
         // Confirm order, execute Create Order
