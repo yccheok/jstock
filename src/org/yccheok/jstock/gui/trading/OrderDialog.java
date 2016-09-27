@@ -244,7 +244,13 @@ public class OrderDialog {
             Commission rate = DriveWealth.getUser().getCommission();
             Double commission = Commission.calcCommission(qty, rate);
 
-            Double total = subtotal + commission;
+            Double total;
+            if (side == OrderSide.BUY) {
+                total = subtotal + commission;
+            } else {
+                // SELL should deduct commission
+                total = subtotal - commission;
+            }
 
             return new OrdSummary(true, symbol, name, instrumentID, side,
                     ordType, qty, price, subtotal, commission, total);
@@ -256,7 +262,13 @@ public class OrderDialog {
             Double subtotal   = order.getGrossTradeAmt();
             Double commission = order.getCommission();
             Double price      = subtotal / qty;
-            Double total      = subtotal + commission;
+            
+            Double total;
+            if (summary.getOrdSide() == OrderSide.BUY) {
+                total = subtotal + commission;
+            } else {
+                total = subtotal - commission;
+            }
 
             return new OrdSummary(false, summary.getSymbol(), summary.getName(),
                     summary.getInstrumentID(), summary.getOrdSide(), summary.getOrdType(),
@@ -326,11 +338,14 @@ public class OrderDialog {
         public PriceValidator (Double bidAsk, OrderSide side) {
             this.side = side;
             this.bidAsk = bidAsk;
-            
+
             if (side == OrderSide.BUY) {
+                // User must enter a price that's $0.05 above the current ask price.
                 this.stopBarrier = bidAsk + 0.05;
+            } else {
+                // User must enter a price that's $0.05 below the current bid price.
+                this.stopBarrier = bidAsk - 0.05;
             }
-            // TODO: add for Sell
         }
 
         public Double getStopBarrier () {
@@ -339,42 +354,36 @@ public class OrderDialog {
 
         public String getLimitTxt () {
             if (this.side == OrderSide.BUY) {
+                // If the price entered is above the current ask price, the limit will be immediately executed (unless after market hours in live).
                 return "Enter Limit Price <= " + Utils.monetaryFormat(this.bidAsk);
+            } else {
+                // If the price entered is below the current bid price, the limit will be immediately executed (unless after market hours in live).
+                return "Enter Limit Price >= " + Utils.monetaryFormat(this.bidAsk);
             }
-
-            // TODO: add for Sell
-            
-            return null;
         }
         
         public String getStopTxt () {
             if (this.side == OrderSide.BUY) {
                 return "Enter Stop Price > " + Utils.monetaryFormat(this.stopBarrier);
+            } else {
+                return "Enter Stop Price < " + Utils.monetaryFormat(this.stopBarrier);
             }
-
-            // TODO: add for Sell
-
-            return null;
         }
 
         public boolean validateStop (String price) {
-            boolean valid = false;
-
             if (price == null || price.isEmpty()) {
-                return valid;
+                return false;
             }
 
-            if (this.side == OrderSide.BUY) {
-                try {
-                    if (Double.parseDouble(price) > this.stopBarrier) {
-                        valid = true;
-                    }
-                } catch (NumberFormatException e) {
-                    System.out.println("[validateStop]  CATCH price NOT NUMBER: " + price);
+            boolean valid = false;
+            try {
+                if ((this.side == OrderSide.BUY  && Double.parseDouble(price) > this.stopBarrier) ||
+                    (this.side == OrderSide.SELL && Double.parseDouble(price) < this.stopBarrier)) {
+                    valid = true;
                 }
+            } catch (NumberFormatException e) {
+                System.out.println("[validateStop]  CATCH price NOT NUMBER: " + price);
             }
-            
-            // TODO: add for Sell
             
             return valid;
         }
@@ -475,11 +484,13 @@ public class OrderDialog {
         grid.add(new Label("Stock:"), 0, 0);
         grid.add(symbolText, 1, 0);
         grid.add(imageView, 2, 0);
-        
-        grid.add(new Label("Ask Price ($):"), 0, 1);
+
+        String bidAsk = (side == OrderSide.BUY) ? "Ask" : "Bid";
+        grid.add(new Label(bidAsk + " Price ($):"), 0, 1);
         grid.add(bidAskLabel, 1, 1);
-        
-        grid.add(new Label("Buy Order:"), 0, 2);
+
+        String buySell = side.getName();
+        grid.add(new Label(buySell + " Order:"), 0, 2);
         grid.add(orderChoice, 1, 2);
 
         grid.add(new Label("Quantity:"), 0, 3);
@@ -599,9 +610,9 @@ public class OrderDialog {
                         ArrayList<String> symbols = new ArrayList<>();
                         symbols.add(symbol);
 
-                        //System.out.println("BUY DIALOG - Scheduled Task to get market data bid/ask");
+                        //System.out.println("BUY / SELL DIALOG - Scheduled Task to get market data bid/ask");
 
-                        // call Get market Data API => bid + bidAskS
+                        // call Get market Data API => Bid + Ask
                         List<MarketDataManager.MarketData> dataList = MarketDataManager.get(symbols, false);
                         MarketDataManager.MarketData marketData = null;
 
@@ -621,13 +632,20 @@ public class OrderDialog {
                 MarketDataManager.MarketData result = (MarketDataManager.MarketData) workerStateEvent.getSource().getValue();
         
                 /*
-                System.out.println("BUY dialog: Get Market Data Service, Updated price for symbol: " + symbol
+                System.out.println("BUY / SELL dialog: Get Market Data Service, Updated price for symbol: " + symbol
                         + ", Bid: " + result.getBid()
                         + ", Ask: " + result.getAsk());
                 */
 
+                Double bidAsk;
+                if (side == OrderSide.BUY) {
+                    bidAsk = result.getAsk();
+                } else {
+                    bidAsk = result.getBid();
+                }
+
                 // Task's event handler is handled in JavaFX Application / UI Thread, so is ok to update UI
-                bidAskLabel.setText(result.getAsk().toString());
+                bidAskLabel.setText(bidAsk.toString());
 
                 // invalidate all, to recalculate BUY button disable property
                 priceValid.invalidate();
@@ -642,7 +660,7 @@ public class OrderDialog {
     private void reviewBtnHandler () {
         // review button event handler
         Node reviewButton = newOrdDlg.getDialogPane().lookupButton(reviewButtonType);
-        
+
         reviewButton.addEventHandler(ActionEvent.ACTION, event -> {
             Double qty        = Double.parseDouble(qtyText.getText().trim());
             OrderType ordType = orderChoice.getValue();
@@ -689,7 +707,7 @@ public class OrderDialog {
             submitDlg.getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
             submitDlg.show();
 
-            // BUY ORDER params
+            // CREATE ORDER params
             SessionManager.User user   = DriveWealth.getUser();
             SessionManager.Account acc = user.getActiveAccount();
 
@@ -697,19 +715,19 @@ public class OrderDialog {
             String accountID = acc.getAccountID();
             String accountNo = acc.getAccountNo();
 
-            Map<String, Object> params = new HashMap<>();
+            OrderType ordType = summary.getOrdType();
+            OrderSide ordSide = summary.getOrdSide();
 
+            Map<String, Object> params = new HashMap<>();
             params.put("symbol",        summary.getSymbol());
             params.put("instrumentID",  summary.getInstrumentID());
             params.put("accountID",     accountID);
             params.put("accountNo",     accountNo);
             params.put("userID",        userID);
             params.put("accountType",   acc.getAccountType().getValue());
-            params.put("side",          summary.getOrdSide().getValue());
+            params.put("side",          ordSide.getValue());
             params.put("orderQty",      summary.getQty());             
             params.put("ordType",       summary.getOrdType().getValue());
-
-            OrderType ordType = summary.getOrdType();
 
             // Stop / Limit price
             if (ordType == OrderType.LIMIT || ordType == OrderType.STOP) {
@@ -718,9 +736,9 @@ public class OrderDialog {
             }
 
             // Create Order
-            Task buyTask = Transaction.startBuyThread(ordType, params);
+            Task buySellTask = Transaction.buySellThread(ordSide, ordType, params);
 
-            buyTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+            buySellTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
                 @Override
                 public void handle(final WorkerStateEvent workerStateEvent) {
                     System.out.println("Buy Task Succeed Handler ....");

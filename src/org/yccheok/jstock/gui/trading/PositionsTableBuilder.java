@@ -150,7 +150,13 @@ public class PositionsTableBuilder {
                     sellItem.setOnAction(new EventHandler<ActionEvent>() {
                         @Override
                         public void handle(ActionEvent event) {
-                            //posTable.getItems().remove(row.getItem());
+                            PositionModel pos = row.getItem();
+                            
+                            //System.out.println("Buy button pressed, symbol: " + pos.getSymbol()
+                            //        + ", instrumentID: " + pos.getInstrumentID());
+
+                            OrderDialog dlg = new OrderDialog(pos, OrderSide.SELL);
+                            dlg.initDlgAndWait();
                         }
                     });
                     

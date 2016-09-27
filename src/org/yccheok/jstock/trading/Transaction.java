@@ -19,31 +19,32 @@ public class Transaction {
 
     private Transaction () {}
 
-    public static Task startBuyThread (OrderManager.OrderType orderType, Map<String, Object> params) {
-        System.out.println("Start Buy order thread ....");
+    public static Task buySellThread (OrderManager.OrderSide orderSide, OrderManager.OrderType orderType, Map<String, Object> params) {
+        System.out.println("Start " + orderSide.getName() + " order thread ....");
 
-        Task buyTask = createBuyTask(orderType, params);
-        Thread buyThread = new Thread(buyTask);
-        buyThread.start();
-        
-        return buyTask;
+        Task buySellTask = buySellTask(orderSide, orderType, params);
+        Thread buySellThread = new Thread(buySellTask);
+        buySellThread.start();
+
+        return buySellTask;
     }
 
-    private static Task createBuyTask (OrderManager.OrderType orderType, final Map<String, Object> params) {
-        Task buyTask = new Task<Pair<OrderManager.Order, String>>() {
+    private static Task buySellTask (OrderManager.OrderSide orderSide, OrderManager.OrderType orderType, final Map<String, Object> params) {
+        Task buySellTask = new Task<Pair<OrderManager.Order, String>>() {
             @Override protected Pair<OrderManager.Order, String> call() throws Exception {
-                System.out.println("BuyTask call create order .....");
+                System.out.println("BuySellTask call create order .....");
 
                 // Create Order
-                Pair<OrderManager.Order, String> createOrder = OrderManager.create(OrderManager.OrderSide.BUY, orderType, params);
+                Pair<OrderManager.Order, String> createOrder = OrderManager.create(orderSide, orderType, params);
                 OrderManager.Order order = createOrder.first;
                 String error = createOrder.second;
-
+                
+                String orderStr = orderSide.getName() + " " + orderType.getName();
+                
                 if (error != null) {
-                    String ordName = orderType.getName();
-                    
-                    System.out.println("BUY " + ordName + " order failed....");
-                    updateMessage("Create " + ordName + " Order Status FAILED !!");
+
+                    System.out.println(orderStr + " order failed....");
+                    updateMessage("Create " + orderStr + " Order Status FAILED !!");
 
                     return new Pair<>(null, error);
                 }
@@ -53,16 +54,16 @@ public class Transaction {
                 // Get Order Status
                 order = OrderManager.status(orderID);
                 OrderManager.OrdStatus ordStatus = order.getOrdStatusEnum();
-                
-                updateMessage("Market Order Status: " + ordStatus.getValue() + " - " + ordStatus.getName());                
-                System.out.println("BuyTask call get order status DONE, order status: "
+
+                updateMessage(orderStr + " Order Status: " + ordStatus.getValue() + " - " + ordStatus.getName());                
+                System.out.println("BuySellTask call get order status DONE, order status: "
                         + ordStatus.getValue() + " - " + ordStatus.getName());
 
                 return new Pair<>(order, null);
             }
         };
 
-        return buyTask;
+        return buySellTask;
     }
         
 }
