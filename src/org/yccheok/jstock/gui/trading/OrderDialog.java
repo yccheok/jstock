@@ -86,6 +86,7 @@ public class OrderDialog {
 
     // Service to update bid ask
     private ScheduledService<MarketDataManager.MarketData> marketDataSrv;
+    private Double bidAskPrice;
 
     public OrderDialog (PositionModel pos, OrderSide side) {
         this.pos            = pos;
@@ -332,7 +333,7 @@ public class OrderDialog {
     private static class PriceValidator {
         private final OrderSide side;
         private final Double bidAsk;
-        private Double stopBarrier;
+        private final Double stopBarrier;
 
         // For Buy, bidAsk = Ask. For Sell, bidAsk = Bid
         public PriceValidator (Double bidAsk, OrderSide side) {
@@ -528,7 +529,6 @@ public class OrderDialog {
                 return false;
             }
 
-            Double bidAsk = Double.parseDouble(bidAskS);
             OrderType ordType = orderChoice.getValue();
             String price = priceText.getText().trim();
 
@@ -541,7 +541,7 @@ public class OrderDialog {
                 // LIMIT price just suggestion, not enforcing price limit. So just validate number is valid
                 valid = PriceValidator.validateNumber(price);
             } else if (ordType == OrderType.STOP) {
-                PriceValidator validator = new PriceValidator(bidAsk, side);
+                PriceValidator validator = new PriceValidator(bidAskPrice, side);
                 valid = validator.validateStop(price);
             }
 
@@ -560,8 +560,7 @@ public class OrderDialog {
         orderChoice.valueProperty().addListener((ObservableValue<? extends OrderType> observable, OrderType oldVal, OrderType newVal) -> {
             System.out.println("Order Type changed: " + newVal.getName());
 
-            Double bidAsk = Double.parseDouble(bidAskLabel.getText().trim());
-            PriceValidator validator = new PriceValidator(bidAsk, side);
+            PriceValidator validator = new PriceValidator(bidAskPrice, side);
 
             switch (newVal) {
                 case LIMIT:
@@ -637,15 +636,14 @@ public class OrderDialog {
                         + ", Ask: " + result.getAsk());
                 */
 
-                Double bidAsk;
                 if (side == OrderSide.BUY) {
-                    bidAsk = result.getAsk();
+                    bidAskPrice = result.getAsk();
                 } else {
-                    bidAsk = result.getBid();
+                    bidAskPrice = result.getBid();
                 }
 
                 // Task's event handler is handled in JavaFX Application / UI Thread, so is ok to update UI
-                bidAskLabel.setText(bidAsk.toString());
+                bidAskLabel.setText(bidAskPrice.toString());
 
                 // invalidate all, to recalculate BUY button disable property
                 priceValid.invalidate();
@@ -666,8 +664,7 @@ public class OrderDialog {
             OrderType ordType = orderChoice.getValue();
 
             String priceS  = priceText.getText().trim();
-            String bidAskS = bidAskLabel.getText().trim();
-            Double price   = (ordType == OrderType.MARKET) ? Double.parseDouble(bidAskS) : Double.parseDouble(priceS);
+            Double price   = (ordType == OrderType.MARKET) ? bidAskPrice : Double.parseDouble(priceS);
 
             // Review Order Dialog
             Alert reviewDlg = new Alert(AlertType.CONFIRMATION);
@@ -741,7 +738,7 @@ public class OrderDialog {
             buySellTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
                 @Override
                 public void handle(final WorkerStateEvent workerStateEvent) {
-                    System.out.println("Buy Task Succeed Handler ....");
+                    System.out.println(ordSide.getName() + " Task Succeed Handler ....");
 
                     Pair<OrderManager.Order, String> result = (Pair) workerStateEvent.getSource().getValue();
                     OrderManager.Order order = result.first;

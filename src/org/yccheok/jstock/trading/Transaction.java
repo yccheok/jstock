@@ -9,6 +9,8 @@ import java.util.Map;
 import javafx.concurrent.Task;
 import org.yccheok.jstock.engine.Pair;
 import org.yccheok.jstock.trading.API.OrderManager;
+import static org.yccheok.jstock.trading.API.OrderManager.OrderSide;
+import static org.yccheok.jstock.trading.API.OrderManager.OrderType;
 
 
 /**
@@ -19,7 +21,7 @@ public class Transaction {
 
     private Transaction () {}
 
-    public static Task buySellThread (OrderManager.OrderSide orderSide, OrderManager.OrderType orderType, Map<String, Object> params) {
+    public static Task buySellThread (OrderSide orderSide, OrderType orderType, Map<String, Object> params) {
         System.out.println("Start " + orderSide.getName() + " order thread ....");
 
         Task buySellTask = buySellTask(orderSide, orderType, params);
@@ -29,7 +31,7 @@ public class Transaction {
         return buySellTask;
     }
 
-    private static Task buySellTask (OrderManager.OrderSide orderSide, OrderManager.OrderType orderType, final Map<String, Object> params) {
+    private static Task buySellTask (OrderSide orderSide, OrderType orderType, final Map<String, Object> params) {
         Task buySellTask = new Task<Pair<OrderManager.Order, String>>() {
             @Override protected Pair<OrderManager.Order, String> call() throws Exception {
                 System.out.println("BuySellTask call create order .....");

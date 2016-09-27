@@ -254,7 +254,11 @@ public class OrderManager {
         if (orderSide == OrderSide.BUY) {
             validate = validateBuy(orderType, ordParams);
         } else {
+            System.out.println("Before validate SELL....  \n\n");
+            
             validate = validateSell(orderType, ordParams);
+            
+            System.out.println("After validate SELL....  \n\n");
         }
 
         // validation error
