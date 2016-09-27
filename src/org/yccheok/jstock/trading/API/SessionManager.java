@@ -6,6 +6,7 @@
 package org.yccheok.jstock.trading.API;
 
 import com.google.gson.Gson;
+import com.google.gson.internal.LinkedTreeMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -40,20 +41,63 @@ public class SessionManager {
         }
     }
     
+    public static class Commission {
+        private final Double baseRate;
+        private final Double baseShares;
+        private final Double excessRate;
+        private final Double fractionalRate;
+        
+        public Commission (Double baseRate, Double baseShares, Double excessRate, Double fractionalRate) {
+            this.baseRate = baseRate;
+            this.baseShares = baseShares;
+            this.excessRate = excessRate;
+            this.fractionalRate = fractionalRate;
+        }
+        
+        public Double getBaseRate () {
+            return this.baseRate;
+        }
+        
+        public Double getBaseShares () {
+            return this.baseShares;
+        }
+        
+        public Double getExcessRate () {
+            return this.excessRate;
+        }
+        
+        public Double getFractionalRate () {
+            return this.fractionalRate;
+        }
+        
+        public static Double calcCommission (Double qty, Commission rate) {
+            Double commission;
+            
+            if (qty < 1) {
+                commission = rate.getFractionalRate();
+            } else if (qty < rate.getBaseShares()) {
+                commission = rate.getBaseRate();
+            } else {
+                commission = qty * rate.getExcessRate();
+            }
+
+            return commission;
+        }
+    }
+    
     public static class User {
         private final String username;
         private final String password;
         private final String userID;
-        private final Double commissionRate;
+        private Commission commission;
         private final List<Account> accounts = new ArrayList<>();
         private Account activeAccount = null;
-        
+
         
         public User (Map<String, Object> params) {
             this.username       = params.get("username").toString();
             this.password       = params.get("password").toString();
             this.userID         = params.get("userID").toString(); 
-            this.commissionRate = (Double) params.get("commissionRate");
             
             // populate user accounts
             List<Map<String, Object>> accs = (ArrayList) params.get("accounts");
@@ -64,6 +108,12 @@ public class SessionManager {
 
                 Account acc = new Account(accMap);
                 this.accounts.add(acc);
+
+                if (this.commission == null) {
+                    LinkedTreeMap<String, Object> comm = (LinkedTreeMap) accMap.get("commissionSchedule");
+                    this.commission = new Commission((Double) comm.get("baseRate"), (Double) comm.get("baseShares"),
+                            (Double) comm.get("excessRate"), (Double) comm.get("fractionalRate"));
+                }
             }
         }
 
@@ -79,10 +129,10 @@ public class SessionManager {
             return this.userID;
         }
 
-        public Double getCommissionRate () {
-            return this.commissionRate;
+        public Commission getCommission () {
+            return this.commission;
         }
-
+        
         public List<Account> getAccounts () {
             return this.accounts;
         }

@@ -175,7 +175,7 @@ public class SignIn {
                                         + ", pwd: "                 + password
                                         + ", sessionKey: "          + session.getSessionKey()
                                         + ", userID: "              + user.getUserID()
-                                        + ", commission: "          + user.getCommissionRate());
+                                        + ", commission: "          + user.getCommission().getBaseRate());
                 }
 
                 return login;

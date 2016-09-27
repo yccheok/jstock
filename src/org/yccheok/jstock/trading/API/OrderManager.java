@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.yccheok.jstock.engine.Pair;
+import static org.yccheok.jstock.trading.API.SessionManager.Commission;
 
 /**
  *
@@ -291,15 +292,17 @@ public class OrderManager {
         
         String accountID  = params.get("accountID").toString();
         String symbol     = params.get("symbol").toString();
-        double orderQty   = Double.parseDouble(params.get("orderQty").toString());
-        double commission = DriveWealth.getUser().getCommissionRate();
+        Double orderQty   = Double.parseDouble(params.get("orderQty").toString());
+        
+        Commission rate   = DriveWealth.getUser().getCommission();
+        Double commission = Commission.calcCommission(orderQty, rate);
 
         // get market price (use "Ask Price" for Buy)
         ArrayList<String> symbols = new ArrayList<>(Arrays.asList(symbol));
         List<MarketDataManager.MarketData> dataList = MarketDataManager.get(symbols, false);
-        double askPrice = dataList.get(0).getAsk();
+        Double askPrice = dataList.get(0).getAsk();
 
-        double price = 0;
+        Double price;
         if (orderType == OrderType.MARKET) {
             price = askPrice;
         } else if (orderType == OrderType.STOP) {
@@ -312,7 +315,8 @@ public class OrderManager {
                 
                 return new Pair<>(false, error);
             }
-        } else if (orderType == OrderType.LIMIT) {
+        } else {
+            // LIMIT Order
             // BUY will execute in the market when the market ask price is at or below the order limit price
             // If the price entered is above the current ask price, order will be immediately executed
 
@@ -323,10 +327,10 @@ public class OrderManager {
 
         // get balance
         AccountManager.AccountBlotter accBlotter = AccountManager.blotter(DriveWealth.getUser().getUserID(), accountID);
-        double balance = accBlotter.getTradingBalance();
+        Double balance = accBlotter.getTradingBalance();
 
         // check for insufficient balance
-        double amount = orderQty * price + commission;
+        Double amount = orderQty * price + commission;
 
         System.out.println("Check balance: amount: " + amount + ", balance: " + balance
                 + ", market price (Ask): " + price + ", Qty: " + orderQty
@@ -348,15 +352,15 @@ public class OrderManager {
         String accountID    = params.get("accountID").toString();
         String symbol       = params.get("symbol").toString();
         String instrumentID = params.get("instrumentID").toString();
-        double orderQty     = Double.parseDouble(params.get("orderQty").toString());
+        Double orderQty     = Double.parseDouble(params.get("orderQty").toString());
 
         if (orderType == OrderType.STOP) {
             // get market price (use "Bid Price" for Sell)
             ArrayList<String> symbols = new ArrayList<>(Arrays.asList(symbol));
             List<MarketDataManager.MarketData> dataList = MarketDataManager.get(symbols, false);
-            double bidPrice = dataList.get(0).getBid();
-            
-            double price = Double.parseDouble(params.get("price").toString());
+            Double bidPrice = dataList.get(0).getBid();
+
+            Double price = Double.parseDouble(params.get("price").toString());
 
             // Check Stop Price <= Bid Price - 0.05
             if (price > (bidPrice - 0.05)) {
@@ -369,7 +373,7 @@ public class OrderManager {
         
         // get available trading Qty
         AccountManager.AccountBlotter accBlotter = AccountManager.blotter(DriveWealth.getUser().getUserID(), accountID);
-        double availQty = accBlotter.getAvailableTradingQty(instrumentID);
+        Double availQty = accBlotter.getAvailableTradingQty(instrumentID);
 
         System.out.println("availableForTradingQty: " + availQty + ", orderQty: " + orderQty);
 

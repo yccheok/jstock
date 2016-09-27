@@ -51,8 +51,9 @@ import org.yccheok.jstock.trading.API.OrderManager.OrderSide;
 import org.yccheok.jstock.trading.API.SessionManager;
 import org.yccheok.jstock.trading.PositionModel;
 import org.yccheok.jstock.trading.Transaction;
-import static org.yccheok.jstock.trading.API.OrderManager.OrderType;
 import org.yccheok.jstock.trading.Utils;
+import static org.yccheok.jstock.trading.API.OrderManager.OrderType;
+import static org.yccheok.jstock.trading.API.SessionManager.Commission;
 
 /**
  *
@@ -240,9 +241,9 @@ public class OrderDialog {
             Double subtotal = qty * price;
 
             // calc commission
-            Double commRate = DriveWealth.getUser().getCommissionRate();
-            Double commission = ((subtotal * commRate / 100) < 1) ? 0.99 : commRate;
-            
+            Commission rate = DriveWealth.getUser().getCommission();
+            Double commission = Commission.calcCommission(qty, rate);
+
             Double total = subtotal + commission;
 
             return new OrdSummary(true, symbol, name, instrumentID, side,
