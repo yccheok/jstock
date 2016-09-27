@@ -126,7 +126,7 @@ public class OrderDialog {
             this.ordName    = new SimpleStringProperty(ordType.getName());
 
             // convert Double to String, avoid display 8.55 as 8.5499999
-            this.qty        = new SimpleStringProperty(Utils.monetaryFormat(qty));
+            this.qty        = new SimpleStringProperty(Utils.formatNumber(qty, 4));
             this.price      = new SimpleStringProperty(Utils.monetaryFormat(price));
             this.subtotal   = new SimpleStringProperty(Utils.monetaryFormat(subtotal));
             this.commission = new SimpleStringProperty(Utils.monetaryFormat(commission));
@@ -551,27 +551,33 @@ public class OrderDialog {
             Double bidAsk = Double.parseDouble(bidAskLabel.getText().trim());
             PriceValidator validator = new PriceValidator(bidAsk, side);
 
-            if (newVal == OrderType.LIMIT) {
-                priceLabel.setText("Limit Price ($)");
-                priceNote.setText(validator.getLimitTxt());
-
-                priceLabel.setVisible(true);
-                priceText.setVisible(true);
-                priceNote.setVisible(true);
-            } else if (newVal == OrderType.STOP) {
-                priceLabel.setText("Stop Price ($)");
-                priceNote.setText(validator.getStopTxt());
-
-                priceLabel.setVisible(true);
-                priceText.setVisible(true);
-            } else if (newVal == OrderType.MARKET) {
-                // clear price
-                priceText.clear();
-
-                // hide price field
-                priceLabel.setVisible(false);
-                priceText.setVisible(false);
-                priceNote.setVisible(false);
+            switch (newVal) {
+                case LIMIT:
+                    priceLabel.setText("Limit Price ($)");
+                    priceNote.setText(validator.getLimitTxt());
+                    
+                    priceLabel.setVisible(true);
+                    priceText.setVisible(true);
+                    priceNote.setVisible(true);
+                    break;
+                case STOP:
+                    priceLabel.setText("Stop Price ($)");
+                    priceNote.setText(validator.getStopTxt());
+                    
+                    priceLabel.setVisible(true);
+                    priceText.setVisible(true);
+                    break;
+                case MARKET:
+                    // clear price
+                    priceText.clear();
+                    
+                    // hide price field
+                    priceLabel.setVisible(false);
+                    priceText.setVisible(false);
+                    priceNote.setVisible(false);
+                    break;
+                default:
+                    break;
             }
 
             // invalidate all, to recalculate BUY button disable property

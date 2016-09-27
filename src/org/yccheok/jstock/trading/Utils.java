@@ -47,7 +47,7 @@ public class Utils {
     public static String formatNumber(Double number, int decimal) {
         String formatter = "###,###,###,###,###,###,##0.";
         do {
-            formatter = formatter.concat("0");
+            formatter = formatter.concat("#");
             decimal--;
         } while (decimal > 0);
         

@@ -92,17 +92,30 @@ public class PositionsTableBuilder {
     
     private class FormatNumberCell extends TableCell<PositionModel, Number> {
         private final boolean style;
+        private final int decimal;
 
         public FormatNumberCell (boolean style) {
             this.style = style;
+            // default to 2 dp
+            this.decimal = 2;
+        }
+        
+        public FormatNumberCell (boolean style, int decimal) {
+            this.style = style;
+            this.decimal = decimal;
         }
 
         @Override
         protected void updateItem(Number item, boolean empty) {
             super.updateItem(item, empty);
 
-            // 1000.56 => 1,000.56, -9999.80 => -9,999.80
-            setText(item == null ? "" : Utils.monetaryFormat((Double) item));
+            if (this.decimal == 2) {
+                // 1000.56 => 1,000.56, -9999.80 => -9,999.80
+                setText(item == null ? "" : Utils.monetaryFormat((Double) item));
+            } else {
+                // for Qty, show up to 4 decimal places
+                setText(item == null ? "" : Utils.formatNumber((Double) item, this.decimal));
+            }
 
             // show profit as GREEN, loss as RED
             if (this.style == true && item != null) {
@@ -179,7 +192,8 @@ public class PositionsTableBuilder {
 
         TableColumn<PositionModel, Number> unitsCol = new TableColumn<>("Units");
         unitsCol.setCellValueFactory(cellData -> cellData.getValue().openQtyProperty());
-        unitsCol.setCellFactory((TableColumn<PositionModel, Number> col) -> new FormatNumberCell(false));
+        // show up to 4 decimal places
+        unitsCol.setCellFactory((TableColumn<PositionModel, Number> col) -> new FormatNumberCell(false, 4));
         unitsCol.getStyleClass().add("right");
 
         TableColumn<PositionModel, Number> avgPriceCol = new TableColumn<>("Average Purchase Price");

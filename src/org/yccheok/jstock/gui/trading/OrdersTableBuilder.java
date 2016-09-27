@@ -86,12 +86,25 @@ public class OrdersTableBuilder {
     }
     
     private class FormatNumberCell extends TableCell<OrderModel, Number> {
-        public FormatNumberCell() {}
+        private final int decimal;
+        
+        public FormatNumberCell () {
+            this.decimal = 2;
+        }
+        
+        public FormatNumberCell (int decimal) {
+            this.decimal = decimal;
+        }
 
         @Override
         protected void updateItem(Number item, boolean empty) {
             super.updateItem(item, empty);
-            setText(item == null ? "" : Utils.monetaryFormat((Double) item));
+            
+            if (this.decimal == 2) {
+                setText(item == null ? "" : Utils.monetaryFormat((Double) item));
+            } else {
+                setText(item == null ? "" : Utils.formatNumber((Double) item, this.decimal));    
+            }
         }
     }
     
@@ -147,7 +160,7 @@ public class OrdersTableBuilder {
 
         TableColumn<OrderModel, Number> unitsCol = new TableColumn("Units");
         unitsCol.setCellValueFactory(cellData -> cellData.getValue().unitsProperty());
-        unitsCol.setCellFactory((TableColumn<OrderModel, Number> col) -> new FormatNumberCell());
+        unitsCol.setCellFactory((TableColumn<OrderModel, Number> col) -> new FormatNumberCell(4));
         unitsCol.getStyleClass().add("right");
 
         TableColumn<OrderModel, Number> mktPriceCol = new TableColumn("Current Price");
