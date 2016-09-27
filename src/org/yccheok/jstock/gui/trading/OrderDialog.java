@@ -94,7 +94,7 @@ public class OrderDialog {
         this.instrumentID   = pos.getInstrumentID();
     }
     
-    private static class OrdSummary {
+    public static class OrdSummary {
         private final SimpleStringProperty symbol;
         private final SimpleStringProperty action;
         private final SimpleStringProperty ordName;
