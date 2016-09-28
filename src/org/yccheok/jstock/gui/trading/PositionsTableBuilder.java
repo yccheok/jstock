@@ -85,6 +85,8 @@ public class PositionsTableBuilder {
                     // use background loading:  public Image(String url, boolean backgroundLoading)
                     Image icon = new Image(url, true);
                     imageView.setImage(icon);
+                } else {
+                    imageView.setImage(null);
                 }
             }
         }

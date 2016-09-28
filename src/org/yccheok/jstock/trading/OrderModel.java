@@ -10,7 +10,7 @@ import javafx.beans.property.SimpleStringProperty;
 import java.util.Map;
 import javafx.beans.property.SimpleObjectProperty;
 import org.yccheok.jstock.trading.API.OrderManager;
-import org.yccheok.jstock.trading.PositionModel.SymbolUrl;
+import static org.yccheok.jstock.trading.PositionModel.SymbolUrl;
 
 /**
  *
