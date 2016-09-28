@@ -123,13 +123,17 @@ public class OrderDialog {
         private final OrderSide ordSide;
         private final String name;
         private final String instrumentID;
+        private ShareCash shareCash;
 
 
-        public OrdSummary (boolean estimated, String symbol, String name, String instrumentID, 
+        public OrdSummary (boolean estimated, ShareCash shareCash,
+                String symbol, String name, String instrumentID, 
                 OrderSide side, OrderType ordType, Double qty,
                 Double price, Double subtotal, Double commission, Double total) {
 
             this.estimated    = estimated;
+            this.shareCash    = shareCash;
+
             this.ordType      = ordType;
             this.ordSide      = side;
             this.name         = name;
@@ -149,6 +153,10 @@ public class OrderDialog {
 
         public boolean isEstimated () {
             return estimated;
+        }
+
+        public ShareCash getShareCash () {
+            return shareCash;
         }
         
         public OrderType getOrdType () {
@@ -249,9 +257,20 @@ public class OrderDialog {
         }
 
         public static OrdSummary buildFromDialog (String symbol, String name, String instrumentID,
-                Double qty, Double price, OrderType ordType, OrderSide side) {
+                ShareCash shareCash, Double share, Double cash,
+                Double price, OrderType ordType, OrderSide side) {
 
-            Double subtotal = qty * price;
+            final Double qty;
+            final Double subtotal;
+
+            // default is Share Qty
+            if (shareCash == null || shareCash == ShareCash.SHARE) {
+                qty = share;
+                subtotal = share * price;
+            } else {
+                subtotal = cash;
+                qty = cash / price;
+            }
 
             // calc commission
             Commission rate = DriveWealth.getUser().getCommission();
@@ -265,7 +284,8 @@ public class OrderDialog {
                 total = subtotal - commission;
             }
 
-            return new OrdSummary(true, symbol, name, instrumentID, side,
+            return new OrdSummary(true, shareCash,
+                    symbol, name, instrumentID, side,
                     ordType, qty, price, subtotal, commission, total);
         }
         
@@ -283,15 +303,28 @@ public class OrderDialog {
                 total = subtotal - commission;
             }
 
-            return new OrdSummary(false, summary.getSymbol(), summary.getName(),
+            return new OrdSummary(false, null,
+                    summary.getSymbol(), summary.getName(),
                     summary.getInstrumentID(), summary.getOrdSide(), summary.getOrdType(),
                     qty, price, subtotal, commission, total);
         }
     }
 
     private static TableView OrdSummaryTable (OrdSummary ordSummary) {
-        String est = ordSummary.isEstimated() ? "Est. " : "";
+        String est = "";
+        String qtyTitle = "Quantity";
+        String subtotalTitle = "Subtotal";
 
+        if (ordSummary.isEstimated() == true) {
+            est = "Est. ";
+
+            if (ordSummary.getShareCash() == null || ordSummary.getShareCash() == ShareCash.SHARE) {
+                subtotalTitle = est + subtotalTitle;
+            } else {
+                qtyTitle = est + qtyTitle;
+            }
+        }
+            
         // table columns
         TableColumn<OrdSummary, String> productCol  = new TableColumn<>("Product");
         productCol.setCellValueFactory(new PropertyValueFactory("symbol"));
@@ -302,13 +335,13 @@ public class OrderDialog {
         TableColumn<OrdSummary, String> ordTypeCol   = new TableColumn<>("Order Type");
         ordTypeCol.setCellValueFactory(new PropertyValueFactory("ordName"));
 
-        TableColumn<OrdSummary, String> qtyCol      = new TableColumn<>("Quantity");
+        TableColumn<OrdSummary, String> qtyCol      = new TableColumn<>(qtyTitle);
         qtyCol.setCellValueFactory(new PropertyValueFactory("qty"));
 
         TableColumn<OrdSummary, String> priceCol    = new TableColumn<>("Price");
         priceCol.setCellValueFactory(new PropertyValueFactory("price"));
 
-        TableColumn<OrdSummary, String> subtotalCol = new TableColumn<>(est + "Subtotal");
+        TableColumn<OrdSummary, String> subtotalCol = new TableColumn<>(subtotalTitle);
         subtotalCol.setCellValueFactory(new PropertyValueFactory("subtotal"));
 
         TableColumn<OrdSummary, String> commCol     = new TableColumn<>(est + "Commission");
@@ -772,19 +805,34 @@ public class OrderDialog {
         Node reviewButton = newOrdDlg.getDialogPane().lookupButton(reviewButtonType);
 
         reviewButton.addEventHandler(ActionEvent.ACTION, event -> {
-            Double qty        = Double.parseDouble(qtyText.getText().trim());
             OrderType ordType = orderChoice.getValue();
 
             String priceS  = priceText.getText().trim();
             Double price   = (ordType == OrderType.MARKET) ? bidAskPrice : Double.parseDouble(priceS);
 
+            ShareCash shareCash = null;
+            Double qty = null;
+            Double cash = null;
+
+            if (ordType == OrderType.MARKET) {
+                shareCash = shareChoice.getValue();
+            }
+
+            if (ordType != OrderType.MARKET || shareCash == ShareCash.SHARE) {
+                qty = Double.parseDouble(qtyText.getText().trim());
+            } else {
+                cash = Double.parseDouble(cashText.getText().trim());
+            }
+            
             // Review Order Dialog
             Alert reviewDlg = new Alert(AlertType.CONFIRMATION);
             reviewDlg.setTitle("Review Order");
             reviewDlg.setHeaderText(symbol + " - " + name);
 
             // Review Order Summary Table
-            OrdSummary order = OrdSummary.buildFromDialog(symbol, name, instrumentID, qty, price, ordType, side);
+            OrdSummary order = OrdSummary.buildFromDialog(symbol, name, instrumentID,
+                    shareCash, qty, cash, price, ordType, side);
+
             TableView orderTable = OrdSummaryTable(order);
             reviewDlg.getDialogPane().setContent(orderTable);
 
@@ -835,13 +883,23 @@ public class OrderDialog {
             params.put("userID",        userID);
             params.put("accountType",   acc.getAccountType().getValue());
             params.put("side",          ordSide.getValue());
-            params.put("orderQty",      summary.getQty());             
             params.put("ordType",       summary.getOrdType().getValue());
 
+            
             // Stop / Limit price
             if (ordType == OrderType.LIMIT || ordType == OrderType.STOP) {
                 String key = (ordType == OrderType.STOP) ? "price" : "limitPrice";
                 params.put(key, summary.getPrice());
+            }
+
+            // LIMIT / STOP Order only by Shares Qty
+            // MARKET order support both Shares Qty & Cash ($ Amount)
+            if (ordType != OrderType.MARKET || summary.getShareCash() == ShareCash.SHARE) {
+                Double qty = Utils.formattedNumtoDouble(summary.getQty());
+                params.put("orderQty", qty);
+            } else {
+                Double subtotal = Utils.formattedNumtoDouble(summary.getSubtotal());
+                params.put("amountCash", subtotal);
             }
 
             // Create Order

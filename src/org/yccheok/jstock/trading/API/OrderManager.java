@@ -205,8 +205,10 @@ public class OrderManager {
             "accountType",
             "ordType",
             "side",
-            "orderQty",
             "comment",
+
+            // might not set for Market Order: either orderQty / amountCash
+            "orderQty",
 
             // for Market Order only
             "amountCash",
@@ -244,41 +246,45 @@ public class OrderManager {
             if (params.containsKey(k)) {
                 Object v = params.get(k);
                 ordParams.put(k, v);
-                //System.out.println("key: " + k + ", value: " + v);
+                // System.out.println("key: " + k + ", value: " + v);
             }
         }
         ordParams.put("ordType", orderType.getValue());
         ordParams.put("side", orderSide.getValue());
         
+        
+        //
+        // Seems validating BUY / SELL is redundant
+        //
+        
+        /*
         Pair<Boolean, String> validate;
         if (orderSide == OrderSide.BUY) {
             validate = validateBuy(orderType, ordParams);
         } else {
-            System.out.println("Before validate SELL....  \n\n");
-            
             validate = validateSell(orderType, ordParams);
-            
-            System.out.println("After validate SELL....  \n\n");
         }
 
         // validation error
         if (validate.first == false) {
             return new Pair<>(null, validate.second);
         }
+        */
 
+        
         // NOTE For LIMIT order:
         //  BUY will execute in the market when the market ask price is at or below the order limit price
         //  If the price entered is above the current ask price, order will be immediately executed
-
+        //
         //  SELL will execute in the market when the market bid price is at or above the order limit price
-        //  If the price entered is below the current ask price, order will be immediately executed
+        //  If the price entered is below the current bid price, order will be immediately executed
         
 
         // create order
         Map<String, Object> respondMap = Http.post(url, params, DriveWealth.getSessionKey());
         String respond = respondMap.get("respond").toString();
         Map<String, Object> result = new Gson().fromJson(respond, HashMap.class);
-
+        
         // debuging only
         for (String k: RESULT_FIELDS) {
             if (result.containsKey(k)) {
@@ -296,6 +302,11 @@ public class OrderManager {
         
         String accountID  = params.get("accountID").toString();
         String symbol     = params.get("symbol").toString();
+        
+        params.containsKey("orderQty");
+        params.containsKey("amountCash");
+
+        
         Double orderQty   = Double.parseDouble(params.get("orderQty").toString());
         
         Commission rate   = DriveWealth.getUser().getCommission();

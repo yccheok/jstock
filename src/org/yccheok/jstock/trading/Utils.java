@@ -7,6 +7,7 @@ package org.yccheok.jstock.trading;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.Locale;
 
 /**
@@ -54,6 +55,20 @@ public class Utils {
         return new DecimalFormat(formatter).format(number);
     }
 
+    public static Double formattedNumtoDouble (String formattedNum) {
+        DecimalFormat formatter = (DecimalFormat) NumberFormat.getInstance();
+        
+        Double result = null;
+        try {
+            Number number = formatter.parse(formattedNum);
+            result = number.doubleValue();
+        } catch (ParseException ex) {
+            System.out.println("[formattedNumtoDouble]  Can't parse formatted number: " + formattedNum);
+        }
+        
+        return result;
+    }
+    
     public static boolean validateNumber (String numberS) {
         if (numberS == null || numberS.isEmpty()) {
             return false;
