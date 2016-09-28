@@ -577,6 +577,7 @@ public class OrderDialog {
                     
                     priceLabel.setVisible(true);
                     priceText.setVisible(true);
+                    priceNote.setVisible(true);
                     break;
                 case MARKET:
                     // clear price
