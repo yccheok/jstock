@@ -53,4 +53,21 @@ public class Utils {
         
         return new DecimalFormat(formatter).format(number);
     }
+
+    public static boolean validateNumber (String numberS) {
+        if (numberS == null || numberS.isEmpty()) {
+            return false;
+        }
+
+        boolean valid = false;
+        try {
+            if (Double.parseDouble(numberS) > 0) {
+                valid = true;
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("[validateNumber]  NOT number format: " + numberS);
+        }
+
+        return valid;
+    }
 }

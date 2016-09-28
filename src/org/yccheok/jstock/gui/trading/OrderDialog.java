@@ -68,16 +68,22 @@ public class OrderDialog {
     private final String instrumentID;
 
     // UI components
-    private final Dialog<ButtonType> newOrdDlg     = new Dialog<>();
-    private final TextField symbolText             = new TextField();
-    private final Label bidAskLabel                = new Label();
-    private final ChoiceBox<OrderType> orderChoice = new ChoiceBox<>();
-    private final TextField qtyText                = new TextField();
-    private final Label priceLabel                 = new Label();
-    private final TextField priceText              = new TextField();
-    private final Label priceNote                  = new Label();
-    private final ButtonType reviewButtonType      = new ButtonType("Review Order", ButtonBar.ButtonData.OK_DONE);
-    private final ButtonType cancelButtonType      = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+    private final Dialog<ButtonType> newOrdDlg      = new Dialog<>();
+    private final TextField symbolText              = new TextField();
+    private final Label bidAskLabel                 = new Label();
+    private final ChoiceBox<OrderType> orderChoice  = new ChoiceBox<>();
+
+    private final Label shareLabel                  = new Label();
+    private final ChoiceBox<ShareCash> shareChoice  = new ChoiceBox<>();
+    private final TextField qtyText                 = new TextField();
+    private final Label cashLabel                   = new Label();
+    private final TextField cashText                = new TextField();
+    
+    private final Label priceLabel                  = new Label();
+    private final TextField priceText               = new TextField();
+    private final Label priceNote                   = new Label();
+    private final ButtonType reviewButtonType       = new ButtonType("Review Order", ButtonBar.ButtonData.OK_DONE);
+    private final ButtonType cancelButtonType       = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
     
     // input fields validator
     private BooleanBinding qtyValid;
@@ -94,6 +100,12 @@ public class OrderDialog {
         this.symbol         = pos.getSymbol();
         this.name           = pos.getName();
         this.instrumentID   = pos.getInstrumentID();
+    }
+
+    
+    public static enum ShareCash {
+        SHARE(),
+        CASH();
     }
     
     public static class OrdSummary {
@@ -388,24 +400,6 @@ public class OrderDialog {
             
             return valid;
         }
-
-        public static boolean validateNumber (String numberS) {
-            boolean valid = false;
-
-            if (numberS == null || numberS.isEmpty()) {
-                return valid;
-            }
-
-            try {
-                if (Double.parseDouble(numberS) > 0) {
-                    valid = true;
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("[validateNumber]  NOT number format: " + numberS);
-            }
-
-            return valid;
-        }
     }
     
     
@@ -416,6 +410,12 @@ public class OrderDialog {
         initNewDlgUI();
         qtyPriceValidator();
         orderChangeListener();
+        shareCashChangeListener();
+        
+        // Market order: calc Qty <-> Cash
+        qtyListener();
+        cashListener();
+        
         reviewBtnHandler();
         startMarketDataSrv();
 
@@ -445,7 +445,7 @@ public class OrderDialog {
         grid.setVgap(10);
         grid.setPadding(new Insets(20, 150, 10, 10));
         
-        ColumnConstraints col1 = new ColumnConstraints(120);
+        ColumnConstraints col1 = new ColumnConstraints(150);
         ColumnConstraints col2 = new ColumnConstraints(200);
         grid.getColumnConstraints().add(col1);
         grid.getColumnConstraints().add(col2);
@@ -459,9 +459,17 @@ public class OrderDialog {
         orderChoice.getItems().setAll(OrderType.values());
         orderChoice.setValue(OrderType.MARKET);
 
-        // Qty
-        // TODO: Suggest : orderSizeMax, orderSizeMin, orderSizeStep (get Instrument)
+        shareLabel.setText("Share / Cash Type");
+        shareChoice.getItems().setAll(ShareCash.SHARE, ShareCash.CASH);
+        shareChoice.setValue(ShareCash.CASH);
+        
+        // Since default to MARKET + Cash, so disable Qty
+        // Qty TODO: Suggest : orderSizeMax, orderSizeMin, orderSizeStep (get Instrument)
         qtyText.setPromptText("Units");
+        qtyText.setDisable(true);
+        
+        cashLabel.setText("Cash ($)");
+        cashText.setPromptText("$ Amount");
 
         // default to MARKET order, so hide Stop / Limit Price field & note
         priceLabel.setVisible(false);
@@ -494,13 +502,20 @@ public class OrderDialog {
         grid.add(new Label(buySell + " Order:"), 0, 2);
         grid.add(orderChoice, 1, 2);
 
-        grid.add(new Label("Quantity:"), 0, 3);
-        grid.add(qtyText, 1, 3);
+        grid.add(shareLabel, 0, 3);
+        grid.add(shareChoice, 1, 3);
         
-        grid.add(priceLabel, 0, 4);
-        grid.add(priceText, 1, 4);
+        grid.add(new Label("Shares:"), 0, 4);
+        grid.add(qtyText, 1, 4);
 
-        grid.add(priceNote, 1, 5);
+        // Market Order: by $ amount (support fractional share where Qty < 1)
+        grid.add(cashLabel, 2, 4);
+        grid.add(cashText, 3, 4);
+        
+        grid.add(priceLabel, 0, 5);
+        grid.add(priceText, 1, 5);
+
+        grid.add(priceNote, 1, 6);
 
         newOrdDlg.getDialogPane().setContent(grid);
 
@@ -512,11 +527,10 @@ public class OrderDialog {
         Platform.runLater(() -> qtyText.requestFocus());
     }
 
-
     private void qtyPriceValidator () {
         // validate Qty
         qtyValid = Bindings.createBooleanBinding(() -> {
-            return PriceValidator.validateNumber(qtyText.getText().trim());
+            return Utils.validateNumber(qtyText.getText().trim());
         }, qtyText.textProperty());
 
         
@@ -525,7 +539,7 @@ public class OrderDialog {
             String bidAskS = bidAskLabel.getText().trim();
 
             // No bidAsk price yet, disable "Review Order" button
-            if (! PriceValidator.validateNumber(bidAskS)) {
+            if (! Utils.validateNumber(bidAskS)) {
                 return false;
             }
 
@@ -534,15 +548,21 @@ public class OrderDialog {
 
             boolean valid = false;
             
-            if (ordType == OrderType.MARKET) {
-                // Market Order doesn't specify price
-                valid = true;
-            } else if (ordType == OrderType.LIMIT) {
-                // LIMIT price just suggestion, not enforcing price limit. So just validate number is valid
-                valid = PriceValidator.validateNumber(price);
-            } else if (ordType == OrderType.STOP) {
-                PriceValidator validator = new PriceValidator(bidAskPrice, side);
-                valid = validator.validateStop(price);
+            if (null != ordType) switch (ordType) {
+                case MARKET:
+                    // Market Order doesn't specify price
+                    valid = true;
+                    break;
+                case LIMIT:
+                    // LIMIT price just suggestion, not enforcing price limit. So just validate number is valid
+                    valid = Utils.validateNumber(price);
+                    break;
+                case STOP:
+                    PriceValidator validator = new PriceValidator(bidAskPrice, side);
+                    valid = validator.validateStop(price);
+                    break;
+                default:
+                    break;
             }
 
             return valid;
@@ -555,6 +575,48 @@ public class OrderDialog {
         reviewButton.disableProperty().bind(reviewEnabled.not());
     }
 
+    private void showPriceField (boolean show, String labelTxt, String noteTxt) {
+        if (show == true) {
+            priceLabel.setText(labelTxt);
+            priceNote.setText(noteTxt);
+
+            priceLabel.setVisible(true);
+            priceText.setVisible(true);
+            priceNote.setVisible(true);
+        } else {
+            // clear price, so not submitted
+            priceText.clear();
+
+            priceLabel.setVisible(false);
+            priceText.setVisible(false);
+            priceNote.setVisible(false);
+        }
+    }
+
+    private void showShareCashChoice (boolean show) {
+        if (show == true) {
+            // for Market Order
+            shareLabel.setVisible(true);
+            shareChoice.setVisible(true);
+            shareChoice.setValue(ShareCash.CASH);
+
+            cashLabel.setVisible(true);
+            cashText.setVisible(true);
+            qtyText.clear();
+
+            enableShareOrCash(ShareCash.CASH);
+        } else {
+            // Stop / Limit order, only allow Share / Unit
+            shareLabel.setVisible(false);
+            shareChoice.setVisible(false);
+
+            cashText.clear();
+            cashLabel.setVisible(false);
+            cashText.setVisible(false);
+            
+            qtyText.setDisable(false);
+        }
+    }
     
     private void orderChangeListener () {
         orderChoice.valueProperty().addListener((ObservableValue<? extends OrderType> observable, OrderType oldVal, OrderType newVal) -> {
@@ -564,29 +626,21 @@ public class OrderDialog {
 
             switch (newVal) {
                 case LIMIT:
-                    priceLabel.setText("Limit Price ($)");
-                    priceNote.setText(validator.getLimitTxt());
+                    showPriceField(true, "Limit Price ($)", validator.getLimitTxt());
+                    showShareCashChoice(false);
                     
-                    priceLabel.setVisible(true);
-                    priceText.setVisible(true);
-                    priceNote.setVisible(true);
                     break;
                 case STOP:
-                    priceLabel.setText("Stop Price ($)");
-                    priceNote.setText(validator.getStopTxt());
-                    
-                    priceLabel.setVisible(true);
-                    priceText.setVisible(true);
-                    priceNote.setVisible(true);
+                    showPriceField(true, "Stop Price ($)", validator.getStopTxt());
+                    showShareCashChoice(false);
+
                     break;
                 case MARKET:
-                    // clear price
-                    priceText.clear();
-                    
-                    // hide price field
-                    priceLabel.setVisible(false);
-                    priceText.setVisible(false);
-                    priceNote.setVisible(false);
+                    // hide price input field
+                    showPriceField(false, null, null);
+                    // specify Share by Qty or Amount ($), support fractional share
+                    showShareCashChoice(true);
+
                     break;
                 default:
                     break;
@@ -599,7 +653,62 @@ public class OrderDialog {
         });
     }
 
+    private void enableShareOrCash (ShareCash type) {
+        if (type == ShareCash.SHARE) {
+            // enable Qty, disable Cash
+            qtyText.setDisable(false);
+            cashText.setDisable(true);
+        } else {
+            // disable Qty, enable Cash
+            qtyText.setDisable(true);
+            cashText.setDisable(false);
+        }
+    }
 
+    private void shareCashChangeListener () {
+        shareChoice.valueProperty().addListener((ObservableValue<? extends ShareCash> observable, ShareCash oldVal, ShareCash newVal) -> {
+            if (orderChoice.getValue() == OrderType.MARKET) {
+                System.out.println("MARKET order : Change Share / Cash Type: " + newVal);
+                enableShareOrCash(newVal);
+            }
+        });
+    }
+    
+    private void qtyListener () {
+        qtyText.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+            // Share Qty to Cash amount
+            if (orderChoice.getValue() == OrderType.MARKET && shareChoice.getValue() == ShareCash.SHARE) {
+
+                if (! Utils.validateNumber(newValue)) {
+                    cashText.clear();
+                    return;
+                }
+
+                Double cash = Double.parseDouble(newValue) * bidAskPrice;
+                String cashS = Utils.monetaryFormat(cash);
+                cashText.setText(cashS);
+            }
+        });
+    }
+
+    private void cashListener () {    
+        cashText.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+            // Cash Amount to Share Qty
+            if (orderChoice.getValue() == OrderType.MARKET && shareChoice.getValue() == ShareCash.CASH) {
+
+                if (! Utils.validateNumber(newValue)) {
+                    qtyText.clear();
+                    return;
+                }
+
+                Double qty = Double.parseDouble(newValue) / bidAskPrice;
+                // Qty up to 4 decimal
+                String qtyS = Utils.formatNumber(qty, 4);
+                qtyText.setText(qtyS);
+            }
+        });
+    }
+    
     private void startMarketDataSrv () {
         // Scheduled service - get Ask price with Get Market Data / Quote API
         marketDataSrv = new ScheduledService<MarketDataManager.MarketData>() {
@@ -655,6 +764,8 @@ public class OrderDialog {
         marketDataSrv.start();
     }
 
+    // orderQty
+    // amountCash
 
     private void reviewBtnHandler () {
         // review button event handler
