@@ -92,7 +92,7 @@ public class OrderDialog {
 
     // Service to update bid ask
     private ScheduledService<MarketDataManager.MarketData> marketDataSrv;
-    private Double bidAskPrice;
+    private Double bidAskPrice = null;
 
     public OrderDialog (PositionModel pos, OrderSide side) {
         this.pos            = pos;
@@ -603,8 +603,10 @@ public class OrderDialog {
                     valid = Utils.validateNumber(price);
                     break;
                 case STOP:
-                    PriceValidator validator = new PriceValidator(bidAskPrice, side);
-                    valid = validator.validateStop(price);
+                    if (bidAskPrice != null) {
+                        PriceValidator validator = new PriceValidator (bidAskPrice, side);
+                        valid = validator.validateStop(price);
+                    }
                     break;
                 default:
                     break;
@@ -667,22 +669,25 @@ public class OrderDialog {
         orderChoice.valueProperty().addListener((ObservableValue<? extends OrderType> observable, OrderType oldVal, OrderType newVal) -> {
             System.out.println("Order Type changed: " + newVal.getName());
 
-            PriceValidator validator = new PriceValidator(bidAskPrice, side);
+            PriceValidator validator = null;
+            if (bidAskPrice != null) {
+                validator = new PriceValidator (bidAskPrice, side);
+            }
 
             switch (newVal) {
                 case LIMIT:
-                    showPriceField(true, "Limit Price ($)", validator.getLimitTxt());
+                    if (validator != null) showPriceField(true, "Limit Price ($)", validator.getLimitTxt());
                     showShareCashChoice(false);
                     
                     break;
                 case STOP:
-                    showPriceField(true, "Stop Price ($)", validator.getStopTxt());
+                    if (validator != null) showPriceField(true, "Stop Price ($)", validator.getStopTxt());
                     showShareCashChoice(false);
 
                     break;
                 case MARKET:
                     // hide price input field
-                    showPriceField(false, null, null);
+                    if (validator != null) showPriceField(false, null, null);
                     // specify Share by Qty or Amount ($), support fractional share
                     showShareCashChoice(true);
 
@@ -721,8 +726,10 @@ public class OrderDialog {
     
     private void qtyListener () {
         qtyText.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
-            // Share Qty to Cash amount
-            if (orderChoice.getValue() == OrderType.MARKET && shareChoice.getValue() == ShareCash.SHARE) {
+            // convert Share Qty => Cash amount
+            if (orderChoice.getValue() == OrderType.MARKET
+                && shareChoice.getValue() == ShareCash.SHARE
+                && bidAskPrice != null && bidAskPrice > 0) {
 
                 if (! Utils.validateNumber(newValue)) {
                     cashText.clear();
@@ -738,8 +745,10 @@ public class OrderDialog {
 
     private void cashListener () {    
         cashText.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
-            // Cash Amount to Share Qty
-            if (orderChoice.getValue() == OrderType.MARKET && shareChoice.getValue() == ShareCash.CASH) {
+            // convert Cash Amount => Share Qty
+            if (orderChoice.getValue() == OrderType.MARKET
+                && shareChoice.getValue() == ShareCash.CASH
+                && bidAskPrice != null && bidAskPrice > 0) {
 
                 if (! Utils.validateNumber(newValue)) {
                     qtyText.clear();
@@ -845,17 +854,19 @@ public class OrderDialog {
                     symbol, name, logoURL, instrumentID,
                     shareCash, qty, cash, price, ordType, side);
 
+            Label noteTxt = new Label();
+            noteTxt.setStyle("-fx-font-weight: bold; -fx-font-style: italic;");
+
             TableView orderTable = OrdSummaryTable(summary);
+            
             GridPane grid = new GridPane();
             grid.setHgap(10);
             grid.setVgap(10);
-            // grid.setPadding(new Insets(20, 150, 10, 10));
             grid.add(orderTable, 0, 0);
+            grid.add(noteTxt, 0, 1);
 
             if (side == OrderSide.SELL) {
-                Label noteTxt = new Label("Note: SEC and TAF fees not included in estimated commission.");
-                noteTxt.setStyle("-fx-font-weight: bold; -fx-font-style: italic;");
-                grid.add(noteTxt, 0, 1);
+                noteTxt.setText("Note: SEC and TAF fees not included in estimated commission.");
             }
 
             reviewDlg.getDialogPane().setContent(grid);
@@ -960,18 +971,53 @@ public class OrderDialog {
                     } else {
                         OrdStatus ordStatus = order.getOrdStatusEnum();
 
-                        if (ordStatus == OrdStatus.REJECTED) {
-                            header = header + " rejected.";
+                        System.out.println("order status: " + ordStatus + " ....\n\n\n");
 
-                            contentText.setText("Reason: " + order.getOrdRejReason());
-                            resultDlg.getDialogPane().setContent(contentText);
-                        } else {
-                            header = "Congratulations! Your order was successfully filled. We emailed you a trade notification.";
-                            
-                            OrdSummary ordSummary = OrdSummary.buildFromOrder(summary, order);
-                            TableView resultTable = OrdSummaryTable(ordSummary);
+                        if (null != ordStatus) switch (ordStatus) {
+                            case REJECTED:
+                                header = header + " rejected.";
+                                contentText.setText("Reason: " + order.getOrdRejReason());
+                                resultDlg.getDialogPane().setContent(contentText);
+                                break;
+                                
+                            case FILLED:
+                                header = "Your order was successfully filled. We emailed you a trade notification.";
+                                OrdSummary ordSummary = OrdSummary.buildFromOrder(summary, order);
+                                TableView resultTable = OrdSummaryTable(ordSummary);
+                                resultDlg.getDialogPane().setContent(resultTable);
+                                break;
+                                
+                            case NEW:
+                            case PARTIAL_FILLED:
+                                header = "Your order was successfully entered. View the status under \"Pending Orders\" in Portfolio.";
 
-                            resultDlg.getDialogPane().setContent(resultTable);
+                                Label noteTxt = new Label();
+                                noteTxt.setStyle("-fx-font-weight: bold; -fx-font-style: italic;");
+
+                                resultTable = OrdSummaryTable(summary);
+
+                                GridPane grid = new GridPane();
+                                grid.setHgap(10);
+                                grid.setVgap(10);
+                                grid.add(resultTable, 0, 0);
+                                grid.add(noteTxt, 0, 1);
+
+                                System.out.println("order type: " + order.getOrdType() + " .....\n\n");
+                                System.out.println("LIMIT order type IS: " + OrderType.LIMIT.getValue() + " .....\n\n");
+                                
+                                if (OrderType.LIMIT.getValue() == Integer.parseInt(order.getOrdType())) {
+                                    System.out.println("NEW LIMIT order ....");
+
+                                    String expired = order.getIsoTimeRestingOrderExpires();
+                                    noteTxt.setText("Unless executed, this order will expire on " + expired);
+                                }
+                                
+                                resultDlg.getDialogPane().setContent(grid);
+
+                                break;
+                                
+                            default:
+                                break;
                         }
                     }
 

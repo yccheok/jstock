@@ -85,6 +85,8 @@ public class OrderManager {
         private Double commission = null;
         // enum for ordStatus
         private OrdStatus ordStatusEnum = null;
+        // Expiration of limit order in UTC (GMT time) format.
+        private String isoTimeRestingOrderExpires = null;
 
         public Order (Map<String, Object> params) {
             this.orderID        = params.get("orderID").toString();
@@ -125,9 +127,13 @@ public class OrderManager {
             if (params.containsKey("commission")) {
                 this.commission = (Double) params.get("commission");
             }
-            
+
             if (params.containsKey("ordStatusEnum")) {
                 this.ordStatusEnum = (OrdStatus) params.get("ordStatusEnum");
+            }
+
+            if (params.containsKey("isoTimeRestingOrderExpires")) {
+                this.isoTimeRestingOrderExpires = params.get("isoTimeRestingOrderExpires").toString();
             }
         }
         
@@ -170,25 +176,29 @@ public class OrderManager {
         public String getOrdRejReason () {
             return this.ordRejReason;
         }
-        
+
         public String getOrderNo () {
             return this.orderNo;
         }
-        
+
         public Double getAccountType () {
             return this.accountType;
         }
-        
+
         public Double getOrderQty () {
             return this.orderQty;
         }
-        
+
         public Double getCommission () {
             return this.commission;
         }
 
         public OrdStatus getOrdStatusEnum () {
             return this.ordStatusEnum;
+        }
+
+        public String getIsoTimeRestingOrderExpires () {
+            return this.isoTimeRestingOrderExpires;
         }
     }
 
@@ -453,6 +463,9 @@ public class OrderManager {
             "accountType",
             "autoStop",
             "ordRejReason",
+            
+            // Expiration of LIMIT Order in UTC format.
+            "isoTimeRestingOrderExpires",
 
             // for Stop Order only
             "price",
