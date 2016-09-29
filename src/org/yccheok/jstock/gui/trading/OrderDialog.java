@@ -568,8 +568,8 @@ public class OrderDialog {
         Node reviewButton = newOrdDlg.getDialogPane().lookupButton(reviewButtonType);
         reviewButton.setDisable(true);
         
-        // Request focus on the Qty field by default.
-        Platform.runLater(() -> qtyText.requestFocus());
+        // focus on Cash
+        Platform.runLater(() -> cashText.requestFocus());
     }
 
     private void qtyPriceValidator () {
@@ -708,10 +708,16 @@ public class OrderDialog {
             // enable Qty, disable Cash
             qtyText.setDisable(false);
             cashText.setDisable(true);
+
+            // set focus on Shares
+            Platform.runLater(() -> qtyText.requestFocus());
         } else {
             // disable Qty, enable Cash
             qtyText.setDisable(true);
             cashText.setDisable(false);
+            
+            // set focus on Cash
+            Platform.runLater(() -> cashText.requestFocus());
         }
     }
 
