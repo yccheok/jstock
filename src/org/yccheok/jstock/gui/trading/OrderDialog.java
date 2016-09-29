@@ -26,6 +26,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
@@ -75,6 +76,11 @@ public class OrderDialog {
 
     private final Label shareLabel                  = new Label();
     private final ChoiceBox<ShareCash> shareChoice  = new ChoiceBox<>();
+
+    // for SELL only: available Qty & Sell All btn
+    private final Label availQtyLabel               = new Label();
+    private final Button sellAllBtn                 = new Button();
+
     private final TextField qtyText                 = new TextField();
     private final Label cashLabel                   = new Label();
     private final TextField cashText                = new TextField();
@@ -93,6 +99,7 @@ public class OrderDialog {
     // Service to update bid ask
     private ScheduledService<MarketDataManager.MarketData> marketDataSrv;
     private Double bidAskPrice = null;
+    private final String availQty;
 
     public OrderDialog (PositionModel pos, OrderSide side) {
         this.pos            = pos;
@@ -100,6 +107,7 @@ public class OrderDialog {
         this.symbol         = pos.getSymbol();
         this.name           = pos.getName();
         this.instrumentID   = pos.getInstrumentID();
+        this.availQty       = Utils.formatNumberNoComma(pos.getOpenQty(), 4);
     }
 
     
@@ -451,6 +459,8 @@ public class OrderDialog {
         qtyPriceValidator();
         orderChangeListener();
         shareCashChangeListener();
+
+        if (side == OrderSide.SELL) sellAllBtnListener();
         
         // Market order: calc Qty <-> Cash
         qtyListener();
@@ -550,6 +560,14 @@ public class OrderDialog {
         grid.add(shareLabel, 0, 3);
         grid.add(shareChoice, 1, 3);
         
+        if (side == OrderSide.SELL) {
+            availQtyLabel.setText("Available Qty: " + availQty);
+            sellAllBtn.setText("Sell All");
+
+            grid.add(availQtyLabel, 2, 3);
+            grid.add(sellAllBtn, 3, 3);
+        }
+
         grid.add(new Label("Shares:"), 0, 4);
         grid.add(qtyText, 1, 4);
 
@@ -570,6 +588,22 @@ public class OrderDialog {
         
         // focus on Cash
         Platform.runLater(() -> cashText.requestFocus());
+    }
+
+    private void sellAllBtnListener () {
+        sellAllBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle (ActionEvent e) {
+
+                // Market Order: select Shares
+                if (orderChoice.getValue() == OrderType.MARKET) {
+                    shareChoice.setValue(ShareCash.SHARE);
+                }
+
+                // Fill in Shares & set focus
+                qtyText.setText(availQty);
+                Platform.runLater(() -> qtyText.requestFocus());
+            }
+        });
     }
 
     private void qtyPriceValidator () {
@@ -743,7 +777,7 @@ public class OrderDialog {
                 }
 
                 Double cash = Double.parseDouble(newValue) * bidAskPrice;
-                String cashS = Utils.monetaryFormat(cash);
+                String cashS = Utils.formatNumberNoComma(cash, 2);
                 cashText.setText(cashS);
             }
         });
@@ -763,7 +797,7 @@ public class OrderDialog {
 
                 Double qty = Double.parseDouble(newValue) / bidAskPrice;
                 // Qty up to 4 decimal
-                String qtyS = Utils.formatNumber(qty, 4);
+                String qtyS = Utils.formatNumberNoComma(qty, 4);
                 qtyText.setText(qtyS);
             }
         });

@@ -50,7 +50,7 @@ public class Utils {
         return formatter.format(number);
     }
 
-    public static String formatNumber(Double number, int decimal) {
+    public static String formatNumber (Double number, int decimal) {
         String formatter = "###,###,###,###,###,###,##0.";
         do {
             formatter = formatter.concat("#");
@@ -60,6 +60,16 @@ public class Utils {
         return new DecimalFormat(formatter).format(number);
     }
 
+    public static String formatNumberNoComma (Double number, int decimal) {
+        String formatter = "#.";
+        do {
+            formatter = formatter.concat("#");
+            decimal--;
+        } while (decimal > 0);
+
+        return new DecimalFormat(formatter).format(number);
+    }
+    
     public static Double formattedNumtoDouble (String formattedNum) {
         DecimalFormat formatter = (DecimalFormat) NumberFormat.getInstance();
         
