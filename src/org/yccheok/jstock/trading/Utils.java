@@ -8,7 +8,12 @@ package org.yccheok.jstock.trading;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -64,6 +69,7 @@ public class Utils {
             result = number.doubleValue();
         } catch (ParseException ex) {
             System.out.println("[formattedNumtoDouble]  Can't parse formatted number: " + formattedNum);
+            Logger.getLogger(Utils.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         return result;
@@ -79,10 +85,33 @@ public class Utils {
             if (Double.parseDouble(numberS) > 0) {
                 valid = true;
             }
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException ex) {
             System.out.println("[validateNumber]  NOT number format: " + numberS);
+            Logger.getLogger(Utils.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return valid;
     }
+    
+    public static String utcDateToLocal (String utcDate) {
+        String localDate = null;
+        
+        try {
+            SimpleDateFormat utcFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.ENGLISH);
+            utcFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+            Date date = utcFormat.parse(utcDate);
+
+            SimpleDateFormat localFormat = new SimpleDateFormat("MMM d, yyyy h:mm a", Locale.ENGLISH);
+            localDate = localFormat.format(date);
+        } catch (ParseException ex) {
+            System.out.println("[utcDateToLocal] parse date error: " + utcDate);
+            Logger.getLogger(Utils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return localDate;
+    }
+    
+    
+    
 }

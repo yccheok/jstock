@@ -818,6 +818,21 @@ public class OrderDialog {
         marketDataSrv.start();
     }
 
+    private static Label setDlgContent (Dialog dlg, TableView orderTable, String note) {
+        Label noteLabel = new Label();
+        if (note != null) noteLabel.setText(note);
+        noteLabel.setStyle("-fx-font-weight: bold; -fx-font-style: italic;");
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.add(orderTable, 0, 0);
+        grid.add(noteLabel, 0, 1);
+
+        dlg.getDialogPane().setContent(grid);
+        return noteLabel;
+    }
+    
     private void reviewBtnHandler () {
         // review button event handler
         Node reviewButton = newOrdDlg.getDialogPane().lookupButton(reviewButtonType);
@@ -854,23 +869,10 @@ public class OrderDialog {
                     symbol, name, logoURL, instrumentID,
                     shareCash, qty, cash, price, ordType, side);
 
-            Label noteTxt = new Label();
-            noteTxt.setStyle("-fx-font-weight: bold; -fx-font-style: italic;");
-
             TableView orderTable = OrdSummaryTable(summary);
-            
-            GridPane grid = new GridPane();
-            grid.setHgap(10);
-            grid.setVgap(10);
-            grid.add(orderTable, 0, 0);
-            grid.add(noteTxt, 0, 1);
+            String note = (side == OrderSide.SELL) ? "Note: SEC and TAF fees not included in estimated commission." : null;
+            setDlgContent(reviewDlg, orderTable, note);
 
-            if (side == OrderSide.SELL) {
-                noteTxt.setText("Note: SEC and TAF fees not included in estimated commission.");
-            }
-
-            reviewDlg.getDialogPane().setContent(grid);
-            
             ButtonType submitButtonType = new ButtonType("Submit Order", ButtonData.OK_DONE);
             reviewDlg.getButtonTypes().setAll(submitButtonType, ButtonType.CANCEL);
 
@@ -990,30 +992,18 @@ public class OrderDialog {
                             case NEW:
                             case PARTIAL_FILLED:
                                 header = "Your order was successfully entered. View the status under \"Pending Orders\" in Portfolio.";
-
-                                Label noteTxt = new Label();
-                                noteTxt.setStyle("-fx-font-weight: bold; -fx-font-style: italic;");
-
                                 resultTable = OrdSummaryTable(summary);
-
-                                GridPane grid = new GridPane();
-                                grid.setHgap(10);
-                                grid.setVgap(10);
-                                grid.add(resultTable, 0, 0);
-                                grid.add(noteTxt, 0, 1);
-
-                                System.out.println("order type: " + order.getOrdType() + " .....\n\n");
-                                System.out.println("LIMIT order type IS: " + OrderType.LIMIT.getValue() + " .....\n\n");
                                 
+                                // LIMIT order: show auto expire time
+                                String note = null;
                                 if (OrderType.LIMIT.getValue() == Integer.parseInt(order.getOrdType())) {
-                                    System.out.println("NEW LIMIT order ....");
+                                    String expiryUTC = order.getIsoTimeRestingOrderExpires();
+                                    String expiryTime = Utils.utcDateToLocal(expiryUTC);
 
-                                    String expired = order.getIsoTimeRestingOrderExpires();
-                                    noteTxt.setText("Unless executed, this order will expire on " + expired);
+                                    if (expiryTime != null) note = "Unless executed, this order will expire on " + expiryTime;
                                 }
                                 
-                                resultDlg.getDialogPane().setContent(grid);
-
+                                setDlgContent(resultDlg, resultTable, note);
                                 break;
                                 
                             default:
