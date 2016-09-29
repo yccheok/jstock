@@ -846,8 +846,20 @@ public class OrderDialog {
                     shareCash, qty, cash, price, ordType, side);
 
             TableView orderTable = OrdSummaryTable(summary);
-            reviewDlg.getDialogPane().setContent(orderTable);
+            GridPane grid = new GridPane();
+            grid.setHgap(10);
+            grid.setVgap(10);
+            // grid.setPadding(new Insets(20, 150, 10, 10));
+            grid.add(orderTable, 0, 0);
 
+            if (side == OrderSide.SELL) {
+                Label noteTxt = new Label("Note: SEC and TAF fees not included in estimated commission.");
+                noteTxt.setStyle("-fx-font-weight: bold; -fx-font-style: italic;");
+                grid.add(noteTxt, 0, 1);
+            }
+
+            reviewDlg.getDialogPane().setContent(grid);
+            
             ButtonType submitButtonType = new ButtonType("Submit Order", ButtonData.OK_DONE);
             reviewDlg.getButtonTypes().setAll(submitButtonType, ButtonType.CANCEL);
 
@@ -863,7 +875,9 @@ public class OrderDialog {
         // Confirm order, execute Create Order
         submitButton.addEventHandler(ActionEvent.ACTION, event -> {
 
-            TableView ordTable = (TableView) reviewDlg.getDialogPane().getContent();
+            GridPane grid = (GridPane) reviewDlg.getDialogPane().getContent();
+            TableView ordTable = (TableView) grid.getChildren().get(0);
+
             OrdSummary summary = (OrdSummary) ordTable.getItems().get(0);
             
             // Submit order dialog
