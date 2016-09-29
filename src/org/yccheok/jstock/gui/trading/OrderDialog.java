@@ -123,11 +123,12 @@ public class OrderDialog {
         private final OrderSide ordSide;
         private final String name;
         private final String instrumentID;
-        private ShareCash shareCash;
+        private final ShareCash shareCash;
+        private final String logoURL;
 
 
         public OrdSummary (boolean estimated, ShareCash shareCash,
-                String symbol, String name, String instrumentID, 
+                String symbol, String name, String logoURL, String instrumentID, 
                 OrderSide side, OrderType ordType, Double qty,
                 Double price, Double subtotal, Double commission, Double total) {
 
@@ -137,6 +138,7 @@ public class OrderDialog {
             this.ordType      = ordType;
             this.ordSide      = side;
             this.name         = name;
+            this.logoURL      = logoURL;
             this.instrumentID = instrumentID;
 
             this.symbol     = new SimpleStringProperty(symbol);
@@ -157,6 +159,10 @@ public class OrderDialog {
 
         public ShareCash getShareCash () {
             return shareCash;
+        }
+        
+        public String getLogoURL () {
+            return logoURL;
         }
         
         public OrderType getOrdType () {
@@ -256,7 +262,8 @@ public class OrderDialog {
             return total;
         }
 
-        public static OrdSummary buildFromDialog (String symbol, String name, String instrumentID,
+        public static OrdSummary buildFromDialog (String symbol, String name,
+                String logoURL, String instrumentID,
                 ShareCash shareCash, Double share, Double cash,
                 Double price, OrderType ordType, OrderSide side) {
 
@@ -285,7 +292,7 @@ public class OrderDialog {
             }
 
             return new OrdSummary(true, shareCash,
-                    symbol, name, instrumentID, side,
+                    symbol, name, logoURL, instrumentID, side,
                     ordType, qty, price, subtotal, commission, total);
         }
         
@@ -304,7 +311,7 @@ public class OrderDialog {
             }
 
             return new OrdSummary(false, null,
-                    summary.getSymbol(), summary.getName(),
+                    summary.getSymbol(), summary.getName(), summary.getLogoURL(),
                     summary.getInstrumentID(), summary.getOrdSide(), summary.getOrdType(),
                     qty, price, subtotal, commission, total);
         }
@@ -439,8 +446,8 @@ public class OrderDialog {
     public void initDlgAndWait () {
         // temporary cancel / suspend Portfolio Scheduled Service
         Portfolio.portfolioService._cancel();
-        
-        initNewDlgUI();
+
+        initDlgUI();
         qtyPriceValidator();
         orderChangeListener();
         shareCashChangeListener();
@@ -458,6 +465,7 @@ public class OrderDialog {
         if (buttonType == reviewButtonType) {
             System.out.println("AFTER Review Order Button Pressed ......");
         } else if (buttonType == ButtonType.CANCEL) {
+            Portfolio.portfolioService._restart();
             System.out.println("AFTER CANCEL Button Pressed ......");
         }
         
@@ -465,12 +473,30 @@ public class OrderDialog {
         marketDataSrv.cancel();
     }
 
-        
-    private void initNewDlgUI () {
+    private static void setDlgTitleHeader (Dialog dlg, String title, String header, String logoURL) {
+        dlg.setTitle(title);
+        dlg.setHeaderText(header);
+
+        // Stock logo
+        ImageView stockLogo = new ImageView();
+        stockLogo.setFitWidth(50);
+        stockLogo.setFitHeight(50);
+        stockLogo.setImage(null);
+
+        if (logoURL != null && ! logoURL.isEmpty()) {
+            // use background loading
+            Image logo = new Image(logoURL, true);
+            stockLogo.setImage(logo);
+        }
+        // show stock logo in Header - Right
+        dlg.setGraphic(stockLogo);
+    }
+    
+    private void initDlgUI () {
         // UI components
-        newOrdDlg.setTitle(side.getName());
-        newOrdDlg.setHeaderText(symbol + " - " + name);
-        
+        String header = symbol + " - " + name;
+        setDlgTitleHeader(newOrdDlg, side.getName(), header, pos.getUrlImage());
+
         newOrdDlg.getDialogPane().getButtonTypes().addAll(reviewButtonType, cancelButtonType);
 
         GridPane grid = new GridPane();
@@ -509,23 +535,9 @@ public class OrderDialog {
         priceText.setVisible(false);
         priceNote.setVisible(false);
 
-        // Stock icon
-        ImageView imageView = new ImageView();
-        imageView.setFitWidth(50);
-        imageView.setFitHeight(50);
-
-        String url = pos.getUrlImage();
-
-        if (url != null && ! url.isEmpty()) {
-            // use background loading
-            Image icon = new Image(url, true);
-            imageView.setImage(icon);
-        }
-
         // add all to grid
         grid.add(new Label("Stock:"), 0, 0);
         grid.add(symbolText, 1, 0);
-        grid.add(imageView, 2, 0);
 
         String bidAsk = (side == OrderSide.BUY) ? "Ask" : "Bid";
         grid.add(new Label(bidAsk + " Price ($):"), 0, 1);
@@ -797,9 +809,6 @@ public class OrderDialog {
         marketDataSrv.start();
     }
 
-    // orderQty
-    // amountCash
-
     private void reviewBtnHandler () {
         // review button event handler
         Node reviewButton = newOrdDlg.getDialogPane().lookupButton(reviewButtonType);
@@ -826,21 +835,24 @@ public class OrderDialog {
             
             // Review Order Dialog
             Alert reviewDlg = new Alert(AlertType.CONFIRMATION);
-            reviewDlg.setTitle("Review Order");
-            reviewDlg.setHeaderText(symbol + " - " + name);
+
+            String logoURL = pos.getUrlImage();
+            String header = symbol + " - " + name;
+            setDlgTitleHeader(reviewDlg, "Review Order", header, logoURL);
 
             // Review Order Summary Table
-            OrdSummary order = OrdSummary.buildFromDialog(symbol, name, instrumentID,
+            OrdSummary summary = OrdSummary.buildFromDialog(
+                    symbol, name, logoURL, instrumentID,
                     shareCash, qty, cash, price, ordType, side);
 
-            TableView orderTable = OrdSummaryTable(order);
+            TableView orderTable = OrdSummaryTable(summary);
             reviewDlg.getDialogPane().setContent(orderTable);
 
             ButtonType submitButtonType = new ButtonType("Submit Order", ButtonData.OK_DONE);
             reviewDlg.getButtonTypes().setAll(submitButtonType, ButtonType.CANCEL);
 
             submitOrderHandler(reviewDlg, submitButtonType);
-            
+
             reviewDlg.show();
         });
     }
@@ -856,9 +868,11 @@ public class OrderDialog {
             
             // Submit order dialog
             Alert submitDlg = new Alert(AlertType.INFORMATION);
-            submitDlg.setTitle(summary.getAction());
-            submitDlg.setHeaderText(summary.getSymbol() + " - " + summary.getName());
-            submitDlg.setContentText("Submitting " + summary.getAction() + " Order ....");
+
+            String header = summary.getSymbol() + " - " + summary.getName();
+            setDlgTitleHeader(submitDlg, summary.getAction(), header, summary.getLogoURL());
+
+            submitDlg.setContentText("Submitting " + summary.getAction() + " " + summary.getOrdName() + " Order ....");
 
             // disable OK button
             submitDlg.getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
@@ -916,7 +930,6 @@ public class OrderDialog {
 
                     // show result Dialog
                     Alert resultDlg = new Alert(AlertType.INFORMATION);
-                    resultDlg.setTitle("Order Status");
 
                     // TextArea - show Create Order Error message
                     TextArea contentText = new TextArea();
@@ -948,7 +961,7 @@ public class OrderDialog {
                         }
                     }
 
-                    resultDlg.setHeaderText(header);
+                    setDlgTitleHeader(resultDlg, "Order Status", header, summary.getLogoURL());
                     resultDlg.show();
 
                     // close Submitting Order Dialog

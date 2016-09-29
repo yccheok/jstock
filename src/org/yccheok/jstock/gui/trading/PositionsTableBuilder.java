@@ -32,7 +32,6 @@ import org.yccheok.jstock.trading.PositionModel.SymbolUrl;
 
 import org.yccheok.jstock.trading.Utils;
 import org.yccheok.jstock.trading.API.InstrumentManager;
-import org.yccheok.jstock.trading.API.OrderManager;
 import org.yccheok.jstock.trading.API.OrderManager.OrderSide;
 
 /**

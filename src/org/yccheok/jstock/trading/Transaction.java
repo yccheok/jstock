@@ -44,7 +44,6 @@ public class Transaction {
                 String orderStr = orderSide.getName() + " " + orderType.getName();
                 
                 if (error != null) {
-
                     System.out.println(orderStr + " order failed....");
                     updateMessage("Create " + orderStr + " Order Status FAILED !!");
 
