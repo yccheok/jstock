@@ -37,7 +37,7 @@ public class Portfolio {
         initTab();
         startPortfolioService();
 
-        return Portfolio.PortfolioTab;
+        return Portfolio.portfolioTab;
     }
     
     private static void initTab () {
@@ -80,9 +80,9 @@ public class Portfolio {
         vboxOrder.prefWidthProperty().bind(splitPane.widthProperty());
 
         // add Portfolio tab
-        Portfolio.PortfolioTab.setText("Portfolio (Practice Account)");
-        Portfolio.PortfolioTab.setClosable(false);
-        Portfolio.PortfolioTab.setContent(vBox);
+        Portfolio.portfolioTab.setText("Portfolio (Practice Account)");
+        Portfolio.portfolioTab.setClosable(false);
+        Portfolio.portfolioTab.setContent(vBox);
     }
     
     private static void startPortfolioService () {
@@ -132,7 +132,7 @@ public class Portfolio {
                 }
             }
         });
-    } 
+    }
     
     public static void setFailedHandler (PortfolioService portfolioService) {
         portfolioService.setOnFailed(new EventHandler<WorkerStateEvent>() {
@@ -152,7 +152,7 @@ public class Portfolio {
     private static final OrdersTableBuilder ordTableBuilder      = new OrdersTableBuilder();
     private static final AccountSummaryBuilder accSummaryBuilder = new AccountSummaryBuilder();
 
-    private static final Tab PortfolioTab = new Tab();
+    private static final Tab portfolioTab = new Tab();
     
     public static final double TABLE_CELL_SIZE = 30;
     public static PortfolioService portfolioService;
