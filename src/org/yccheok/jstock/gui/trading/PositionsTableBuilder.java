@@ -128,59 +128,50 @@ public class PositionsTableBuilder {
     
     private void setRowContextMenu () {
         this.posTable.setRowFactory(new Callback<TableView<PositionModel>, TableRow<PositionModel>>() {
-                @Override
-                public TableRow<PositionModel> call(TableView<PositionModel> tableView) {
-                    final TableRow<PositionModel> row = new TableRow<>();
-                    final ContextMenu rowMenu = new ContextMenu();
-                    
-                    final MenuItem buyItem = new MenuItem("Buy");
-                    buyItem.setOnAction(new EventHandler<ActionEvent>() {
-                        @Override
-                        public void handle(ActionEvent event) {
-                            PositionModel pos = row.getItem();
-                            
-                            //System.out.println("Buy button pressed, symbol: " + pos.getSymbol()
-                            //        + ", instrumentID: " + pos.getInstrumentID());
+            @Override
+            public TableRow<PositionModel> call(TableView<PositionModel> tableView) {
+                final TableRow<PositionModel> row = new TableRow<>();
+                final ContextMenu rowMenu = new ContextMenu();
 
-                            OrderDialog dlg = new OrderDialog(pos, OrderSide.BUY);
-                            dlg.initDlgAndWait();
-                        }
-                    });
+                final MenuItem buyItem = new MenuItem("Buy");
+                buyItem.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent event) {
+                        PositionModel pos = row.getItem();
+                        CreateOrderDlg dlg = new CreateOrderDlg(pos, OrderSide.BUY);
+                        dlg.initDlgAndWait();
+                    }
+                });
 
-                    final MenuItem sellItem = new MenuItem("Sell");
-                    sellItem.setOnAction(new EventHandler<ActionEvent>() {
-                        @Override
-                        public void handle(ActionEvent event) {
-                            PositionModel pos = row.getItem();
-                            
-                            //System.out.println("Buy button pressed, symbol: " + pos.getSymbol()
-                            //        + ", instrumentID: " + pos.getInstrumentID());
+                final MenuItem sellItem = new MenuItem("Sell");
+                sellItem.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent event) {
+                        PositionModel pos = row.getItem();
+                        CreateOrderDlg dlg = new CreateOrderDlg(pos, OrderSide.SELL);
+                        dlg.initDlgAndWait();
+                    }
+                });
 
-                            OrderDialog dlg = new OrderDialog(pos, OrderSide.SELL);
-                            dlg.initDlgAndWait();
-                        }
-                    });
-                    
-                    final MenuItem chartItem = new MenuItem("History Chart");
-                    chartItem.setOnAction(new EventHandler<ActionEvent>() {
-                        @Override
-                        public void handle(ActionEvent event) {
-                            //posTable.getItems().remove(row.getItem());
-                        }
-                    });
-                    
-                    rowMenu.getItems().addAll(buyItem, sellItem, new SeparatorMenuItem(), chartItem);
+                final MenuItem chartItem = new MenuItem("History Chart");
+                chartItem.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent event) {
+                        //posTable.getItems().remove(row.getItem());
+                    }
+                });
 
-                    // only display context menu for non-null items:
-                    row.contextMenuProperty().bind(
-                        Bindings.when(Bindings.isNotNull(row.itemProperty()))
-                        .then(rowMenu)
-                        .otherwise((ContextMenu)null));
-                    
-                    return row;
-                }
+                rowMenu.getItems().addAll(buyItem, sellItem, new SeparatorMenuItem(), chartItem);
+
+                // only display context menu for non-null items:
+                row.contextMenuProperty().bind(
+                    Bindings.when(Bindings.isNotNull(row.itemProperty()))
+                    .then(rowMenu)
+                    .otherwise((ContextMenu)null));
+
+                return row;
             }
-        );
+        });
     }
 
     

@@ -5,11 +5,12 @@
  */
 package org.yccheok.jstock.trading;
 
+import java.util.Map;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
-import java.util.Map;
 import javafx.beans.property.SimpleObjectProperty;
-import org.yccheok.jstock.trading.API.OrderManager;
+import static org.yccheok.jstock.trading.API.OrderManager.OrderType;
+import static org.yccheok.jstock.trading.API.OrderManager.OrderSide;
 import static org.yccheok.jstock.trading.PositionModel.SymbolUrl;
 
 /**
@@ -24,31 +25,32 @@ public class OrderModel {
     
     private final SimpleDoubleProperty units;
     private final SimpleDoubleProperty marketPrice;
-    private final SimpleDoubleProperty limitPrice;
-    private final SimpleDoubleProperty stopPrice;
+    private final SimpleDoubleProperty orderPrice;
+
+    // for cancel order
+    private final String orderID;
+
     
     public OrderModel(Map<String, Object> ord) {
-        this.name   = new SimpleStringProperty(ord.get("name").toString());
+        this.orderID = ord.get("orderID").toString();
+        this.name = new SimpleStringProperty(ord.get("name").toString());
         
-        Double _stopPrice = 0.0;
-        Double _limitPrice = 0.0;
-
-        OrderManager.OrderType ordType = (OrderManager.OrderType) ord.get("orderType");
-        if (ordType == OrderManager.OrderType.LIMIT) {
-            _limitPrice = (Double) ord.get("limitPrice");
-        } else if (ordType == OrderManager.OrderType.STOP) {
-            _stopPrice = (Double) ord.get("stopPrice");
+        OrderType ordType = (OrderType) ord.get("orderType");
+        Double ordPrice = null;
+        if (ordType == OrderType.LIMIT) {
+            ordPrice = (Double) ord.get("limitPrice");
+        } else if (ordType == OrderType.STOP) {
+            ordPrice = (Double) ord.get("stopPrice");
         }
         this.type = new SimpleStringProperty(ordType.getName());
 
-        OrderManager.OrderSide ordSide = (OrderManager.OrderSide) ord.get("side");
+        OrderSide ordSide = (OrderSide) ord.get("side");
         this.side = new SimpleStringProperty(ordSide.getName());
 
         this.units       = new SimpleDoubleProperty((Double) ord.get("units"));
         this.marketPrice = new SimpleDoubleProperty((Double) ord.get("marketPrice"));
-        this.limitPrice  = new SimpleDoubleProperty(_limitPrice);
-        this.stopPrice   = new SimpleDoubleProperty(_stopPrice);
-        
+        this.orderPrice  = new SimpleDoubleProperty(ordPrice);
+
         // symbolObj to represent symbol + icon URL
         String symbolStr    = ord.get("symbol").toString();
         String urlStr       = ord.get("urlImage").toString();
@@ -56,6 +58,10 @@ public class OrderModel {
         symbolObj.set(new SymbolUrl(symbolStr, urlStr));
     }
 
+    public String getOrderID () {
+        return this.orderID;
+    }
+    
     // symbol + Image URL
     public void setSymbolObj (SymbolUrl sym) {
         symbolObj.set(sym);
@@ -81,7 +87,7 @@ public class OrderModel {
         this.symbolObj.set(symbolUrl);
     }
 
-    public final String getUrlImage (String v) {
+    public final String getUrlImage () {
         SymbolUrl symbolUrl = (SymbolUrl) this.symbolObj.get();
         return symbolUrl.getUrl();
     }
@@ -137,23 +143,14 @@ public class OrderModel {
         return marketPrice;
     }
 
-    public final Double getLimitPrice() {
-        return limitPrice.get();
+    public final Double getOrderPrice() {
+        return orderPrice.get();
     }
-    public final void setLimitPrice(Double v) {
-        limitPrice.set(v);
+    public final void setOrderPrice(Double v) {
+        orderPrice.set(v);
     }
-    public SimpleDoubleProperty limitPriceProperty () {
-        return limitPrice;
+    public SimpleDoubleProperty orderPriceProperty () {
+        return orderPrice;
     }
     
-    public final Double getStopPrice() {
-        return stopPrice.get();
-    }
-    public final void setStopPrice(Double v) {
-        stopPrice.set(v);
-    }
-    public SimpleDoubleProperty stopPriceProperty () {
-        return stopPrice;
-    }
 }

@@ -13,6 +13,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
@@ -109,42 +110,42 @@ public class OrdersTableBuilder {
             }
         }
     }
-    
-    private void setRowContextMenu () {
-        this.ordTable.setRowFactory(new Callback<TableView<PositionModel>, TableRow<PositionModel>>() {
-                @Override
-                public TableRow<PositionModel> call(TableView<PositionModel> tableView) {
-                    final TableRow<PositionModel> row = new TableRow<>();
-                    final ContextMenu rowMenu = new ContextMenu();
-                    
-                    final MenuItem cancelItem = new MenuItem("Cancel");
-                    cancelItem.setOnAction(new EventHandler<ActionEvent>() {
-                        @Override
-                        public void handle(ActionEvent event) {
-                            //posTable.getItems().remove(row.getItem());
-                        }
-                    });
-                    
-                    final MenuItem chartItem = new MenuItem("History Chart");
-                    chartItem.setOnAction(new EventHandler<ActionEvent>() {
-                        @Override
-                        public void handle(ActionEvent event) {
-                            //posTable.getItems().remove(row.getItem());
-                        }
-                    });
-                    
-                    rowMenu.getItems().addAll(cancelItem, new SeparatorMenuItem(), chartItem);
 
-                    // only display context menu for non-null items:
-                    row.contextMenuProperty().bind(
-                        Bindings.when(Bindings.isNotNull(row.itemProperty()))
-                        .then(rowMenu)
-                        .otherwise((ContextMenu)null));
-                    
-                    return row;
-                }
+    private void setRowContextMenu () {
+        this.ordTable.setRowFactory(new Callback<TableView<OrderModel>, TableRow<OrderModel>>() {
+            @Override
+            public TableRow<OrderModel> call(TableView<OrderModel> tableView) {
+                final TableRow<OrderModel> row = new TableRow<>();
+                final ContextMenu rowMenu = new ContextMenu();
+
+                final MenuItem cancelItem = new MenuItem("Cancel");
+                cancelItem.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent event) {
+                        CancelOrderDlg dlg = new CancelOrderDlg(row.getItem());
+                        dlg.initDlgAndWait();
+                    }
+                });
+
+                final MenuItem chartItem = new MenuItem("History Chart");
+                chartItem.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent event) {
+                        //posTable.getItems().remove(row.getItem());
+                    }
+                });
+
+                rowMenu.getItems().addAll(cancelItem, new SeparatorMenuItem(), chartItem);
+
+                // only display context menu for non-null items:
+                row.contextMenuProperty().bind(
+                    Bindings.when(Bindings.isNotNull(row.itemProperty()))
+                    .then(rowMenu)
+                    .otherwise((ContextMenu)null));
+
+                return row;
             }
-        );
+        });
     }
 
     public TableView build () {
@@ -174,28 +175,53 @@ public class OrdersTableBuilder {
         typeCol.setCellValueFactory(new PropertyValueFactory("type"));
         typeCol.getStyleClass().add("left");
 
-        TableColumn<OrderModel, String> sideCol = new TableColumn("Buy / Sell");
+        TableColumn<OrderModel, String> sideCol = new TableColumn("Action");
         sideCol.setCellValueFactory(new PropertyValueFactory("side"));
         sideCol.getStyleClass().add("left");
 
-        
-        /////////
-        ///
-        ///   TODO
-        ///     => combine Limit / Stop Price => 1 column
-        ///
-        /////////
+        TableColumn<OrderModel, Number> ordPriceCol = new TableColumn("Order Price");
+        ordPriceCol.setCellValueFactory(cellData -> cellData.getValue().orderPriceProperty());
+        ordPriceCol.setCellFactory((TableColumn<OrderModel, Number> col) -> new FormatNumberCell());
+        ordPriceCol.getStyleClass().add("right");
 
-        
-        TableColumn<OrderModel, Number> limitCol = new TableColumn("Limit Price");
-        limitCol.setCellValueFactory(cellData -> cellData.getValue().limitPriceProperty());
-        limitCol.setCellFactory((TableColumn<OrderModel, Number> col) -> new FormatNumberCell());
-        limitCol.getStyleClass().add("right");
+        // Cancel Order Button
+        TableColumn<OrderModel, OrderModel> cancelCol = new TableColumn("Cancel Order");
+        ordPriceCol.getStyleClass().add("right");
 
-        TableColumn<OrderModel, Number> stopCol = new TableColumn("Stop Price");
-        stopCol.setCellValueFactory(cellData -> cellData.getValue().stopPriceProperty());
-        stopCol.setCellFactory((TableColumn<OrderModel, Number> col) -> new FormatNumberCell());
-        stopCol.getStyleClass().add("right");
+        cancelCol.setCellFactory((TableColumn<OrderModel, OrderModel> col) -> new TableCell<OrderModel, OrderModel>() {
+            Button cancelBtn = new Button("Cancel");
+
+            @Override
+            public void updateItem(OrderModel item, boolean empty) {
+                super.updateItem(item, empty);
+                
+                if (!isEmpty()) {
+                    setGraphic(cancelBtn);
+                    setAlignment(Pos.CENTER);
+                }
+            }
+        });
+
+        /////////
+        //
+        //  TODO
+        //      Cancel Order BUTTON handler
+        //
+        ////////
+        
+        /*
+        cancelBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle (ActionEvent e) {
+
+
+
+                CancelOrderDlg dlg = new CancelOrderDlg(item);
+                dlg.initDlgAndWait();
+            }
+        });
+        */
+        
+        
         
         symbolCol.setSortable(false);
         nameCol.setSortable(false);
@@ -203,10 +229,10 @@ public class OrdersTableBuilder {
         mktPriceCol.setSortable(false);
         typeCol.setSortable(false);
         sideCol.setSortable(false);
-        limitCol.setSortable(false);
-        stopCol.setSortable(false);
+        ordPriceCol.setSortable(false);
+        cancelCol.setSortable(false);
 
-        this.ordTable.getColumns().setAll(symbolCol, nameCol, unitsCol, mktPriceCol, typeCol, sideCol, limitCol, stopCol);
+        this.ordTable.getColumns().setAll(symbolCol, nameCol, unitsCol, mktPriceCol, typeCol, sideCol, ordPriceCol, cancelCol);
 
         this.ordTable.setEditable(false);
         

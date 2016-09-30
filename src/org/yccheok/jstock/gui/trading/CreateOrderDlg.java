@@ -60,7 +60,7 @@ import static org.yccheok.jstock.trading.API.SessionManager.Commission;
  *
  * @author shuwnyuan
  */
-public class OrderDialog {
+public class CreateOrderDlg {
     
     private final PositionModel pos;
     private final OrderSide side;
@@ -101,7 +101,7 @@ public class OrderDialog {
     private Double bidAskPrice = null;
     private final String availQty;
 
-    public OrderDialog (PositionModel pos, OrderSide side) {
+    public CreateOrderDlg (PositionModel pos, OrderSide side) {
         this.pos            = pos;
         this.side           = side;
         this.symbol         = pos.getSymbol();
@@ -483,7 +483,7 @@ public class OrderDialog {
         marketDataSrv.cancel();
     }
 
-    private static void setDlgTitleHeader (Dialog dlg, String title, String header, String logoURL) {
+    public static void setDlgTitleHeader (Dialog dlg, String title, String header, String logoURL) {
         dlg.setTitle(title);
         dlg.setHeaderText(header);
 

@@ -18,6 +18,8 @@ import java.util.Set;
 import org.yccheok.jstock.trading.PositionModel;
 import org.yccheok.jstock.trading.OrderModel;
 import org.yccheok.jstock.trading.AccountSummaryModel;
+import static org.yccheok.jstock.trading.API.OrderManager.OrderSide;
+import static org.yccheok.jstock.trading.API.OrderManager.OrderType;
 
 
 /**
@@ -82,8 +84,6 @@ public final class AccountManager {
             List<LinkedTreeMap<String, Object>> orders = (List) this.resultMap.get("orders");
 
             for (LinkedTreeMap<String, Object> ord : orders) {
-                final String symbol = ord.get("symbol").toString();
-
                 Map<String, Object> data = new HashMap<>();
 
                 // orders from accBlotter don't have stock name, icon URL & market price
@@ -91,32 +91,37 @@ public final class AccountManager {
                 data.put("urlImage",    "");
                 data.put("marketPrice", 0.0);
 
-                data.put("symbol",      symbol);
+                data.put("orderID",     ord.get("orderID").toString());
+                data.put("symbol",      ord.get("symbol").toString());
                 data.put("units",       ord.get("orderQty"));
 
                 // side: BUY, SELL
-                final OrderManager.OrderSide ordSide;
+                final OrderSide ordSide;
                 String side = ord.get("side").toString();
 
                 if (side.equals("B")) {
-                    ordSide = OrderManager.OrderSide.BUY;
+                    ordSide = OrderSide.BUY;
                 } else {
-                    ordSide = OrderManager.OrderSide.SELL;
+                    ordSide = OrderSide.SELL;
                 }
                 data.put("side", ordSide);
 
                 // Order Type: Market, Limit, Stop
-                final OrderManager.OrderType ordType;
+                final OrderType ordType;
                 String type = ord.get("orderType").toString();
 
-                if (type.equals("2")) {
-                    ordType = OrderManager.OrderType.LIMIT;
-                    data.put("limitPrice", ord.get("limitPrice"));
-                } else if (type.equals("3")) {
-                    ordType = OrderManager.OrderType.STOP;
-                    data.put("stopPrice", ord.get("stopPrice"));
-                } else {
-                    ordType = OrderManager.OrderType.MARKET;
+                switch (type) {
+                    case "2":
+                        ordType = OrderType.LIMIT;
+                        data.put("limitPrice", ord.get("limitPrice"));
+                        break;
+                    case "3":
+                        ordType = OrderType.STOP;
+                        data.put("stopPrice", ord.get("stopPrice"));
+                        break;
+                    default:
+                        ordType = OrderType.MARKET;
+                        break;
                 }
                 data.put("orderType", ordType);
 
