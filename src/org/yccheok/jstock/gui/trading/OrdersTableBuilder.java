@@ -170,13 +170,22 @@ public class OrdersTableBuilder {
         mktPriceCol.setCellFactory((TableColumn<OrderModel, Number> col) -> new FormatNumberCell());
         mktPriceCol.getStyleClass().add("right");
         
-        TableColumn<OrderModel, String> typeCol = new TableColumn("Type");
+        TableColumn<OrderModel, String> typeCol = new TableColumn("Order Type");
         typeCol.setCellValueFactory(new PropertyValueFactory("type"));
         typeCol.getStyleClass().add("left");
 
-        TableColumn<OrderModel, String> sideCol = new TableColumn("Side");
+        TableColumn<OrderModel, String> sideCol = new TableColumn("Buy / Sell");
         sideCol.setCellValueFactory(new PropertyValueFactory("side"));
         sideCol.getStyleClass().add("left");
+
+        
+        /////////
+        ///
+        ///   TODO
+        ///     => combine Limit / Stop Price => 1 column
+        ///
+        /////////
+
         
         TableColumn<OrderModel, Number> limitCol = new TableColumn("Limit Price");
         limitCol.setCellValueFactory(cellData -> cellData.getValue().limitPriceProperty());

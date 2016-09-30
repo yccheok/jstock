@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.yccheok.jstock.engine.Pair;
+import static org.yccheok.jstock.trading.API.DriveWealth.getSessionKey;
 import static org.yccheok.jstock.trading.API.SessionManager.Commission;
 
 /**
@@ -546,5 +547,15 @@ public class OrderManager {
         return new Order(result);
     }
 
-    
+    public static boolean cancel (String orderID) {
+        System.out.println("\n[Cancel order]: " + orderID);
+
+        String url = "orders/" + orderID;
+
+        Map<String, Object> result = Http.delete(url, DriveWealth.getSessionKey());
+        int statusCode = (int) result.get("code");
+
+        return statusCode == 200;
+    }
+
 }
