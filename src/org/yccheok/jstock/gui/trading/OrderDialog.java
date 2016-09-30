@@ -609,7 +609,14 @@ public class OrderDialog {
     private void qtyPriceValidator () {
         // validate Qty
         qtyValid = Bindings.createBooleanBinding(() -> {
-            return Utils.validateNumber(qtyText.getText().trim());
+            
+            String qtyS = qtyText.getText().trim();
+            if (! Utils.validateNumber(qtyS)) return false;
+
+            if (side == OrderSide.BUY) return true;
+            
+            // for sell: Qty <= available Qty
+            return (Double.parseDouble(qtyS) <= pos.getOpenQty());
         }, qtyText.textProperty());
 
         
@@ -858,19 +865,23 @@ public class OrderDialog {
         marketDataSrv.start();
     }
 
-    private static Label setDlgContent (Dialog dlg, TableView orderTable, String note) {
-        Label noteLabel = new Label();
-        if (note != null) noteLabel.setText(note);
-        noteLabel.setStyle("-fx-font-weight: bold; -fx-font-style: italic;");
+    private static void setDlgContent (Dialog dlg, TableView orderTable, String headerNote, String footerNote) {
+        Label headerLabel = new Label();
+        if (headerNote != null) headerLabel.setText("* " + headerNote);
+        headerLabel.setStyle("-fx-font-weight: bold; -fx-font-style: italic;");
+
+        Label footerLabel = new Label();
+        if (footerNote != null) footerLabel.setText("* " + footerNote);
+        footerLabel.setStyle("-fx-font-weight: bold; -fx-font-style: italic;");
 
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
-        grid.add(orderTable, 0, 0);
-        grid.add(noteLabel, 0, 1);
+        grid.add(headerLabel, 0, 0);
+        grid.add(orderTable, 0, 1);
+        grid.add(footerLabel, 0, 2);
 
         dlg.getDialogPane().setContent(grid);
-        return noteLabel;
     }
     
     private void reviewBtnHandler () {
@@ -910,8 +921,8 @@ public class OrderDialog {
                     shareCash, qty, cash, price, ordType, side);
 
             TableView orderTable = OrdSummaryTable(summary);
-            String note = (side == OrderSide.SELL) ? "Note: SEC and TAF fees not included in estimated commission." : null;
-            setDlgContent(reviewDlg, orderTable, note);
+            String footerNote = (side == OrderSide.SELL) ? "SEC and TAF fees not included in estimated commission." : null;
+            setDlgContent(reviewDlg, orderTable, null, footerNote);
 
             ButtonType submitButtonType = new ButtonType("Submit Order", ButtonData.OK_DONE);
             reviewDlg.getButtonTypes().setAll(submitButtonType, ButtonType.CANCEL);
@@ -929,7 +940,8 @@ public class OrderDialog {
         submitButton.addEventHandler(ActionEvent.ACTION, event -> {
 
             GridPane grid = (GridPane) reviewDlg.getDialogPane().getContent();
-            TableView ordTable = (TableView) grid.getChildren().get(0);
+            // Grid children:  1) Label headerNote   2) TableView   3) Label footerNote
+            TableView ordTable = (TableView) grid.getChildren().get(1);
 
             OrdSummary summary = (OrdSummary) ordTable.getItems().get(0);
             
@@ -1026,24 +1038,27 @@ public class OrderDialog {
                                 header = "Your order was successfully filled. We emailed you a trade notification.";
                                 OrdSummary ordSummary = OrdSummary.buildFromOrder(summary, order);
                                 TableView resultTable = OrdSummaryTable(ordSummary);
-                                resultDlg.getDialogPane().setContent(resultTable);
+                                setDlgContent(resultDlg, resultTable, null, null);
                                 break;
-                                
+
                             case NEW:
                             case PARTIAL_FILLED:
                                 header = "Your order was successfully entered. View the status under \"Pending Orders\" in Portfolio.";
                                 resultTable = OrdSummaryTable(summary);
+
+                                // Note for pending orders
+                                String headerNote = "Estimated values for order if executed.";
                                 
                                 // LIMIT order: show auto expire time
-                                String note = null;
+                                String footerNote = null;
                                 if (OrderType.LIMIT.getValue() == Integer.parseInt(order.getOrdType())) {
                                     String expiryUTC = order.getIsoTimeRestingOrderExpires();
                                     String expiryTime = Utils.utcDateToLocal(expiryUTC);
 
-                                    if (expiryTime != null) note = "Unless executed, this order will expire on " + expiryTime;
+                                    if (expiryTime != null) footerNote = "Unless executed, this order will expire on " + expiryTime;
                                 }
-                                
-                                setDlgContent(resultDlg, resultTable, note);
+
+                                setDlgContent(resultDlg, resultTable, headerNote, footerNote);
                                 break;
                                 
                             default:
