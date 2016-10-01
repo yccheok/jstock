@@ -5,6 +5,7 @@
  */
 package org.yccheok.jstock.gui.trading;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javafx.beans.binding.Bindings;
@@ -81,9 +82,7 @@ public class PositionsTableBuilder {
                 symLabel.setText(symbol);
 
                 if (url != null && ! url.isEmpty()) {
-                    // use background loading:  public Image(String url, boolean backgroundLoading)
-                    Image icon = new Image(url, true);
-                    imageView.setImage(icon);
+                    imageView.setImage(Portfolio.getIcon(url));
                 } else {
                     imageView.setImage(null);
                 }

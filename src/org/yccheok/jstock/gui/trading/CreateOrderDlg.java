@@ -502,9 +502,7 @@ public class CreateOrderDlg {
         stockLogo.setImage(null);
 
         if (logoURL != null && ! logoURL.isEmpty()) {
-            // use background loading
-            Image logo = new Image(logoURL, true);
-            stockLogo.setImage(logo);
+            stockLogo.setImage(Portfolio.getIcon(logoURL));
         }
         // show stock logo in Header - Right
         dlg.setGraphic(stockLogo);

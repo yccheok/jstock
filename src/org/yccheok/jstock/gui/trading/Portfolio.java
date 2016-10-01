@@ -16,6 +16,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableView;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import org.yccheok.jstock.trading.API.InstrumentManager;
@@ -143,7 +144,17 @@ public class Portfolio {
             }
         });
     }
-    
+
+    // cache Stock icon for Position & Order table
+    public static Image getIcon (String url) {
+        if (! icons.containsKey(url)) {
+            // use background loading:  public Image(String url, boolean backgroundLoading)
+            Image icon = new Image(url, true);
+            icons.put(url, icon);
+        }
+        return icons.get(url);
+    }
+
 
     private static Map<String, InstrumentManager.Instrument> instruments = new HashMap<>();
     private static Map<String, Double> marketPrices;
@@ -157,5 +168,7 @@ public class Portfolio {
     public static final double TABLE_CELL_SIZE = 30;
     public static final double ICON_SIZE = TABLE_CELL_SIZE - 5;
     public static PortfolioService portfolioService;
+
+    private static final Map<String, Image> icons = new HashMap<>();
 }
     

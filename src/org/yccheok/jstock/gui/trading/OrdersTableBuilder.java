@@ -25,7 +25,6 @@ import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.util.Callback;
@@ -72,6 +71,8 @@ public class OrdersTableBuilder {
         
         @Override
         protected void updateItem (SymbolUrl item, boolean empty) {
+            super.updateItem(item, empty);
+
             if (item != null) {
                 String symbol = item.getSymbol();
                 String url = item.getUrl();
@@ -79,9 +80,7 @@ public class OrdersTableBuilder {
                 symLabel.setText(symbol);
 
                 if (url != null && ! url.isEmpty()) {
-                    // use background loading:  public Image(String url, boolean backgroundLoading)
-                    Image icon = new Image(url, true);
-                    imageView.setImage(icon);
+                    imageView.setImage(Portfolio.getIcon(url));
                 } else {
                     imageView.setImage(null);
                 }
@@ -104,10 +103,12 @@ public class OrdersTableBuilder {
         protected void updateItem(Number item, boolean empty) {
             super.updateItem(item, empty);
             
-            if (this.decimal == 2) {
-                setText(item == null ? "" : Utils.monetaryFormat((Double) item));
-            } else {
-                setText(item == null ? "" : Utils.formatNumber((Double) item, this.decimal));    
+            if (item != null) {
+                if (this.decimal == 2) {
+                    setText(Utils.monetaryFormat((Double) item));
+                } else {
+                    setText(Utils.formatNumber((Double) item, this.decimal));   
+                }
             }
         }
     }
