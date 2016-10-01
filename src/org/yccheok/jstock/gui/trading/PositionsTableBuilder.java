@@ -61,9 +61,9 @@ public class PositionsTableBuilder {
 
             // Set image height = table cell height
             // defaul image size: 125x125. Set width = height so image scale proportionally
-            imageView.setFitHeight(Portfolio.TABLE_CELL_SIZE);
-            imageView.setFitWidth(Portfolio.TABLE_CELL_SIZE);
-            
+            imageView.setFitHeight(Portfolio.ICON_SIZE);
+            imageView.setFitWidth(Portfolio.ICON_SIZE);
+
             hbox.setSpacing(10) ;
             // align text vertically center
             hbox.setAlignment(Pos.CENTER_LEFT);

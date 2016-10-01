@@ -155,6 +155,7 @@ public class Portfolio {
     private static final Tab portfolioTab = new Tab();
     
     public static final double TABLE_CELL_SIZE = 30;
+    public static final double ICON_SIZE = TABLE_CELL_SIZE - 5;
     public static PortfolioService portfolioService;
 }
     
