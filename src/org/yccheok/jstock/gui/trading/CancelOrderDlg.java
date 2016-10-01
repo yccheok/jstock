@@ -73,22 +73,26 @@ public class CancelOrderDlg {
     }
 
     public void initDlgAndWait () {
-        // temporary cancel / suspend Portfolio Scheduled Service
-        Portfolio.portfolioService._cancel();
-
+        String title = String.format("Cancel %1$s Order", ord.getType());
         String header = String.format("%1$s - %2$s", ord.getSymbol(), ord.getName());
-        CreateOrderDlg.setDlgTitleHeader(cancelDlg, "Cancel Order", header, ord.getUrlImage());
+        CreateOrderDlg.setDlgTitleHeader(cancelDlg, title, header, ord.getUrlImage());
 
-        // Order details, confirm message
+        // Order details
         Label orderMsg = new Label(getOrderMsg());
+        orderMsg.setId("order-msg");
+        
+        double width = 450;
+        orderMsg.setPrefWidth(width);
+
+        // Confirm msg
         Label confirmMsg = new Label("Are you sure you wish to cancel this order?");
 
         GridPane grid = new GridPane();
-        ColumnConstraints col1 = new ColumnConstraints(500);
+        ColumnConstraints col1 = new ColumnConstraints(width);
         grid.getColumnConstraints().add(col1);
 
         grid.setHgap(10);
-        grid.setVgap(10);
+        grid.setVgap(20);
         grid.add(orderMsg, 0, 0);
         grid.add(confirmMsg, 0, 1);
         cancelDlg.getDialogPane().setContent(grid);
@@ -104,18 +108,16 @@ public class CancelOrderDlg {
             System.out.println("YES btn Pressed ......");
         } else {
             System.out.println("NO btn Pressed ......");
-
-            Portfolio.portfolioService._restart();
         }
     }
  
     private void cancelOrdHandler () {
         Node yesButton = cancelDlg.getDialogPane().lookupButton(yesButtonType);
 
-        // show Dialog => Canceling Order
-        // Once Done => Order Cancelled successfully
-        
         yesButton.addEventHandler(ActionEvent.ACTION, event -> {
+            // temporary cancel / suspend Portfolio Scheduled Service
+            Portfolio.portfolioService._cancel();
+
             // Dialog to show Cancelling Order
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
 
@@ -148,7 +150,13 @@ public class CancelOrderDlg {
             task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
                 @Override
                 public void handle(final WorkerStateEvent workerStateEvent) {
-                    alert.setContentText("Order cancelled.");
+                    boolean result = (boolean) workerStateEvent.getSource().getValue();
+
+                    String content;
+                    if (result == true) content = "Order cancelled successfully.";
+                    else content = "Failed to cancel order.";
+                    
+                    alert.setContentText(content);
                     alert.getDialogPane().lookupButton(ButtonType.OK).setDisable(false);
                     
                     Portfolio.portfolioService._restart();

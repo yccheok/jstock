@@ -484,6 +484,9 @@ public class CreateOrderDlg {
     }
 
     public static void setDlgTitleHeader (Dialog dlg, String title, String header, String logoURL) {
+        // load css file
+        dlg.getDialogPane().getScene().getStylesheets().add(CancelOrderDlg.class.getResource("trading.css").toExternalForm()); 
+        
         dlg.setTitle(title);
         dlg.setHeaderText(header);
 
@@ -867,12 +870,12 @@ public class CreateOrderDlg {
 
     private static void setDlgContent (Dialog dlg, TableView orderTable, String headerNote, String footerNote) {
         Label headerLabel = new Label();
+        headerLabel.getStyleClass().add("bold-italic");
         if (headerNote != null) headerLabel.setText("* " + headerNote);
-        headerLabel.setStyle("-fx-font-weight: bold; -fx-font-style: italic;");
 
         Label footerLabel = new Label();
+        footerLabel.getStyleClass().add("bold-italic");
         if (footerNote != null) footerLabel.setText("* " + footerNote);
-        footerLabel.setStyle("-fx-font-weight: bold; -fx-font-style: italic;");
 
         GridPane grid = new GridPane();
         grid.setHgap(10);

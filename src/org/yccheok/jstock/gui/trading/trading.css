@@ -48,3 +48,16 @@ and open the template in the editor.
 #accBorderPane .label {
     -fx-font-size: 14px;
 }
+
+#order-msg {
+    -fx-font-size: 16px;
+    -fx-background-color: #FFFFFF;
+    -fx-padding: 12 10 12 10;       /* top right bottom left */
+    -fx-margin: 10 0 0 0;
+}
+
+.bold-italic {
+    -fx-font-weight: bold;
+    -fx-font-style: italic;
+}
+
