@@ -474,11 +474,11 @@ public class CreateOrderDlg {
         
         if (buttonType == reviewButtonType) {
             System.out.println("AFTER Review Order Button Pressed ......");
-        } else if (buttonType == ButtonType.CANCEL) {
+        } else {
             Portfolio.portfolioService._restart();
             System.out.println("AFTER CANCEL Button Pressed ......");
         }
-        
+
         // cancel get market data scheduled service
         marketDataSrv.cancel();
     }

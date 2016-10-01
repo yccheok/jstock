@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.yccheok.jstock.engine.Pair;
-import static org.yccheok.jstock.trading.API.DriveWealth.getSessionKey;
 import static org.yccheok.jstock.trading.API.SessionManager.Commission;
 
 /**
@@ -547,15 +546,25 @@ public class OrderManager {
         return new Order(result);
     }
 
-    public static boolean cancel (String orderID) {
+    public static Pair<Boolean, String> cancel (String orderID) {
         System.out.println("\n[Cancel order]: " + orderID);
 
         String url = "orders/" + orderID;
 
-        Map<String, Object> result = Http.delete(url, DriveWealth.getSessionKey());
-        int statusCode = (int) result.get("code");
+        Map<String, Object> respondMap = Http.delete(url, DriveWealth.getSessionKey());
+        int statusCode = (int) respondMap.get("code");
+        
+        Map<String, Object> result = new Gson().fromJson(respondMap.get("respond").toString(), HashMap.class);
+        String code = result.get("code").toString();
+        System.out.println("cancel order, code: " + code);
 
-        return statusCode == 200;
+        String error = null;
+        if (result.containsKey("message")) {
+            error = result.get("message").toString();
+            System.out.println("cancel order, message: " + error);
+        }
+
+        Boolean success = (statusCode == 200);
+        return new Pair<>(success, error);
     }
-
 }

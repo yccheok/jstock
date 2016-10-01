@@ -17,6 +17,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.Label;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import org.yccheok.jstock.engine.Pair;
 import org.yccheok.jstock.trading.API.OrderManager;
 import org.yccheok.jstock.trading.OrderModel;
 import org.yccheok.jstock.trading.Utils;
@@ -124,6 +125,7 @@ public class CancelOrderDlg {
             String header = String.format("%1$s - %2$s", ord.getSymbol(), ord.getName());
             CreateOrderDlg.setDlgTitleHeader(alert, "Cancel Order", header, ord.getUrlImage());
 
+            alert.getDialogPane().setPrefSize(450, 200);
             alert.setContentText("Cancelling order....");
 
             // disable OK button
@@ -131,16 +133,16 @@ public class CancelOrderDlg {
             alert.show();
 
             // Cancel Order API call
-            Task task = new Task<Boolean>() {
+            Task task = new Task<Pair<Boolean, String>>() {
                 @Override
-                protected Boolean call() throws Exception {
+                protected Pair<Boolean, String> call() throws Exception {
                     String orderID = ord.getOrderID();
                     System.out.println("Cancel OrderID :" + orderID);
 
-                    boolean success = OrderManager.cancel(orderID);
-                    System.out.println("Cancel Order success : " + success + "....\n\n");
+                    Pair<Boolean, String> result = OrderManager.cancel(orderID);
+                    System.out.println("Cancel Order success : " + result.first + "....\n\n");
 
-                    return success;
+                    return result;
                 }
             };
             
@@ -150,12 +152,15 @@ public class CancelOrderDlg {
             task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
                 @Override
                 public void handle(final WorkerStateEvent workerStateEvent) {
-                    boolean result = (boolean) workerStateEvent.getSource().getValue();
+                    Pair<Boolean, String> result = (Pair<Boolean, String>) workerStateEvent.getSource().getValue();
 
-                    String content;
-                    if (result == true) content = "Order cancelled successfully.";
-                    else content = "Failed to cancel order.";
+                    Boolean success = result.first;
+                    String error = result.second;
                     
+                    String content;
+                    if (success == true) content = "Order cancelled successfully.";
+                    else content = "Cancel order failed! Reason: " + error;
+
                     alert.setContentText(content);
                     alert.getDialogPane().lookupButton(ButtonType.OK).setDisable(false);
                     
