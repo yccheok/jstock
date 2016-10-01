@@ -42,6 +42,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Modality;
 import javafx.util.Duration;
 import org.yccheok.jstock.engine.Pair;
 import org.yccheok.jstock.trading.API.DriveWealth;
@@ -484,6 +485,10 @@ public class CreateOrderDlg {
     }
 
     public static void setDlgTitleHeader (Dialog dlg, String title, String header, String logoURL) {
+        // As dialog is inside JFXPanel of Swing application, set modal doesn't work 
+        // This only works if whole application is JavaFX
+        dlg.initModality(Modality.APPLICATION_MODAL);
+
         // load css file
         dlg.getDialogPane().getScene().getStylesheets().add(CancelOrderDlg.class.getResource("trading.css").toExternalForm()); 
         
