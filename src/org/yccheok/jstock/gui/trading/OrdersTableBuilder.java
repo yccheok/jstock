@@ -8,6 +8,7 @@ package org.yccheok.jstock.gui.trading;
 import java.util.List;
 import java.util.Map;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -20,6 +21,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -28,7 +30,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.util.Callback;
 import org.yccheok.jstock.trading.API.InstrumentManager;
-import org.yccheok.jstock.trading.PositionModel;
 import org.yccheok.jstock.trading.OrderModel;
 import org.yccheok.jstock.trading.Utils;
 import org.yccheok.jstock.trading.PositionModel.SymbolUrl;
@@ -186,43 +187,32 @@ public class OrdersTableBuilder {
 
         // Cancel Order Button
         TableColumn<OrderModel, OrderModel> cancelCol = new TableColumn("Cancel Order");
-        ordPriceCol.getStyleClass().add("right");
+        cancelCol.setCellValueFactory((CellDataFeatures<OrderModel, OrderModel> features) -> new ReadOnlyObjectWrapper(features.getValue()));
 
         cancelCol.setCellFactory((TableColumn<OrderModel, OrderModel> col) -> new TableCell<OrderModel, OrderModel>() {
-            Button cancelBtn = new Button("Cancel");
+            final Button cancelBtn = new Button("Cancel");
 
             @Override
             public void updateItem(OrderModel item, boolean empty) {
                 super.updateItem(item, empty);
-                
+
                 if (!isEmpty()) {
                     setGraphic(cancelBtn);
                     setAlignment(Pos.CENTER);
+                    
+                    // cancel btn handler
+                    cancelBtn.setOnAction(new EventHandler<ActionEvent>() {
+                        @Override public void handle (ActionEvent e) {
+                            CancelOrderDlg dlg = new CancelOrderDlg(item);
+                            dlg.initDlgAndWait();
+                        }
+                    });
+                } else {
+                    setGraphic(null);
                 }
             }
         });
 
-        /////////
-        //
-        //  TODO
-        //      Cancel Order BUTTON handler
-        //
-        ////////
-        
-        /*
-        cancelBtn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle (ActionEvent e) {
-
-
-
-                CancelOrderDlg dlg = new CancelOrderDlg(item);
-                dlg.initDlgAndWait();
-            }
-        });
-        */
-        
-        
-        
         symbolCol.setSortable(false);
         nameCol.setSortable(false);
         unitsCol.setSortable(false);
