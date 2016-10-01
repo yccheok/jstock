@@ -84,6 +84,12 @@ public final class AccountManager {
             List<LinkedTreeMap<String, Object>> orders = (List) this.resultMap.get("orders");
 
             for (LinkedTreeMap<String, Object> ord : orders) {
+                // skip if order status:  4 - Cancelled,    8 - Rejected
+                String orderStatus = ord.get("orderStatus").toString();
+                if (orderStatus.equals("4") || orderStatus.equals("8")) {
+                    continue;
+                }
+                
                 Map<String, Object> data = new HashMap<>();
 
                 // orders from accBlotter don't have stock name, icon URL & market price
@@ -125,6 +131,63 @@ public final class AccountManager {
                 }
                 data.put("orderType", ordType);
 
+                
+                
+                // debug
+                String sym = ord.get("symbol").toString();
+                Double qty = (Double) ord.get("orderQty");
+                String buysell = ord.get("side").toString();
+
+                Double limit = 0.0;
+                Double stop = 0.0;
+                
+                if (ord.containsKey("limitPrice")) {
+                    limit = (Double) ord.get("limitPrice");
+                }
+                if (ord.containsKey("stopPrice")) {
+                    limit = (Double) ord.get("stopPrice");
+                }
+                
+                String typ = ord.get("orderType").toString();
+
+                String st = ord.get("orderStatus").toString();
+                
+                // 0 - New
+                // 1 - partial fill
+                // 2 - filled
+                // 4 - Cancelled
+                // 8 - Rejected
+
+                String status = "";
+                switch (st) {
+                    case "0":
+                        status = "new";
+                        break;
+                    case "1":
+                        status = "partially filled";
+                        break;
+                    case "2":
+                        status = "filled";
+                        break;
+                    case "4":
+                        status = "cancelled";
+                        break;
+                    case "8":
+                        status = "rejected";
+                        break;
+                    default:
+                        break;
+                }
+                
+                System.out.println(
+                        
+String.format("Pending order: %1$s, %2$s, %3$s, %4$s, %5$s, %6$s, %7$s", status, sym, buysell, typ, qty, limit, stop)
+
+                );
+                
+                
+                
+                
                 this.ordList.add(new OrderModel(data));
             }
 

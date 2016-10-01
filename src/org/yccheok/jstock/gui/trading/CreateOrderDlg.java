@@ -714,18 +714,22 @@ public class CreateOrderDlg {
             System.out.println("Order Type changed: " + newVal.getName());
 
             PriceValidator validator = null;
+            String limitHint = "";
+            String stopHint = "";
             if (bidAskPrice != null) {
                 validator = new PriceValidator (bidAskPrice, side);
+                limitHint = validator.getLimitTxt();
+                stopHint  = validator.getStopTxt();
             }
 
             switch (newVal) {
                 case LIMIT:
-                    if (validator != null) showPriceField(true, "Limit Price ($)", validator.getLimitTxt());
+                    showPriceField(true, "Limit Price ($)", limitHint);
                     showShareCashChoice(false);
                     
                     break;
                 case STOP:
-                    if (validator != null) showPriceField(true, "Stop Price ($)", validator.getStopTxt());
+                    showPriceField(true, "Stop Price ($)", stopHint);
                     showShareCashChoice(false);
 
                     break;
