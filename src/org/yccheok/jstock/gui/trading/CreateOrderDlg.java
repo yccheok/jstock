@@ -38,7 +38,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -687,11 +686,11 @@ public class CreateOrderDlg {
         }
     }
 
-    private void showShareCashChoice (boolean show) {
-        if (show == true) {
+    private void enableShareChoice (boolean enable) {
+        if (enable == true) {
             // for Market Order
-            shareLabel.setVisible(true);
-            shareChoice.setVisible(true);
+            shareLabel.setDisable(false);
+            shareChoice.setDisable(false);
             shareChoice.setValue(ShareCash.CASH);
 
             cashLabel.setVisible(true);
@@ -701,8 +700,9 @@ public class CreateOrderDlg {
             enableShareOrCash(ShareCash.CASH);
         } else {
             // Stop / Limit order, only allow Share / Unit
-            shareLabel.setVisible(false);
-            shareChoice.setVisible(false);
+            shareChoice.setValue(ShareCash.SHARE);
+            shareLabel.setDisable(true);
+            shareChoice.setDisable(true);
 
             cashText.clear();
             cashLabel.setVisible(false);
@@ -728,19 +728,19 @@ public class CreateOrderDlg {
             switch (newVal) {
                 case LIMIT:
                     showPriceField(true, "Limit Price ($)", limitHint);
-                    showShareCashChoice(false);
+                    enableShareChoice(false);
                     
                     break;
                 case STOP:
                     showPriceField(true, "Stop Price ($)", stopHint);
-                    showShareCashChoice(false);
+                    enableShareChoice(false);
 
                     break;
                 case MARKET:
                     // hide price input field
                     if (validator != null) showPriceField(false, null, null);
                     // specify Share by Qty or Amount ($), support fractional share
-                    showShareCashChoice(true);
+                    enableShareChoice(true);
 
                     break;
                 default:

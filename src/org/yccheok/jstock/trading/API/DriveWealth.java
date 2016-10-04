@@ -7,6 +7,7 @@ package org.yccheok.jstock.trading.API;
 
 
 import com.google.gson.Gson;
+import com.google.gson.internal.LinkedTreeMap;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.yccheok.jstock.engine.Pair;
+import org.yccheok.jstock.trading.PositionModel;
 
 /**
  *
@@ -408,6 +410,15 @@ public final class DriveWealth {
             if (! user.getPracticeAccounts().isEmpty()) {
                 user.setActiveAccount(user.getPracticeAccounts().get(0));
             }
+            
+
+            // get all accounts
+            for (SessionManager.Account ac : user.getAccounts()) {
+                System.out.println(String.format("Ac ID %1$s, ac type: %2$s ......\n\n ",
+                        ac.getAccountID(), ac.getAccountType()));
+            }
+            
+            
         }
         
         return createSession;
