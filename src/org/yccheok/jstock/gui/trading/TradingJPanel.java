@@ -24,8 +24,7 @@ import javax.swing.JScrollPane;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TabPane.TabClosingPolicy;
+import javafx.scene.layout.StackPane;
 
 /**
  *
@@ -44,14 +43,11 @@ public class TradingJPanel extends javax.swing.JPanel {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                // Tab Pane
-                tabPane = new TabPane();
-                tabPane.setTabClosingPolicy(TabClosingPolicy.ALL_TABS);
+                stack = new StackPane();
+                SignIn.build(stack).show();
 
-                // create Sign In Tab & license Tab
-                SignIn.createTab(tabPane);
-                
-                scene = new Scene(tabPane);
+                scene = new Scene(stack, 500, 500);
+
                 scene.getStylesheets().add(TradingJPanel.class.getResource("trading.css").toExternalForm());
                 jfxPanel.setScene(scene);
                 jfxPanel.setPreferredSize(new Dimension(500, 500));
@@ -70,5 +66,5 @@ public class TradingJPanel extends javax.swing.JPanel {
     private final JScrollPane jScrollPane = new javax.swing.JScrollPane();
     private final JFXPanel jfxPanel = new JFXPanel();
     private Scene scene;
-    private TabPane tabPane;
+    private StackPane stack;
 }

@@ -453,7 +453,7 @@ public class CreateOrderDlg {
     
     public void initDlgAndWait () {
         // temporary cancel / suspend Portfolio Scheduled Service
-        Portfolio.portfolioService._cancel();
+        Portfolio.getInstance().cancelPortfolioService();
 
         initDlgUI();
         qtyPriceValidator();
@@ -475,7 +475,7 @@ public class CreateOrderDlg {
         if (buttonType == reviewButtonType) {
             System.out.println("AFTER Review Order Button Pressed ......");
         } else {
-            Portfolio.portfolioService._restart();
+            Portfolio.getInstance().restartPortfolioService();
             System.out.println("AFTER CANCEL Button Pressed ......");
         }
 
@@ -501,7 +501,7 @@ public class CreateOrderDlg {
         stockLogo.setImage(null);
 
         if (logoURL != null && ! logoURL.isEmpty()) {
-            stockLogo.setImage(Portfolio.getIcon(logoURL));
+            stockLogo.setImage(Portfolio.getInstance().getIcon(logoURL));
         }
         // show stock logo in Header - Right
         dlg.setGraphic(stockLogo);
@@ -1083,7 +1083,7 @@ public class CreateOrderDlg {
                     submitDlg.close();
 
                     // refresh Portfolio
-                    Portfolio.portfolioService._restart();
+                    Portfolio.getInstance().restartPortfolioService();
                 }
             });
         });

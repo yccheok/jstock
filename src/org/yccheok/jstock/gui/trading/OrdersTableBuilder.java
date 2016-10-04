@@ -80,7 +80,7 @@ public class OrdersTableBuilder {
                 symLabel.setText(symbol);
 
                 if (url != null && ! url.isEmpty()) {
-                    imageView.setImage(Portfolio.getIcon(url));
+                    imageView.setImage(Portfolio.getInstance().getIcon(url));
                 } else {
                     imageView.setImage(null);
                 }

@@ -34,6 +34,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.web.WebEngine;
@@ -49,23 +51,31 @@ import org.yccheok.jstock.engine.Pair;
 public class SignIn {
     private SignIn () {}
 
-    public static void createTab (TabPane tabPane) {
-        SignIn.tabPane = tabPane;
+    private static final SignIn INSTANCE = new SignIn();
 
-        initTab();
+    public static SignIn getInstance () {
+        return INSTANCE;
+    }
+
+    public static SignIn build (StackPane stack) {
+        INSTANCE.stack = stack;
+        return INSTANCE;
+    }
+
+    public void show () {
+        initUI();
         initEventHandler();
         
         // Drive Wealth Terms & Condition
-        initLicenceTab();
+        //initLicenceTab();
     }
 
-    private static void initTab () {
-        GridPane grid = new GridPane();
-        grid.setAlignment(Pos.CENTER);
-        grid.setHgap(10);
-        grid.setVgap(30);
-        grid.setPadding(new Insets(25, 25, 25, 25));
-        grid.setId("grid");
+    private void initUI () {
+        signInGrid.setAlignment(Pos.CENTER);
+        signInGrid.setHgap(10);
+        signInGrid.setVgap(15);
+        signInGrid.setPadding(new Insets(25, 25, 25, 25));
+        signInGrid.setId("grid");
 
         // Drive Wealth Logo as Title
         Label titleLabel = new Label();
@@ -74,26 +84,34 @@ public class SignIn {
         
         titleLabel.setGraphic(new ImageView(image));
         titleLabel.setAlignment(Pos.CENTER);
-        grid.add(titleLabel, 0, 0);
+        signInGrid.add(titleLabel, 0, 0);
         GridPane.setHalignment(titleLabel, HPos.CENTER);
 
         // username field
         userField.setPromptText("Username");
-        grid.add(userField, 0, 1);
+        signInGrid.add(userField, 0, 1);
 
         // password field
         pwdField.setPromptText("Password");
-        grid.add(pwdField, 0, 2);
+        signInGrid.add(pwdField, 0, 2);
+
+        // Error msg
+        errorText.setWrapText(true);
+        errorText.setVisible(false);
+        signInGrid.add(errorText, 0, 3);
 
         // Sign In button
         signInBtn.setId("green");
         signInBtn.setMaxWidth(Double.MAX_VALUE);
         signInBtn.setMaxHeight(Double.MAX_VALUE);
         signInBtn.setTextAlignment(TextAlignment.CENTER);
-        // rowspan = 2
-        grid.add(signInBtn, 0, 4, 1, 2);
+        
+        signInGrid.add(signInBtn, 0, 4);
+        
         GridPane.setHalignment(signInBtn, HPos.CENTER);
 
+        
+        /*
         // Licence
         HBox licenceHBox = new HBox(0);
         Label licenceLabel = new Label("By signing in you agree to ");
@@ -108,42 +126,36 @@ public class SignIn {
         licenceHBox.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE );
         grid.add(licenceHBox, 0, 6);
         GridPane.setHalignment(licenceHBox, HPos.CENTER);
+        */
 
-        // Sign In successful msg
-        successText.setWrapText(true);
-        grid.add(successText, 0, 7);
-
+        
         // make components auto resize
         ColumnConstraints cc = new ColumnConstraints();
         cc.setPercentWidth(50);
         cc.setHgrow(Priority.ALWAYS);
-        grid.getColumnConstraints().setAll(cc);
+        signInGrid.getColumnConstraints().setAll(cc);
 
         RowConstraints rr = new RowConstraints();
         rr.setVgrow(Priority.ALWAYS);
-        grid.getRowConstraints().setAll(rr, rr, rr, rr, rr, rr, rr);
+        signInGrid.getRowConstraints().setAll(rr, rr, rr, rr, rr, rr, rr);
 
-        SignIn.signInTab.setTooltip(new Tooltip("Sign In"));
-        SignIn.signInTab.setText("Sign In");
-        SignIn.signInTab.setContent(grid);
-        SignIn.signInTab.setClosable(false);
-        SignIn.tabPane.getTabs().add(SignIn.signInTab);
+        stack.getChildren().add(signInGrid);
     }
     
-    private static void initEventHandler () {
+    private void initEventHandler () {
         // Sign In Button action
         signInBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                successText.setVisible(false);
+                errorText.setVisible(false);
                 String userName = userField.getText();
                 String password = pwdField.getText();
 
                 if (userName.isEmpty() || password.isEmpty()) {
                     String errorStr = "Please enter username and password";
-                    successText.setTextFill(Color.FIREBRICK);
-                    successText.setText(errorStr);
-                    successText.setVisible(true);
+                    errorText.setTextFill(Color.FIREBRICK);
+                    errorText.setText(errorStr);
+                    errorText.setVisible(true);
 
                     System.out.println(errorStr);
                     return;
@@ -157,27 +169,12 @@ public class SignIn {
             }
         });
     }
-    
-    private static Task createLoginTask (String userName, String password) {
+
+    private Task createLoginTask (String userName, String password) {
         
         Task< Pair<SessionManager.Session, DriveWealth.Error> > loginTask = new Task< Pair<SessionManager.Session, DriveWealth.Error> >() {
             @Override protected Pair<SessionManager.Session, DriveWealth.Error> call() throws Exception {
-                System.out.println("Drive Wealth User Sign In....\n\n ");
-
                 Pair<SessionManager.Session, DriveWealth.Error> login = DriveWealth.login(userName, password);
-
-                SessionManager.Session session  = login.first;
-                DriveWealth.Error error         = login.second;
-                SessionManager.User user        = session.getUser();
-
-                if (error == null) {
-                    System.out.println("DriveWealth: username: "    + userName
-                                        + ", pwd: "                 + password
-                                        + ", sessionKey: "          + session.getSessionKey()
-                                        + ", userID: "              + user.getUserID()
-                                        + ", commission: "          + user.getCommission().getBaseRate());
-                }
-
                 return login;
             }
         };
@@ -191,52 +188,35 @@ public class SignIn {
                 DriveWealth.Error error         = login.second;
 
                 if (error != null) {
-                    System.out.println("Sign In failed, code: " + error.getMessage());
-                    successText.setText("Sign In failed: " + error.getMessage());
-                } else {
-                    SessionManager.User user = session.getUser();
+                    errorText.setText("Sign In failed: " + error.getMessage());
+                    errorText.setTextFill(Color.FIREBRICK);
+                    errorText.setVisible(true);
 
-                    System.out.println("Successfully Sign In, userID: " + user.getUserID());
-
-                    // Login will set practice acc as active account
-                    SessionManager.Account acc = user.getActiveAccount();
-                    String welcomeStr;
-
-                    if (acc == null && user.getPracticeAccounts().isEmpty()) {
-                        System.out.println("No practice account, prompt for creating ??");
-                        welcomeStr = "Successfully Sign In, please create practice account to start trading";
-                    } else {
-                        welcomeStr = "Start trading with Practice Account "
-                            + ".\n AccountNo: " + acc.getAccountNo()
-                            + "\n AccountID: " + acc.getAccountID()
-                            + "\n Balance: " + acc.getCash();
-                    }
-                    successText.setText(welcomeStr);
-
-                    // create Portfolio Tab
-                    if (acc != null) {
-                        Tab portfolioTab = Portfolio.createTab();
-                        tabPane.getTabs().add(portfolioTab);
-                        // select tab
-                        SingleSelectionModel<Tab> selectionModel = tabPane.getSelectionModel();
-                        selectionModel.select(portfolioTab);
-
-                        tabPane.getTabs().remove(signInTab);
-                        System.out.println("Init Portfolio tab DONE....");
-                    }
+                    // reenable "Sign In" button
+                    signInBtn.setDisable(false);
+                    return;
                 }
 
-                successText.setTextFill(Color.FIREBRICK);
-                successText.setVisible(true);
-                // reenable "Sign In" button
-                signInBtn.setDisable(false);
+                SessionManager.User user = session.getUser();
+                System.out.println("Successfully Sign In, userID: " + user.getUserID());
+
+                // Login will set practice acc as active account
+                SessionManager.Account acc = user.getActiveAccount();
+
+                // create Portfolio Tab
+                if (acc != null) {
+                    VBox portfolio = Portfolio.getInstance().show();
+                    stack.getChildren().remove(signInGrid);
+                    stack.getChildren().add(portfolio);
+                }
             }
         });
 
         return loginTask;
     }
-    
-    private static void initLicenceTab () {
+
+    /*  
+    private void initLicenceTab () {
         // Load Drive Wealth's licence in new Tab with browser
         final WebView browser = new WebView();
         final WebEngine webEngine = browser.getEngine();
@@ -284,16 +264,18 @@ public class SignIn {
             }
         );
     }
-
-    private static TabPane tabPane;
-
-    private static final Hyperlink licenceLink = new Hyperlink("Drive Wealth's Terms of Use");
+    */
     
-    private static final Button signInBtn = new Button("Sign in");;
-    private static final TextField userField = new TextField();;
-    private static final PasswordField pwdField = new PasswordField();
-    private static final Label successText = new Label();
     
-    private static final Tab signInTab  = new Tab();
-    private static final Tab licenceTab = new Tab();
+    //private final Hyperlink licenceLink = new Hyperlink("Drive Wealth's Terms of Use");
+    
+    private final Button signInBtn = new Button("Sign in");
+    private final TextField userField = new TextField();
+    private final PasswordField pwdField = new PasswordField();
+    private final Label errorText = new Label();
+    
+    //private final Tab licenceTab = new Tab();
+
+    private StackPane stack;
+    private final GridPane signInGrid = new GridPane();
 }

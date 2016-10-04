@@ -7,7 +7,6 @@ package org.yccheok.jstock.trading.API;
 
 
 import com.google.gson.Gson;
-import com.google.gson.internal.LinkedTreeMap;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -24,7 +23,6 @@ import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.yccheok.jstock.engine.Pair;
-import org.yccheok.jstock.trading.PositionModel;
 
 /**
  *

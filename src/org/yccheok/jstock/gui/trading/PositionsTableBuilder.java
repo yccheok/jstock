@@ -5,7 +5,6 @@
  */
 package org.yccheok.jstock.gui.trading;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javafx.beans.binding.Bindings;
@@ -23,7 +22,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
@@ -82,7 +80,7 @@ public class PositionsTableBuilder {
                 symLabel.setText(symbol);
 
                 if (url != null && ! url.isEmpty()) {
-                    imageView.setImage(Portfolio.getIcon(url));
+                    imageView.setImage(Portfolio.getInstance().getIcon(url));
                 } else {
                     imageView.setImage(null);
                 }

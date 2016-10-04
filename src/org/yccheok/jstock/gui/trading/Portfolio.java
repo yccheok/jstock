@@ -31,18 +31,22 @@ import org.yccheok.jstock.trading.OrderModel;
  * @author shuwnyuan
  */
 public class Portfolio {
-    
     private Portfolio () {}
 
-    public static Tab createTab () {
-        initTab();
-        startPortfolioService();
+    private static final Portfolio INSTANCE = new Portfolio();
 
-        return Portfolio.portfolioTab;
+    public static Portfolio getInstance () {
+        return INSTANCE;
     }
     
-    private static void initTab () {
-        final VBox vBox = new VBox();
+    public VBox show () {
+        initUI();
+        startPortfolioService();
+
+        return this.vBox;
+    }
+    
+    private void initUI () {
         vBox.setSpacing(5);
         vBox.setPadding(new Insets(5, 10, 5, 10));  // Insets: top, right, bottom, left
         vBox.setPrefWidth(1000);
@@ -52,7 +56,7 @@ public class Portfolio {
         vBox.getChildren().add(accBorderPane);
         
         // Open Positions
-        final TableView posTable = Portfolio.posTableBuilder.build();
+        final TableView posTable = this.posTableBuilder.build();
         
         VBox vboxOpenPos = new VBox(5);
         vboxOpenPos.setPadding(new Insets(5, 5, 5, 5));  // Insets: top, right, bottom, left
@@ -61,7 +65,7 @@ public class Portfolio {
         vboxOpenPos.getChildren().addAll(posLabel, posTable);
 
         // Pending orders
-        final TableView ordTable = Portfolio.ordTableBuilder.build();
+        final TableView ordTable = this.ordTableBuilder.build();
         
         VBox vboxOrder = new VBox(5);
         vboxOrder.setPadding(new Insets(5, 5, 5, 5));  // Insets: top, right, bottom, left
@@ -79,15 +83,18 @@ public class Portfolio {
         
         vboxOpenPos.prefWidthProperty().bind(splitPane.widthProperty());
         vboxOrder.prefWidthProperty().bind(splitPane.widthProperty());
-
-        // add Portfolio tab
-        Portfolio.portfolioTab.setText("Portfolio (Practice Account)");
-        Portfolio.portfolioTab.setClosable(false);
-        Portfolio.portfolioTab.setContent(vBox);
     }
     
-    private static void startPortfolioService () {
-        Portfolio.portfolioService = new PortfolioService();
+    public void cancelPortfolioService () {
+        portfolioService._cancel();
+    }
+
+    public void restartPortfolioService () {
+        portfolioService._restart();
+    }
+    
+    private void startPortfolioService () {
+        this.portfolioService = new PortfolioService();
         
         setSucceedHandler(portfolioService);
         setFailedHandler(portfolioService);
@@ -95,7 +102,7 @@ public class Portfolio {
         portfolioService.start();
     }
 
-    private static void setSucceedHandler (PortfolioService portfolioService) {
+    private void setSucceedHandler (PortfolioService portfolioService) {
         portfolioService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(final WorkerStateEvent workerStateEvent) {
@@ -135,7 +142,7 @@ public class Portfolio {
         });
     }
     
-    public static void setFailedHandler (PortfolioService portfolioService) {
+    public void setFailedHandler (PortfolioService portfolioService) {
         portfolioService.setOnFailed(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(WorkerStateEvent event) {
@@ -146,7 +153,7 @@ public class Portfolio {
     }
 
     // cache Stock icon for Position & Order table
-    public static Image getIcon (String url) {
+    public Image getIcon (String url) {
         if (! icons.containsKey(url)) {
             // use background loading:  public Image(String url, boolean backgroundLoading)
             Image icon = new Image(url, true);
@@ -156,19 +163,18 @@ public class Portfolio {
     }
 
 
-    private static Map<String, InstrumentManager.Instrument> instruments = new HashMap<>();
-    private static Map<String, Double> marketPrices;
+    private Map<String, InstrumentManager.Instrument> instruments = new HashMap<>();
+    private Map<String, Double> marketPrices;
+    private PortfolioService portfolioService;
 
-    private static final PositionsTableBuilder posTableBuilder   = new PositionsTableBuilder();
-    private static final OrdersTableBuilder ordTableBuilder      = new OrdersTableBuilder();
-    private static final AccountSummaryBuilder accSummaryBuilder = new AccountSummaryBuilder();
+    private final PositionsTableBuilder posTableBuilder   = new PositionsTableBuilder();
+    private final OrdersTableBuilder ordTableBuilder      = new OrdersTableBuilder();
+    private final AccountSummaryBuilder accSummaryBuilder = new AccountSummaryBuilder();
 
-    private static final Tab portfolioTab = new Tab();
+    private final VBox vBox = new VBox();
+    private final Map<String, Image> icons = new HashMap<>();
     
     public static final double TABLE_CELL_SIZE = 30;
     public static final double ICON_SIZE = TABLE_CELL_SIZE - 5;
-    public static PortfolioService portfolioService;
-
-    private static final Map<String, Image> icons = new HashMap<>();
 }
     

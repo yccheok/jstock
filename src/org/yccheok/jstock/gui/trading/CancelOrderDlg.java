@@ -117,7 +117,7 @@ public class CancelOrderDlg {
 
         yesButton.addEventHandler(ActionEvent.ACTION, event -> {
             // temporary cancel / suspend Portfolio Scheduled Service
-            Portfolio.portfolioService._cancel();
+            Portfolio.getInstance().cancelPortfolioService();
 
             // Dialog to show Cancelling Order
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -164,7 +164,7 @@ public class CancelOrderDlg {
                     alert.setContentText(content);
                     alert.getDialogPane().lookupButton(ButtonType.OK).setDisable(false);
                     
-                    Portfolio.portfolioService._restart();
+                    Portfolio.getInstance().restartPortfolioService();
                 }
             });
         });
