@@ -5,7 +5,7 @@
  */
 package org.yccheok.jstock.gui.trading;
 
-import java.util.Optional;
+import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
@@ -24,12 +24,9 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.SingleSelectionModel;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
@@ -109,9 +106,16 @@ public class SignIn {
         signInBtn.setTextAlignment(TextAlignment.CENTER);
         
         signInGrid.add(signInBtn, 0, 4);
-        
         GridPane.setHalignment(signInBtn, HPos.CENTER);
 
+        // progress indicator
+        progressIn.setVisible(false);
+        final VBox progressBox = new VBox();
+        progressBox.setSpacing(5);
+        progressBox.getChildren().addAll(progressIn);
+
+        signInGrid.add(progressBox, 0, 5);
+        
         // Licence
         HBox licenceHBox = new HBox(0);
         Label licenceLabel = new Label("By signing in you agree to ");
@@ -139,6 +143,9 @@ public class SignIn {
         signInGrid.getRowConstraints().setAll(rr, rr, rr, rr, rr, rr, rr);
 
         stack.getChildren().add(signInGrid);
+        
+        // focus on username
+        Platform.runLater(() -> userField.requestFocus());
     }
     
     private void signInHandler () {
@@ -165,48 +172,65 @@ public class SignIn {
 
                 // disable "Sign In" button
                 signInBtn.setDisable(true);
+
+                // progress indicator
+                progressIn.setVisible(true);
             }
         });
     }
 
     private void licenceHandler () {
-        final WebView browser = new WebView();
-        final WebEngine webEngine = browser.getEngine();
+        WebView webView = new WebView();
+        WebEngine webEngine = webView.getEngine();
 
+        Dialog licenceDlg = new Dialog<>();
+        StackPane dlgStack = new StackPane();
+        ProgressBar progressBar = new ProgressBar();
+        Label error = new Label("Failed to load page.");
+
+        licenceDlg.setResizable(true);
+
+        ButtonType closeBtn = new ButtonType("Close", ButtonData.CANCEL_CLOSE);
+        licenceDlg.getDialogPane().getButtonTypes().add(closeBtn);
+
+        // updating progress bar using binding
+        progressBar.progressProperty().bind(webEngine.getLoadWorker().progressProperty());
+
+        dlgStack.getChildren().addAll(error, webView, progressBar);
+        licenceDlg.getDialogPane().setContent(dlgStack);
+
+        
         licenceLink.setOnAction(new EventHandler<ActionEvent>() {
             @Override
-            public void handle(ActionEvent e) {                
+            public void handle(ActionEvent e) {            
                 // Load DriveWealth T&C in Dialog - WebView
                 webEngine.load("https://drivewealth.com/terms-of-use/");
                 licenceLink.setDisable(true);
 
-                // show in Dialog
-                Dialog licenceDlg = new Dialog<>();
-                licenceDlg.setResizable(true);
+                error.setVisible(false);
+                progressBar.setVisible(true);
+                webView.setVisible(true);
 
-                ButtonType closeBtn = new ButtonType("Close", ButtonData.CANCEL_CLOSE);
-                licenceDlg.getDialogPane().getButtonTypes().add(closeBtn);
-
-                licenceDlg.getDialogPane().setContent(browser);
                 licenceDlg.showAndWait();
 
                 // Close btn is clicked, stop webEngine load
                 // http://stackoverflow.com/questions/22436498/how-to-stop-webengine-after-closing-stage-javafx
                 webEngine.load(null);
+                licenceLink.setDisable(false);
             }
         });
 
-        webEngine.getLoadWorker().stateProperty().addListener(
-            new javafx.beans.value.ChangeListener<Worker.State>() {
+        webEngine.getLoadWorker().stateProperty().addListener(new javafx.beans.value.ChangeListener<Worker.State>() {
                 public void changed(ObservableValue ov, Worker.State oldState, Worker.State newState) {
                     System.out.println("Loading licence page status: " + newState);
 
-                    if (newState == SUCCEEDED || newState == FAILED) {
-                        licenceLink.setDisable(false);
-
-                        if (newState == FAILED) {
-                            System.out.println("Failed loading licence page");
-                        }
+                    if (newState == SUCCEEDED) {
+                        // hide progress bar
+                        progressBar.setVisible(false);
+                    } else if (newState == FAILED) {
+                        progressBar.setVisible(false);
+                        webView.setVisible(false);
+                        error.setVisible(true);
                     }
                 }
             }
@@ -264,6 +288,7 @@ public class SignIn {
     private final TextField userField = new TextField();
     private final PasswordField pwdField = new PasswordField();
     private final Label errorText = new Label();
+    private final ProgressIndicator progressIn = new ProgressIndicator();
     
     private StackPane stack;
     private final GridPane signInGrid = new GridPane();
