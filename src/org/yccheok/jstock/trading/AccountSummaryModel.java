@@ -36,7 +36,11 @@ public class AccountSummaryModel {
         this.accountTotal.bind(Bindings.add(this.cashBalance, this.equity));
         
         this.totalUnrealizedPLPercent = new SimpleDoubleProperty();
-        this.totalUnrealizedPLPercent.bind(this.totalUnrealizedPL.divide(this.equity.subtract(this.totalUnrealizedPL)).multiply(100));
+        this.totalUnrealizedPLPercent.bind(
+                Bindings.when(this.equity.greaterThan(0)).then(
+                    this.totalUnrealizedPL.divide(this.equity.subtract(this.totalUnrealizedPL)).multiply(100)
+                ).otherwise(0)
+            );
     }
 
     public void update (ObservableList<PositionModel> posList) {
