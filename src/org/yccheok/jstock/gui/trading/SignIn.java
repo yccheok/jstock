@@ -276,48 +276,10 @@ public class SignIn {
                 User user = session.getUser();
                 System.out.println("Successfully Sign In, userID: " + user.getUserID());
 
-                
-                
-                // switch a/c DropDown
-                ComboBox<Account> accCombo = new ComboBox<>();
-                ObservableList<Account> data = FXCollections.observableArrayList(user.getAccounts());
-                accCombo.setItems(data);
-
-                // switch acc listener
-                accCombo.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Account>() {
-                    @Override
-                    public void changed(ObservableValue<? extends Account> arg0, Account oldVal, Account newVal) {
-                        if (newVal != null) {
-                            System.out.println("Acc changed: " + newVal.toString());
-
-                            SessionManager.getInstance().getUser().setActiveAccount(newVal);
-                            Portfolio.getInstance().initPortfolioServ();
-                        }
-                    }
-                });
-
-                HBox accHBox = new HBox();
-                accHBox.setAlignment(Pos.BASELINE_CENTER);
-                accHBox.setPadding(new Insets(10, 0, 10, 0));    // Top Right Bottom Left
-                accHBox.setSpacing(5);
-                accHBox.getChildren().addAll(new Label("Active Account: "), accCombo);
-
-                VBox DWVBox = new VBox();
-                DWVBox.getChildren().add(accHBox);
-
-                // Login will set practice acc as active account
-                Account acc = user.getActiveAccount();
-
-                // Portfolio
-                if (acc != null) {
-                    accCombo.getSelectionModel().select(acc);
-
-                    VBox portfolio = Portfolio.getInstance().show();
-                    DWVBox.getChildren().add(portfolio);
-                }
+                VBox tradingView = Trading.getInstance().show();
 
                 signInGrid.setVisible(false);
-                stack.getChildren().add(DWVBox);
+                stack.getChildren().add(tradingView);
             }
         });
 
