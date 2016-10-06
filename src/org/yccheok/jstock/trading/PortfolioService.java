@@ -133,21 +133,17 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
             while (itr.hasNext()) {
                 String symbol = itr.next();
 
-                Portfolio.getInstance().getIcon("ccc");
-                
+                // only get once for >1 open positions & orders for same stock
                 if (instruments.containsKey(symbol)) {
-                    // avoid Get Instrument call if already did in previous iteration
                     continue;
                 }
 
-                /*
                 // use previously cached value. This is helpful during switch a/c
                 Map<String, InstrumentManager.Instrument> portIns = Portfolio.getInstance().getInstruments();
                 if (portIns.containsKey(symbol)) {
                     instruments.put(symbol, portIns.get(symbol));
                     continue;
                 }
-                */
                 
                 Map<String, String> param = new HashMap<>();
                 // only search for exact symbol match

@@ -133,8 +133,9 @@ public class Portfolio {
                     accSummaryBuilder.initData(accModel);
                 } else {
                     if (state.equals("INSTRUMENTS")) {
-                        instruments = (Map<String, InstrumentManager.Instrument>) result.get("instruments");
-                        
+                        Map<String, InstrumentManager.Instrument> ins = (Map<String, InstrumentManager.Instrument>) result.get("instruments");
+                        instruments.putAll(ins);
+
                         posTableBuilder.updateNameURL(instruments);
                         ordTableBuilder.updateNameURL(instruments);
                     }
