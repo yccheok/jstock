@@ -15,9 +15,8 @@ import javafx.application.Platform;
 import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;
 import javafx.util.Duration;
-import org.yccheok.jstock.trading.API.DriveWealth;
+import org.yccheok.jstock.gui.trading.Portfolio;
 import org.yccheok.jstock.trading.API.AccountManager;
-import org.yccheok.jstock.trading.API.SessionManager;
 import org.yccheok.jstock.trading.API.MarketDataManager;
 import org.yccheok.jstock.trading.API.InstrumentManager;
 import org.yccheok.jstock.trading.API.InstrumentManager.Instrument;
@@ -28,12 +27,14 @@ import org.yccheok.jstock.trading.API.InstrumentManager.Instrument;
  */
 
 public class PortfolioService extends ScheduledService<Map<String, Object>> {
-    
+    private final String userID;
+    private final String accountID;
+
     private List<PositionModel> posList = new ArrayList<>();
     private List<OrderModel> ordList = new ArrayList<>();
     private AccountSummaryModel accModel;
     
-    private Map<String, Instrument> instruments = new HashMap<>();
+    private final Map<String, Instrument> instruments = new HashMap<>();
     private Set symbolsSet;
     private TaskState taskState = TaskState.ACC_BLOTTER;
     private boolean refresh = false;
@@ -71,8 +72,11 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
     // TODO: after BUY ORDER (especially Limit / STOP), order might be pending.
     // How to monitor order status & reset Service accordingly ??
     ////////////////
-    
-    public PortfolioService () {
+
+    public PortfolioService (String userID, String accountID) {
+        this.userID = userID;
+        this.accountID = accountID;
+
         // The minimum amount of time to allow between the start of the last run and the start of the next run.
         this.setPeriod(Duration.ZERO);
         
@@ -110,7 +114,7 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
         
         public PortfolioTask() {}
 
-        private void getAccBlotter (String userID, String accountID) {
+        private void getAccBlotter () {
             AccountManager.AccountBlotter accBlot = AccountManager.blotter(userID, accountID);
 
             // List of positions (PositionModel) & pending oders (OrderModel)
@@ -129,11 +133,22 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
             while (itr.hasNext()) {
                 String symbol = itr.next();
 
+                Portfolio.getInstance().getIcon("ccc");
+                
                 if (instruments.containsKey(symbol)) {
                     // avoid Get Instrument call if already did in previous iteration
                     continue;
                 }
 
+                /*
+                // use previously cached value. This is helpful during switch a/c
+                Map<String, InstrumentManager.Instrument> portIns = Portfolio.getInstance().getInstruments();
+                if (portIns.containsKey(symbol)) {
+                    instruments.put(symbol, portIns.get(symbol));
+                    continue;
+                }
+                */
+                
                 Map<String, String> param = new HashMap<>();
                 // only search for exact symbol match
                 param.put("symbols", symbol);
@@ -184,10 +199,6 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
         
         @Override
         protected Map<String, Object> call() throws Exception {
-            SessionManager.User user = DriveWealth.getUser();
-            String userID = user.getUserID();
-            String accountID = user.getActiveAccount().getAccountID();
-            
             if (userID == null || accountID == null) {
                 return null;
             }
@@ -199,7 +210,7 @@ public class PortfolioService extends ScheduledService<Map<String, Object>> {
 
             // Not calling Account Blotter & get instruments on every iteration
             if (taskState == TaskState.ACC_BLOTTER) {
-                getAccBlotter(userID, accountID);
+                getAccBlotter();
 
                 result.put("posList", posList);
                 result.put("ordList", ordList);

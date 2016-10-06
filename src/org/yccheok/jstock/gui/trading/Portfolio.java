@@ -19,6 +19,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import org.yccheok.jstock.trading.API.InstrumentManager;
+import org.yccheok.jstock.trading.API.SessionManager;
 import org.yccheok.jstock.trading.AccountSummaryModel;
 import org.yccheok.jstock.trading.PortfolioService;
 import org.yccheok.jstock.trading.PositionModel;
@@ -40,20 +41,21 @@ public class Portfolio {
 
     public VBox show () {
         initUI();
-        startPortfolioService();
+        initPortfolioServ();
 
         return this.vBox;
     }
 
     private void initUI () {
+        vBox = new VBox();
         vBox.setSpacing(5);
         vBox.setPadding(new Insets(5, 10, 5, 10));  // Insets: top, right, bottom, left
         vBox.setPrefWidth(1000);
 
         // Account Summary
-        final BorderPane accBorderPane = accSummaryBuilder.build();
+        final BorderPane accBorderPane = this.accSummaryBuilder.build();
         vBox.getChildren().add(accBorderPane);
-        
+
         // Open Positions
         final TableView posTable = this.posTableBuilder.build();
         
@@ -83,22 +85,26 @@ public class Portfolio {
         vboxOpenPos.prefWidthProperty().bind(splitPane.widthProperty());
         vboxOrder.prefWidthProperty().bind(splitPane.widthProperty());
     }
-    
-    public void cancelPortfolioService () {
-        portfolioService._cancel();
+
+    public void cancelPortfolioServ () {
+        portfolioServ._cancel();
     }
 
-    public void restartPortfolioService () {
-        portfolioService._restart();
+    public void restartPortfolioServ () {
+        portfolioServ._restart();
     }
-    
-    private void startPortfolioService () {
-        this.portfolioService = new PortfolioService();
-        
-        setSucceedHandler(portfolioService);
-        setFailedHandler(portfolioService);
-        
-        portfolioService.start();
+
+    public void initPortfolioServ () {
+        // Cancels any currently running task and stops this scheduled service, such that no additional iterations will occur.
+        if (portfolioServ != null) portfolioServ.cancel();
+
+        SessionManager.User user = SessionManager.getInstance().getUser();
+        portfolioServ = new PortfolioService(user.getUserID(), user.getActiveAccount().getAccountID());
+
+        setSucceedHandler(portfolioServ);
+        setFailedHandler(portfolioServ);
+
+        portfolioServ.start();
     }
 
     private void setSucceedHandler (PortfolioService portfolioService) {
@@ -161,16 +167,20 @@ public class Portfolio {
         return icons.get(url);
     }
 
+    public Map<String, InstrumentManager.Instrument> getInstruments () {
+        return this.instruments;
+    }
 
+    
     private Map<String, InstrumentManager.Instrument> instruments = new HashMap<>();
     private Map<String, Double> marketPrices;
-    private PortfolioService portfolioService;
+    private PortfolioService portfolioServ = null;
 
     private final PositionsTableBuilder posTableBuilder   = new PositionsTableBuilder();
     private final OrdersTableBuilder ordTableBuilder      = new OrdersTableBuilder();
     private final AccountSummaryBuilder accSummaryBuilder = new AccountSummaryBuilder();
 
-    private final VBox vBox = new VBox();
+    private VBox vBox;
     private final Map<String, Image> icons = new HashMap<>();
     
     public static final double TABLE_CELL_SIZE = 30;

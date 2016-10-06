@@ -23,7 +23,6 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Hyperlink;
@@ -49,6 +48,9 @@ import javafx.scene.web.WebView;
 import org.yccheok.jstock.trading.API.DriveWealth;
 import org.yccheok.jstock.trading.API.SessionManager;
 import org.yccheok.jstock.engine.Pair;
+import static org.yccheok.jstock.trading.API.SessionManager.Session;
+import static org.yccheok.jstock.trading.API.SessionManager.User;
+import static org.yccheok.jstock.trading.API.SessionManager.Account;
 
 /**
  *
@@ -244,9 +246,9 @@ public class SignIn {
     
     private Task createLoginTask (String userName, String password) {
         
-        Task< Pair<SessionManager.Session, DriveWealth.Error> > loginTask = new Task< Pair<SessionManager.Session, DriveWealth.Error> >() {
-            @Override protected Pair<SessionManager.Session, DriveWealth.Error> call() throws Exception {
-                Pair<SessionManager.Session, DriveWealth.Error> login = DriveWealth.login(userName, password);
+        Task< Pair<Session, DriveWealth.Error> > loginTask = new Task< Pair<Session, DriveWealth.Error> >() {
+            @Override protected Pair<Session, DriveWealth.Error> call() throws Exception {
+                Pair<Session, DriveWealth.Error> login = SessionManager.getInstance().login(userName, password);
                 return login;
             }
         };
@@ -254,10 +256,10 @@ public class SignIn {
         loginTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(WorkerStateEvent t) {
-                Pair<SessionManager.Session, DriveWealth.Error> login = loginTask.getValue();
+                Pair<Session, DriveWealth.Error> login = loginTask.getValue();
 
-                SessionManager.Session session  = login.first;
-                DriveWealth.Error error         = login.second;
+                Session session         = login.first;
+                DriveWealth.Error error = login.second;
 
                 if (error != null) {
                     errorText.setText("Sign In failed: " + error.getMessage());
@@ -271,29 +273,32 @@ public class SignIn {
                     return;
                 }
 
-                SessionManager.User user = session.getUser();
+                User user = session.getUser();
                 System.out.println("Successfully Sign In, userID: " + user.getUserID());
 
                 
                 
-                // switch accounts DropDown
-                ComboBox<SessionManager.Account> accCombo = new ComboBox<>();
-                ObservableList<SessionManager.Account> data = FXCollections.observableArrayList(user.getAccounts());
+                // switch a/c DropDown
+                ComboBox<Account> accCombo = new ComboBox<>();
+                ObservableList<Account> data = FXCollections.observableArrayList(user.getAccounts());
                 accCombo.setItems(data);
 
                 // switch acc listener
-                accCombo.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<SessionManager.Account>() {
+                accCombo.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Account>() {
                     @Override
-                    public void changed(ObservableValue<? extends SessionManager.Account> arg0, SessionManager.Account oldVal, SessionManager.Account newVal) {
+                    public void changed(ObservableValue<? extends Account> arg0, Account oldVal, Account newVal) {
                         if (newVal != null) {
                             System.out.println("Acc changed: " + newVal.toString());
+
+                            SessionManager.getInstance().getUser().setActiveAccount(newVal);
+                            Portfolio.getInstance().initPortfolioServ();
                         }
                     }
                 });
-                
+
                 HBox accHBox = new HBox();
                 accHBox.setAlignment(Pos.BASELINE_CENTER);
-                accHBox.setPadding(new Insets(5, 5, 5, 0));    // Top Right Bottom Left
+                accHBox.setPadding(new Insets(10, 0, 10, 0));    // Top Right Bottom Left
                 accHBox.setSpacing(5);
                 accHBox.getChildren().addAll(new Label("Active Account: "), accCombo);
 
@@ -301,7 +306,7 @@ public class SignIn {
                 DWVBox.getChildren().add(accHBox);
 
                 // Login will set practice acc as active account
-                SessionManager.Account acc = user.getActiveAccount();
+                Account acc = user.getActiveAccount();
 
                 // Portfolio
                 if (acc != null) {

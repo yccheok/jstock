@@ -319,7 +319,7 @@ public class OrderManager {
         
         Double orderQty   = Double.parseDouble(params.get("orderQty").toString());
         
-        Commission rate   = DriveWealth.getUser().getCommission();
+        Commission rate   = SessionManager.getInstance().getUser().getCommission();
         Double commission = Commission.calcCommission(orderQty, rate);
 
         // get market price (use "Ask Price" for Buy)
@@ -351,7 +351,7 @@ public class OrderManager {
         }
 
         // get balance
-        AccountManager.AccountBlotter accBlotter = AccountManager.blotter(DriveWealth.getUser().getUserID(), accountID);
+        AccountManager.AccountBlotter accBlotter = AccountManager.blotter(SessionManager.getInstance().getUser().getUserID(), accountID);
         Double balance = accBlotter.getTradingBalance();
 
         // check for insufficient balance
@@ -397,7 +397,7 @@ public class OrderManager {
         }
         
         // get available trading Qty
-        AccountManager.AccountBlotter accBlotter = AccountManager.blotter(DriveWealth.getUser().getUserID(), accountID);
+        AccountManager.AccountBlotter accBlotter = AccountManager.blotter(SessionManager.getInstance().getUser().getUserID(), accountID);
         Double availQty = accBlotter.getAvailableTradingQty(instrumentID);
 
         System.out.println("availableForTradingQty: " + availQty + ", orderQty: " + orderQty);

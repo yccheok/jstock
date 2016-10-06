@@ -43,7 +43,7 @@ public class PositionsTableBuilder {
 
     
     public PositionsTableBuilder () {}
-    
+
     public ObservableList<PositionModel> getPosList () {
         return this.posList;
     }

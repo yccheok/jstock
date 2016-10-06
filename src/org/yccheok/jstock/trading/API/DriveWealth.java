@@ -24,6 +24,11 @@ import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.yccheok.jstock.engine.Pair;
 
+import static org.yccheok.jstock.trading.API.SessionManager.Session;
+import static org.yccheok.jstock.trading.API.SessionManager.User;
+import static org.yccheok.jstock.trading.API.SessionManager.Account;
+
+
 /**
  *
  * @author shuwnyuan
@@ -396,29 +401,7 @@ public final class DriveWealth {
      * API: Accounts
      ********************/
 
-    public static Pair<SessionManager.Session, Error> login (String userName, String password) {
-        Pair<SessionManager.Session, Error> createSession = SessionManager.create(userName, password);
-        
-        SessionManager.Session _session = createSession.first;
-
-        if (_session != null) {
-            session = _session;
-            user    = _session.getUser();
-            
-            if (! user.getPracticeAccounts().isEmpty()) {
-                user.setActiveAccount(user.getPracticeAccounts().get(0));
-            }
-            
-
-            // get all accounts
-            for (SessionManager.Account ac : user.getAccounts()) {
-                System.out.println(String.format("Ac ID %1$s, ac type: %2$s ......\n\n ",
-                        ac.getAccountID(), ac.getAccountType()));
-            }
-        }
-        
-        return createSession;
-    }
+    
     
     public static Map<String, Object> getAccount(String userID, String accountID) {
         System.out.println("\n[getAccount] " + accountID);
@@ -474,7 +457,7 @@ public final class DriveWealth {
         if userMap & practice accMap exist, POST with userID returns existing accountID
     */
 
-    public static SessionManager.Account createPracticeAccount(Map<String, Object> args) {
+    public static Account createPracticeAccount(Map<String, Object> args) {
         System.out.println("\n[create Practice Account]");
         String url = "signups/practice";
         
@@ -483,14 +466,14 @@ public final class DriveWealth {
             String userID = args.get("userID").toString();
             
             // existing userMap requires SignIn: to create SessionKey
-            if (DriveWealth.user == null || ! DriveWealth.user.getUserID().equals(userID)) {
+            if (SessionManager.getInstance().getSession() == null) {
                 System.out.println("Please Sign In, userID: " + userID);
                 return null;
             }
 
             // practice acc exists
-            List<SessionManager.Account> accs = DriveWealth.user.getPracticeAccounts();
-            SessionManager.Account acc = accs.get(0);
+            List<Account> accs = SessionManager.getInstance().getUser().getPracticeAccounts();
+            Account acc = accs.get(0);
             
             if (acc != null) {
                 System.out.println("Practice a/c exists: accountID: " + acc.getAccountID() + ", accountNo: " + acc.getAccountNo());
@@ -509,16 +492,13 @@ public final class DriveWealth {
             System.out.println("user already exist, created practice accountID: " + accountID);
 
             // Login to create sessionMap
-            String userName = DriveWealth.user.getUserName();
-            String password = DriveWealth.user.getPassword();
-
-            Pair<SessionManager.Session, Error> login = login(userName, password);
+            Pair<Session, Error> login = SessionManager.getInstance().relogin();
 
             if (login.second != null) {
                 return null;
             }
 
-            return DriveWealth.user.getPracticeAccounts().get(0);
+            return SessionManager.getInstance().getUser().getPracticeAccounts().get(0);
         }
 
         // create new userMap + practice a/c
@@ -538,7 +518,7 @@ public final class DriveWealth {
         Map<String, Object> result = gson.fromJson(respond, HashMap.class);
         int statusCode = (int) respondMap.get("code");
 
-        SessionManager.Account acc = null;
+        Account acc = null;
         
         // status code: 400 => duplicate username, 200 => OK
         if (statusCode == 200) {
@@ -548,13 +528,13 @@ public final class DriveWealth {
             String password = result.get("password").toString();
             
             // Create sessionMap for new User
-            Pair<SessionManager.Session, Error> login = login(userName, password);
+            Pair<Session, Error> login = SessionManager.getInstance().login(userName, password);
             // error
             if (login.second != null) {
                 return null;
             }
 
-            acc = DriveWealth.user.getPracticeAccounts().get(0);
+            acc = SessionManager.getInstance().getUser().getPracticeAccounts().get(0);
         } else {
             Error error = getError(result);
             Double code = error.getCode();
@@ -887,7 +867,9 @@ public final class DriveWealth {
     public static Map<String, Object> getSetting (String key) {
         System.out.println("\n[Get Setting]");
 
-        Map<String, Object> respondMap = Http.get("users/" + DriveWealth.user.getUserID() + "/settings/" + key, getSessionKey());
+        String url = "users/" + SessionManager.getInstance().getUser().getUserID() + "/settings/" + key;
+        
+        Map<String, Object> respondMap = Http.get(url, getSessionKey());
         Map<String, Object> result = gson.fromJson(respondMap.get("respond").toString(), HashMap.class);
         Map<String, Object> setting = new HashMap<>();
 
@@ -904,7 +886,9 @@ public final class DriveWealth {
     public static List<Map<String, Object>> listAllSettings () {
         System.out.println("\n[List all Settings]");
 
-        Map<String, Object> respondMap = Http.get("users/" + DriveWealth.user.getUserID() + "/settings", getSessionKey());
+        String url = "users/" + SessionManager.getInstance().getUser().getUserID() + "/settings";
+        
+        Map<String, Object> respondMap = Http.get(url, getSessionKey());
         List<Map<String, Object>> result = gson.fromJson(respondMap.get("respond").toString(), ArrayList.class);
         List<Map<String, Object>> settings = new ArrayList<>();
         
@@ -925,12 +909,15 @@ public final class DriveWealth {
     public static Map<String, Object> createSetting (Map<String, String> args) {
         System.out.println("\n[Create Setting]");
 
+        String userID = SessionManager.getInstance().getUser().getUserID();
+        String url = "users/" + userID + "/settings";
+        
         Map<String, Object> params = new HashMap<>();
-        params.put("userID", DriveWealth.user.getUserID());
+        params.put("userID", userID);
         params.put("key", args.get("key"));
         params.put("value", args.get("value"));
         
-        Map<String, Object> respondMap = Http.post("users/" + DriveWealth.user.getUserID() + "/settings", params, getSessionKey());
+        Map<String, Object> respondMap = Http.post(url, params, getSessionKey());
         String respond = respondMap.get("respond").toString();
         Map<String, Object> result = gson.fromJson(respond, HashMap.class);
 
@@ -949,7 +936,8 @@ public final class DriveWealth {
     public static boolean deleteSetting (String key) {
         System.out.println("\n[Delete Setting]");
 
-        Map<String, Object> result = Http.delete("users/" + DriveWealth.user.getUserID() + "/settings/" + key, getSessionKey());
+        String url = "users/" + SessionManager.getInstance().getUser().getUserID() + "/settings/";
+        Map<String, Object> result = Http.delete(url + key, getSessionKey());
         int statusCode = (int) result.get("code");
 
         return statusCode == 200;
@@ -1311,10 +1299,7 @@ public final class DriveWealth {
      ************************/
     
     public static String getSessionKey() {
-        if (session == null) {
-            return null;
-        }
-        return session.getSessionKey();
+        return SessionManager.getInstance().getSessionKey();
     }
     
     /************************
@@ -1346,22 +1331,6 @@ public final class DriveWealth {
         return null;
     }
     
-    public static SessionManager.User getUser () {
-        return user;
-    }
-    
-    public static void setUser (SessionManager.User _user) {
-        user = _user;
-    }
-    
-    public static SessionManager.Session getSession () {
-        return session;
-    }
-    
-    public static void setSession (SessionManager.Session _session) {
-        session = _session;
-    }
-    
     /*****************
      * Variables
      *****************/
@@ -1369,7 +1338,4 @@ public final class DriveWealth {
     private static final Gson gson = new Gson();
     public static String hostURL = "https://api.drivewealth.io/v1/";
     public static String reportURL = "http://reports.drivewealth.io/";
-
-    private static SessionManager.User user = null;
-    private static SessionManager.Session session = null;
 }

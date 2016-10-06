@@ -288,7 +288,7 @@ public class CreateOrderDlg {
             }
 
             // calc commission
-            Commission rate = DriveWealth.getUser().getCommission();
+            Commission rate = SessionManager.getInstance().getUser().getCommission();
             Double commission = Commission.calcCommission(qty, rate);
 
             Double total;
@@ -453,7 +453,7 @@ public class CreateOrderDlg {
     
     public void initDlgAndWait () {
         // temporary cancel / suspend Portfolio Scheduled Service
-        Portfolio.getInstance().cancelPortfolioService();
+        Portfolio.getInstance().cancelPortfolioServ();
 
         initDlgUI();
         qtyPriceValidator();
@@ -475,7 +475,7 @@ public class CreateOrderDlg {
         if (buttonType == reviewButtonType) {
             System.out.println("AFTER Review Order Button Pressed ......");
         } else {
-            Portfolio.getInstance().restartPortfolioService();
+            Portfolio.getInstance().restartPortfolioServ();
             System.out.println("AFTER CANCEL Button Pressed ......");
         }
 
@@ -968,7 +968,7 @@ public class CreateOrderDlg {
             submitDlg.show();
 
             // CREATE ORDER params
-            SessionManager.User user   = DriveWealth.getUser();
+            SessionManager.User user   = SessionManager.getInstance().getUser();
             SessionManager.Account acc = user.getActiveAccount();
 
             String userID    = user.getUserID();
@@ -1083,7 +1083,7 @@ public class CreateOrderDlg {
                     submitDlg.close();
 
                     // refresh Portfolio
-                    Portfolio.getInstance().restartPortfolioService();
+                    Portfolio.getInstance().restartPortfolioServ();
                 }
             });
         });

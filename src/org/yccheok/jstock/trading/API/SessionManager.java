@@ -23,6 +23,12 @@ public class SessionManager {
     // avoid being instantiated as object instance
     private SessionManager () {}
 
+    private static final SessionManager INSTANCE = new SessionManager();
+
+    public static SessionManager getInstance () {
+        return INSTANCE;
+    }
+
     public static class Session {
         private final String sessionKey;
         private final User user;
@@ -86,19 +92,15 @@ public class SessionManager {
     }
     
     public static class User {
-        private final String username;
-        private final String password;
         private final String userID;
-        private Commission commission;
         private final List<Account> accounts = new ArrayList<>();
         private Account activeAccount = null;
+        private Commission commission = null;
 
         
         public User (Map<String, Object> params) {
-            this.username       = params.get("username").toString();
-            this.password       = params.get("password").toString();
-            this.userID         = params.get("userID").toString(); 
-            
+            this.userID = params.get("userID").toString(); 
+
             // populate user accounts
             List<Map<String, Object>> accs = (ArrayList) params.get("accounts");
             for (Map<String, Object> accMap : accs) {
@@ -115,14 +117,6 @@ public class SessionManager {
                             (Double) comm.get("excessRate"), (Double) comm.get("fractionalRate"));
                 }
             }
-        }
-
-        public String getUserName () {
-            return this.username;
-        }
-
-        public String getPassword () {
-            return this.password;
         }
 
         public String getUserID () {
@@ -187,11 +181,11 @@ public class SessionManager {
     }
 
     public static class Account {
-        
         public Account (Map<String, Object> acc) {
             this.accountID      = acc.get("accountID").toString();
             this.accountNo      = acc.get("accountNo").toString();
             this.userID         = acc.get("userID").toString();
+            this.nickname       = acc.get("nickname").toString();
             this.cash           = (Double) acc.get("cash");
 
             Double type = (Double) acc.get("accountType");
@@ -220,6 +214,10 @@ public class SessionManager {
             return this.userID;
         }
 
+        public String getNickname () {
+            return this.nickname;
+        }
+        
         public AccountType getAccountType () {
             return this.accountType;
         }
@@ -231,12 +229,38 @@ public class SessionManager {
         private final String accountID;
         private final String accountNo;
         private final String userID;
+        private final String nickname;
         private final AccountType accountType;
         private final Double cash;
     }
-    
-    
-    public static Pair<Session, DriveWealth.Error> create (String userName, String password) {
+
+
+    public Pair<Session, DriveWealth.Error> login (String userName, String password) {
+        Pair<Session, DriveWealth.Error> createSession = create(userName, password);
+
+        if (this.session != null && this.user != null) {
+            // default to live a/c if available
+            Account active = null;
+            if (! user.getLiveAccounts().isEmpty()) {
+                active = user.getLiveAccounts().get(0);
+            } else if (! user.getPracticeAccounts().isEmpty()) {
+                active = user.getPracticeAccounts().get(0);
+            }
+
+            if (active != null) user.setActiveAccount(active);
+        }
+        
+        return createSession;
+    }
+
+    public Pair<Session, DriveWealth.Error> relogin () {
+        return login(this.userName, this.password);
+    }
+
+    private Pair<Session, DriveWealth.Error> create (String userName, String password) {
+        this.userName = userName;
+        this.password = password;
+
         String url = "userSessions";
 
         List<String> INPUT_FIELDS = new ArrayList<>(Arrays.asList(
@@ -288,9 +312,8 @@ public class SessionManager {
         String respond = respondMap.get("respond").toString();
         Map<String, Object> result  = new Gson().fromJson(respond, HashMap.class);
 
-        Session session = null;
         DriveWealth.Error error = null;
-        
+
         if ((int) respondMap.get("code") == 200) {
             // debugging only
             for (String k: OUTPUT_FIELDS) {
@@ -300,15 +323,32 @@ public class SessionManager {
                 }
             }
 
-            result.put("username", userName);
-            result.put("password", password);
-            
-            session = new Session(result);
+            this.session = new Session(result);
+            this.user    = this.session.getUser();
         } else {
             error = DriveWealth.getError(result);
         }
 
-        return new Pair<>(session, error);
+        return new Pair<>(this.session, error);
     }
 
+    public User getUser () {
+        return this.user;
+    }
+    
+    public Session getSession () {
+        return this.session;
+    }
+    
+    public String getSessionKey () {
+        if (this.session == null) return null;
+        
+        return this.session.getSessionKey();
+    }
+
+    private User user = null;
+    private Session session = null;
+
+    private String userName;
+    private String password;
 }
