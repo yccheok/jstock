@@ -166,8 +166,8 @@ public class SessionManager {
     }
     
     public static enum AccountType {
-        PRACTICE(1, "PRACTICE"),
-        LIVE(2, "LIVE");
+        PRACTICE(1, "Practice"),
+        LIVE(2, "Live");
 
         private final Integer value;
         private final String name;
@@ -284,7 +284,7 @@ public class SessionManager {
 
         Session session = null;
         DriveWealth.Error error = null;
-
+        
         if ((int) respondMap.get("code") == 200) {
             // debugging only
             for (String k: OUTPUT_FIELDS) {

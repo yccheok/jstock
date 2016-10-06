@@ -14,7 +14,6 @@ import javafx.geometry.Insets;
 import static javafx.geometry.Orientation.VERTICAL;
 import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TableView;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
@@ -38,14 +37,14 @@ public class Portfolio {
     public static Portfolio getInstance () {
         return INSTANCE;
     }
-    
+
     public VBox show () {
         initUI();
         startPortfolioService();
 
         return this.vBox;
     }
-    
+
     private void initUI () {
         vBox.setSpacing(5);
         vBox.setPadding(new Insets(5, 10, 5, 10));  // Insets: top, right, bottom, left

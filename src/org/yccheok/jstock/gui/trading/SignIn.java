@@ -20,6 +20,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
@@ -158,7 +159,7 @@ public class SignIn {
                 String password = pwdField.getText();
 
                 if (userName.isEmpty() || password.isEmpty()) {
-                    String errorStr = "Please enter username and password";
+                    String errorStr = "Please enter username and password.";
                     errorText.setTextFill(Color.FIREBRICK);
                     errorText.setText(errorStr);
                     errorText.setVisible(true);
@@ -259,8 +260,10 @@ public class SignIn {
                     errorText.setTextFill(Color.FIREBRICK);
                     errorText.setVisible(true);
 
-                    // reenable "Sign In" button
+                    // Enable "Sign In" Btn
                     signInBtn.setDisable(false);
+                    // Hide progress Indicator
+                    progressIn.setVisible(false);
                     return;
                 }
 
@@ -272,9 +275,32 @@ public class SignIn {
 
                 // create Portfolio Tab
                 if (acc != null) {
+                    
+                    // switch accounts
+                    ChoiceBox<String> accChoice  = new ChoiceBox<>();
+                    
+                    boolean first = true;
+                    for (SessionManager.Account ac: user.getAccounts()) {
+                        String acNo = ac.getAccountNo();
+                        String type = ac.getAccountType().getName();
+                        String accStr = String.format("%1$s Account : %2$s", type, acNo);
+
+                        accChoice.getItems().add(accStr);
+                        
+                        if (first == true) {
+                            accChoice.setValue(accStr);
+                            first = false;
+                        }
+                    }
+                    VBox all = new VBox();
+                    
+                    all.getChildren().add(accChoice);
+                    
                     VBox portfolio = Portfolio.getInstance().show();
-                    stack.getChildren().remove(signInGrid);
-                    stack.getChildren().add(portfolio);
+                    all.getChildren().add(portfolio);
+
+                    signInGrid.setVisible(false);
+                    stack.getChildren().add(all);
                 }
             }
         });

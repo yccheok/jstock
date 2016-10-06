@@ -415,8 +415,6 @@ public final class DriveWealth {
                 System.out.println(String.format("Ac ID %1$s, ac type: %2$s ......\n\n ",
                         ac.getAccountID(), ac.getAccountType()));
             }
-            
-            
         }
         
         return createSession;
@@ -559,7 +557,7 @@ public final class DriveWealth {
             acc = DriveWealth.user.getPracticeAccounts().get(0);
         } else {
             Error error = getError(result);
-            Integer code = error.getCode();
+            Double code = error.getCode();
             String message = error.getMessage();
 
             System.out.println("ERROR createPracticeAccount, code: " + code + ", message: " + message);
@@ -1324,15 +1322,15 @@ public final class DriveWealth {
      ************************/
 
     public static class Error {
-        private final Integer code;
+        private final Double code;
         private final String message;
         
-        public Error (Integer code, String message) {
+        public Error (Double code, String message) {
             this.code = code;
             this.message = message;
         }
         
-        public Integer getCode () {
+        public Double getCode () {
             return this.code;
         }
         
@@ -1343,7 +1341,7 @@ public final class DriveWealth {
     
     public static Error getError (Map<String, Object> result) {
         if (result.containsKey("code") && result.containsKey("message")) {
-            return new Error((Integer) result.get("code"), result.get("message").toString());
+            return new Error(Double.parseDouble(result.get("code").toString()), result.get("message").toString());
         }
         return null;
     }
