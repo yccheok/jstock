@@ -118,7 +118,7 @@ public class SignIn {
         // progress indicator
         progressIn.setVisible(false);
         final VBox progressBox = new VBox();
-        progressBox.setSpacing(5);
+        progressBox.setPrefHeight(5);
         progressBox.getChildren().addAll(progressIn);
 
         signInGrid.add(progressBox, 0, 5);
