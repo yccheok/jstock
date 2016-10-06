@@ -202,6 +202,12 @@ public class SessionManager {
             }
         }
 
+        // override this for Switch a/c comboBox
+        @Override
+        public String toString() {
+            return String.format("%1$s Account : %2$s", this.accountType.getName(), this.accountNo);
+        }
+        
         public String getAccountID () {
             return this.accountID;
         }

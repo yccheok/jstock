@@ -6,7 +6,10 @@
 package org.yccheok.jstock.gui.trading;
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import static javafx.concurrent.Worker.State.FAILED;
@@ -21,6 +24,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
@@ -270,38 +274,45 @@ public class SignIn {
                 SessionManager.User user = session.getUser();
                 System.out.println("Successfully Sign In, userID: " + user.getUserID());
 
+                
+                
+                // switch accounts DropDown
+                ComboBox<SessionManager.Account> accCombo = new ComboBox<>();
+                ObservableList<SessionManager.Account> data = FXCollections.observableArrayList(user.getAccounts());
+                accCombo.setItems(data);
+
+                // switch acc listener
+                accCombo.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<SessionManager.Account>() {
+                    @Override
+                    public void changed(ObservableValue<? extends SessionManager.Account> arg0, SessionManager.Account oldVal, SessionManager.Account newVal) {
+                        if (newVal != null) {
+                            System.out.println("Acc changed: " + newVal.toString());
+                        }
+                    }
+                });
+                
+                HBox accHBox = new HBox();
+                accHBox.setAlignment(Pos.BASELINE_CENTER);
+                accHBox.setPadding(new Insets(5, 5, 5, 0));    // Top Right Bottom Left
+                accHBox.setSpacing(5);
+                accHBox.getChildren().addAll(new Label("Active Account: "), accCombo);
+
+                VBox DWVBox = new VBox();
+                DWVBox.getChildren().add(accHBox);
+
                 // Login will set practice acc as active account
                 SessionManager.Account acc = user.getActiveAccount();
 
-                // create Portfolio Tab
+                // Portfolio
                 if (acc != null) {
-                    
-                    // switch accounts
-                    ChoiceBox<String> accChoice  = new ChoiceBox<>();
-                    
-                    boolean first = true;
-                    for (SessionManager.Account ac: user.getAccounts()) {
-                        String acNo = ac.getAccountNo();
-                        String type = ac.getAccountType().getName();
-                        String accStr = String.format("%1$s Account : %2$s", type, acNo);
+                    accCombo.getSelectionModel().select(acc);
 
-                        accChoice.getItems().add(accStr);
-                        
-                        if (first == true) {
-                            accChoice.setValue(accStr);
-                            first = false;
-                        }
-                    }
-                    VBox all = new VBox();
-                    
-                    all.getChildren().add(accChoice);
-                    
                     VBox portfolio = Portfolio.getInstance().show();
-                    all.getChildren().add(portfolio);
-
-                    signInGrid.setVisible(false);
-                    stack.getChildren().add(all);
+                    DWVBox.getChildren().add(portfolio);
                 }
+
+                signInGrid.setVisible(false);
+                stack.getChildren().add(DWVBox);
             }
         });
 
