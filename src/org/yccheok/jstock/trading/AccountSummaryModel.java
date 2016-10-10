@@ -127,24 +127,7 @@ public class AccountSummaryModel {
     }
 
     // Css class: display profit in green, loss in red
-    public String equityValueCss () {
-        return "profit";
-    }
-    
     public String unrealizedPLCss () {
-        return cssClass(this.getTotalUnrealizedPL());
+        return (this.getTotalUnrealizedPL() >= 0) ? "profit" : "loss";
     }
-    
-    public String cashForTradeCss () {
-        return cssClass(this.getCashForTrade());
-    }
-    
-    public String accountTotalCss () {
-        return cssClass(this.getAccountTotal());
-    }
-    
-    private String cssClass (Double value) {
-        return (value >= 0) ? "profit" : "loss";
-    }
-    
 }

@@ -722,16 +722,7 @@ public final class DriveWealth {
         }
         return sessionMap;
     }
-    
-    public static boolean cancelSession(String sessionKey) {
-        System.out.println("\n[Cancel Session] sessionKey: " + sessionKey);
 
-        Map<String, Object> result = Http.delete("userSessions/" + sessionKey, getSessionKey());
-        int statusCode = (int) result.get("code");
-
-        return statusCode == 200;
-    }
-    
     /********************
      * API: Instruments
      ********************/

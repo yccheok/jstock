@@ -70,6 +70,11 @@ public class SignIn {
         licenceHandler();
     }
 
+    public void showLogin () {
+        if (portfolio != null) portfolio.setVisible(false);
+        signInGrid.setVisible(true);
+    }
+    
     private void initUI () {
         signInGrid.setAlignment(Pos.CENTER);
         signInGrid.setHgap(10);
@@ -250,8 +255,12 @@ public class SignIn {
         loginTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(WorkerStateEvent t) {
-                Pair<String, DriveWealth.Error> login = loginTask.getValue();
+                // Enable "Sign In" Btn
+                signInBtn.setDisable(false);
+                // Hide progress Indicator
+                progressIn.setVisible(false);
 
+                Pair<String, DriveWealth.Error> login = loginTask.getValue();
                 String sessionKey       = login.first;
                 DriveWealth.Error error = login.second;
 
@@ -259,18 +268,17 @@ public class SignIn {
                     errorText.setText("Sign In failed: " + error.getMessage());
                     errorText.setTextFill(Color.FIREBRICK);
                     errorText.setVisible(true);
-
-                    // Enable "Sign In" Btn
-                    signInBtn.setDisable(false);
-                    // Hide progress Indicator
-                    progressIn.setVisible(false);
                     return;
                 }
+
+                // clear fields, so that when user Logout & reLogin, username + pwd are not set
+                userField.clear();
+                pwdField.clear();
 
                 User user = SessionManager.getInstance().getUser();
                 System.out.println("Successfully Sign In, userID: " + user.getUserID());
 
-                VBox portfolio = Portfolio.getInstance().show();
+                portfolio = Portfolio.getInstance().show();
 
                 signInGrid.setVisible(false);
                 stack.getChildren().add(portfolio);
@@ -290,4 +298,5 @@ public class SignIn {
     
     private StackPane stack;
     private final GridPane signInGrid = new GridPane();
+    private VBox portfolio = null;
 }

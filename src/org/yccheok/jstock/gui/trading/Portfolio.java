@@ -16,7 +16,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableView;
 import javafx.scene.image.Image;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.yccheok.jstock.trading.API.InstrumentManager;
@@ -54,25 +53,28 @@ public class Portfolio {
         vBox.setPrefWidth(1000);
 
         // Account Summary
-        final HBox accHBox = this.accSummaryBuilder.build();
+        accSummaryBuilder = new AccountSummaryBuilder();
+        HBox accHBox = accSummaryBuilder.build();
         vBox.getChildren().add(accHBox);
 
         // Open Positions
-        final TableView posTable = this.posTableBuilder.build();
+        posTableBuilder = new PositionsTableBuilder();
+        TableView posTable = posTableBuilder.build();
         
         VBox vboxOpenPos = new VBox(5);
         vboxOpenPos.setPadding(new Insets(5, 5, 5, 5));  // Insets: top, right, bottom, left
 
-        final Label posLabel = new Label("Current Investments");
+        Label posLabel = new Label("Current Investments");
         vboxOpenPos.getChildren().addAll(posLabel, posTable);
 
         // Pending orders
-        final TableView ordTable = this.ordTableBuilder.build();
+        ordTableBuilder = new OrdersTableBuilder();
+        TableView ordTable = ordTableBuilder.build();
         
         VBox vboxOrder = new VBox(5);
         vboxOrder.setPadding(new Insets(5, 5, 5, 5));  // Insets: top, right, bottom, left
 
-        final Label ordLabel = new Label("Pending Orders");
+        Label ordLabel = new Label("Pending Orders");
         vboxOrder.getChildren().addAll(ordLabel, ordTable);
 
         // Up Down partition
@@ -173,14 +175,14 @@ public class Portfolio {
         return this.instruments;
     }
 
-    
+
     private Map<String, InstrumentManager.Instrument> instruments = new HashMap<>();
     private Map<String, Double> marketPrices;
     private PortfolioService portfolioServ = null;
 
-    private final PositionsTableBuilder posTableBuilder   = new PositionsTableBuilder();
-    private final OrdersTableBuilder ordTableBuilder      = new OrdersTableBuilder();
-    private final AccountSummaryBuilder accSummaryBuilder = new AccountSummaryBuilder();
+    private PositionsTableBuilder posTableBuilder;
+    private OrdersTableBuilder ordTableBuilder;
+    private AccountSummaryBuilder accSummaryBuilder;
 
     private VBox vBox;
     private final Map<String, Image> icons = new HashMap<>();

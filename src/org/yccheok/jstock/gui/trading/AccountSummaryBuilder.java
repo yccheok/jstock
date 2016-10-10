@@ -33,7 +33,6 @@ import javafx.util.Callback;
  * @author shuwnyuan
  */
 public class AccountSummaryBuilder {
-
     private final Label activeAccLbl = new Label();
     private final HBox headerBox = new HBox();
     private final Label shareAmount = new Label();
@@ -50,7 +49,7 @@ public class AccountSummaryBuilder {
     public HBox build () {
         // switch a/c DropDown
         ComboBox accCombo = getAccCombo();
-        
+
         Label dwLabel = new Label("DriveWealth");
         dwLabel.setId("dwLabel");
         //dwLabel.setAlignment(Pos.CENTER);
@@ -60,30 +59,35 @@ public class AccountSummaryBuilder {
         dwBox.setAlignment(Pos.CENTER);
 
         // A/c summary
-        shareAmount.getStyleClass().add("cash");
-        profitAmount.getStyleClass().add("cash");
-        cashAmount.getStyleClass().add("cash");
-        totalAmount.getStyleClass().addAll("cash", "bold");
+        shareAmount.getStyleClass().clear();
+        profitAmount.getStyleClass().clear();
+        cashAmount.getStyleClass().clear();
+        totalAmount.getStyleClass().clear();
+
+        shareAmount.getStyleClass().add("bigFont");
+        profitAmount.getStyleClass().add("bigFont");
+        cashAmount.getStyleClass().add("bigFont");
+        totalAmount.getStyleClass().addAll("bigFont", "bold");
 
         VBox cashBox = new VBox();
         cashBox.setAlignment(Pos.CENTER_LEFT);
         cashBox.setSpacing(5);
         Label cashLabel = new Label("CASH TO INVEST");
-        cashLabel.getStyleClass().add("headerTitle");
+        cashLabel.getStyleClass().addAll("smallFont", "grey");
         cashBox.getChildren().addAll(cashLabel, this.cashAmount);
         
         VBox shareBox = new VBox();
         shareBox.setAlignment(Pos.CENTER_LEFT);
         shareBox.setSpacing(5);
         Label shareLabel = new Label("INVESTMENTS");
-        shareLabel.getStyleClass().add("headerTitle");
+        shareLabel.getStyleClass().addAll("smallFont", "grey");
         shareBox.getChildren().addAll(shareLabel, this.shareAmount);
 
         VBox totalBox = new VBox();
         totalBox.setAlignment(Pos.CENTER_LEFT);
         totalBox.setSpacing(5);
         Label totalLabel = new Label("TOTAL");
-        totalLabel.getStyleClass().addAll("headerTitle", "bold");
+        totalLabel.getStyleClass().addAll("smallFont", "grey");
         totalBox.getChildren().addAll(totalLabel, this.totalAmount);
 
         VBox profitBox = new VBox();
@@ -121,6 +125,7 @@ public class AccountSummaryBuilder {
         // Header
         headerBox.setId("accHeader");
         headerBox.setPrefHeight(120);
+        headerBox.getChildren().clear();
         headerBox.getChildren().addAll(dwBox, summaryBox, userBox);
 
         return headerBox;
@@ -151,10 +156,10 @@ public class AccountSummaryBuilder {
                                     Account ac = (Account) item;
 
                                     Label acType = new Label(ac.getAccountType().getName() + " Account");
-                                    acType.getStyleClass().add("accType");
+                                    acType.getStyleClass().add("smallFont");
 
                                     Label acNo = new Label(ac.getAccountNo());
-                                    acNo.getStyleClass().add("accNo");
+                                    acNo.getStyleClass().add("bigFont");
 
                                     VBox accBox = new VBox();
                                     accBox.setSpacing(5);
@@ -204,9 +209,12 @@ public class AccountSummaryBuilder {
                     if (action.equals("Profile")) {
                         System.out.println("Profile ------ No profile yet");
                     } else if (action.equals("Logout")) {
-                        // Cancel session
-                        // show login page
-                        System.out.println("Signout ------ ");
+                        // Logout & show Login Page
+                        boolean success = SessionManager.cancelSession();
+
+                        // stop Portfolio service
+                        Portfolio.getInstance().cancelPortfolioServ();
+                        SignIn.getInstance().showLogin();
                     }
                 }
             }
@@ -223,7 +231,7 @@ public class AccountSummaryBuilder {
         Locale locale  = new Locale("en", "US");
 
         this.shareAmount.textProperty().bind(Bindings.format(locale, "$%,.2f", this.acc.equityProperty()));
-        
+
         this.profitAmount.textProperty().bind(Bindings.format(locale, "$%,.2f (%,.2f%%)",
                 this.acc.totalUnrealizedPLProperty(),
                 this.acc.totalUnrealizedPLPercentProperty()));
@@ -237,6 +245,15 @@ public class AccountSummaryBuilder {
     public void resetData () {
         // remove binding & css
         this.profitAmount.textProperty().unbind();
+        this.shareAmount.textProperty().unbind();
+        this.cashAmount.textProperty().unbind();
+        this.totalAmount.textProperty().unbind();
+
+        this.profitAmount.setText("");
+        this.shareAmount.setText("");
+        this.cashAmount.setText("");
+        this.totalAmount.setText("");
+        
         this.profitAmount.getStyleClass().clear();
     }
     

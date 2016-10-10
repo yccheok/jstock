@@ -357,6 +357,18 @@ public class SessionManager {
         return new Pair<>(session, error);
     }
 
+    public static boolean cancelSession () {
+        String sessionKey = SessionManager.getInstance().getSessionKey();
+
+        System.out.println("\n[Cancel Session] sessionKey: " + sessionKey);
+
+        Map<String, Object> result = Http.delete("userSessions/" + sessionKey, sessionKey);
+        int statusCode = (int) result.get("code");
+
+        return statusCode == 200;
+    }
+    
+    
     public static Map<String, Object> getUserAPI (String userID) {
         System.out.println("\n[getUser API]");
  
