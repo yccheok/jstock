@@ -18,8 +18,6 @@
 
 package org.yccheok.jstock.portfolio;
 
-import java.awt.Image;
-
 /**
  *
  * @author yccheok
@@ -27,9 +25,9 @@ import java.awt.Image;
 public class BrokingFirm {
     public BrokingFirm(String name) {
         this.name = name;
-        this.broker = new SimpleBroker(name, 0.0, 0.0, 0.0);
-        this.clearingFee = new SimpleClearingFee(name, 0.0, 0.0, 0.0);
-        this.stampDuty = new SimpleStampDuty(name, 0.0, 1.0, 0.0);
+        this.broker = new SimpleBroker(0.0, 0.0, 0.0);
+        this.clearingFee = new SimpleClearingFee(0.0, 0.0, 0.0);
+        this.stampDuty = new SimpleStampDuty(0.0, 1.0, 0.0);
     }
     
     public BrokingFirm(BrokingFirm brokingFirm) {
@@ -37,16 +35,6 @@ public class BrokingFirm {
         this.broker = new SimpleBroker((SimpleBroker)brokingFirm.broker);
         this.clearingFee = new SimpleClearingFee((SimpleClearingFee)brokingFirm.clearingFee);
         this.stampDuty = new SimpleStampDuty((SimpleStampDuty)brokingFirm.stampDuty);
-        this.logo = brokingFirm.logo;
-    }
-    
-    public void setLogo(Image logo) {
-        if(logo == null) {
-            this.logo = logo;
-            return;
-        }
-        
-        this.logo = org.yccheok.jstock.gui.Utils.getScaledImage(logo, MAX_IMAGE_SIZE, MAX_IMAGE_SIZE);
     }
     
     public void setName(String name) {
@@ -54,20 +42,12 @@ public class BrokingFirm {
     }
     
     private String name;
-    // We want the image data, to be serialized at seperate XML file.
-    private transient Image logo;
     private Broker broker;
     private ClearingFee clearingFee;
     private StampDuty stampDuty;
 
-    private static final int MAX_IMAGE_SIZE = 256;
-
     public String getName() {
         return name;
-    }
-
-    public Image getLogo() {
-        return logo;
     }
 
     public void setBrokerMaximumRate(double maximumRate) {

@@ -226,7 +226,8 @@ public class JStockOptions {
 
     private List<BrokingFirm> brokingFirms = new ArrayList<BrokingFirm>();
     private int selectedBrokingFirmIndex = -1;
-    private boolean isAutoBrokerFeeCalculationEnabled = false;
+    @Deprecated
+    private transient boolean isAutoBrokerFeeCalculationEnabled = false;
     
     private double expectedProfitPercentage = 10.0;
 
@@ -324,15 +325,7 @@ public class JStockOptions {
         
     private boolean isDynamicChartVisible = false;
     
-    private List<Country> recentCountries = new ArrayList<>();
-    
-    public boolean isAutoBrokerFeeCalculationEnabled() {
-        return this.isAutoBrokerFeeCalculationEnabled;
-    }
-    
-    public void setAutoBrokerFeeCalculationEnabled(boolean isAutoBrokerFeeCalculationEnabled) {
-        this.isAutoBrokerFeeCalculationEnabled = isAutoBrokerFeeCalculationEnabled;
-    }
+    private List<Country> recentCountries = new ArrayList<>();    
 
     // Will be used by LoadFromCloudDialog.
     public void insensitiveCopy(JStockOptions jStockOptions) {
@@ -370,7 +363,6 @@ public class JStockOptions {
 
         this.brokingFirms = jStockOptions.brokingFirms;
         this.selectedBrokingFirmIndex = jStockOptions.selectedBrokingFirmIndex;
-        this.isAutoBrokerFeeCalculationEnabled = jStockOptions.isAutoBrokerFeeCalculationEnabled;
 
         this.expectedProfitPercentage = jStockOptions.expectedProfitPercentage;
 
@@ -657,6 +649,10 @@ public class JStockOptions {
     
     public int getBrokingFirmSize() {        
         return brokingFirms.size();
+    }
+    
+    public List<BrokingFirm> getBrokingFirms() {
+        return java.util.Collections.unmodifiableList(brokingFirms);
     }
     
     public BrokingFirm getBrokingFirm(int index) {
