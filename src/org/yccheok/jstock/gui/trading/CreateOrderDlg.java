@@ -44,7 +44,6 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
 import javafx.util.Duration;
 import org.yccheok.jstock.engine.Pair;
-import org.yccheok.jstock.trading.API.DriveWealth;
 import org.yccheok.jstock.trading.API.MarketDataManager;
 import org.yccheok.jstock.trading.API.OrderManager;
 import org.yccheok.jstock.trading.API.OrderManager.OrdStatus;

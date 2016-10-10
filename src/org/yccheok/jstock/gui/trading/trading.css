@@ -101,3 +101,17 @@ and open the template in the editor.
     -fx-font-weight: bold;
 }
 
+.rounded {
+    -fx-background-radius: 30;
+}
+
+.accType {
+    -fx-underline: true;
+    -fx-font-size: 10px;
+    -fx-font-style: italic;
+}
+
+.accNo {
+    -fx-font-size: 14px; 
+}
+

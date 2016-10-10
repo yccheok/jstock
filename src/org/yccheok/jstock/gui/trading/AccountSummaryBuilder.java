@@ -14,11 +14,19 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Circle;
 import org.yccheok.jstock.trading.API.SessionManager;
+import org.yccheok.jstock.trading.API.SessionManager.User;
+import org.yccheok.jstock.trading.API.SessionManager.Account;
 import org.yccheok.jstock.trading.AccountSummaryModel;
 import org.yccheok.jstock.trading.PositionModel;
+import javafx.scene.paint.ImagePattern;
+import javafx.util.Callback;
 
 /**
  *
@@ -26,8 +34,8 @@ import org.yccheok.jstock.trading.PositionModel;
  */
 public class AccountSummaryBuilder {
 
+    private final Label activeAccLbl = new Label();
     private final HBox headerBox = new HBox();
-
     private final Label shareAmount = new Label();
     private final Label profitAmount = new Label();
     private final Label cashAmount = new Label();
@@ -41,32 +49,13 @@ public class AccountSummaryBuilder {
 
     public HBox build () {
         // switch a/c DropDown
-        SessionManager.User user = SessionManager.getInstance().getUser();
-
-        ComboBox<SessionManager.Account> accCombo = new ComboBox<>();
-        ObservableList<SessionManager.Account> data = FXCollections.observableArrayList(user.getAccounts());
-        accCombo.setItems(data);
-
-        SessionManager.Account acc = user.getActiveAccount();
-        if (acc != null) {
-            accCombo.getSelectionModel().select(acc);
-        }
-        
-        // a/c change listener
-        accCombo.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends SessionManager.Account> arg0, SessionManager.Account oldVal, SessionManager.Account newVal) -> {
-            if (newVal != null) {
-                System.out.println("Acc changed: " + newVal.toString());
-
-                user.setActiveAccount(newVal);
-                Portfolio.getInstance().initPortfolioServ();
-            }
-        });
+        ComboBox accCombo = getAccCombo();
         
         Label dwLabel = new Label("DriveWealth");
         dwLabel.setId("dwLabel");
         //dwLabel.setAlignment(Pos.CENTER);
         HBox dwBox = new HBox();
-        dwBox.setPrefWidth(350);
+        dwBox.setPrefWidth(450);
         dwBox.getChildren().add(dwLabel);
         dwBox.setAlignment(Pos.CENTER);
 
@@ -107,17 +96,126 @@ public class AccountSummaryBuilder {
         summaryBox.setId("accSummaryBox");
         summaryBox.setPadding(new Insets(15, 10, 10, 15));
         summaryBox.setSpacing(15);
-        //summaryBox.setPrefWidth(450);
         summaryBox.getChildren().addAll(cashBox, shareBox, totalBox, profitBox);
+
+        // Avator
+        User user = SessionManager.getInstance().getUser();
+        Circle circle = new Circle(30);
+        // can't load img in background, as ImagePattern requires img already loaded
+        Image img = new Image(user.getAvatarUrl(), false);
+        ImagePattern pattern = new ImagePattern(img);
+        circle.setFill(pattern);
+
+        HBox userBox = new HBox();
+        userBox.setAlignment(Pos.CENTER);
+        userBox.setSpacing(15);
+        userBox.setPadding(new Insets(10, 10, 10, 10));
+        
+        // Show Active acc, Acc DrowDown, Profile, Logout
+        VBox accBox = new VBox();
+        accBox.setSpacing(5);
+        activeAccLbl.setText(user.getActiveAccount().getNickname());
+        accBox.getChildren().addAll(activeAccLbl, accCombo);
+        userBox.getChildren().addAll(circle, accBox);
 
         // Header
         headerBox.setId("accHeader");
         headerBox.setPrefHeight(120);
-        headerBox.getChildren().addAll(dwBox, summaryBox, accCombo);
+        headerBox.getChildren().addAll(dwBox, summaryBox, userBox);
 
         return headerBox;
     }
 
+    public ComboBox getAccCombo () {
+        User user = SessionManager.getInstance().getUser();
+
+        ComboBox<Object> accCombo = new ComboBox<>();
+        ObservableList<Object> options = FXCollections.observableArrayList(user.getAccounts());
+        accCombo.setItems(options);
+
+        options.add("Profile");
+        options.add("Logout");
+
+        accCombo.setCellFactory(
+            new Callback<ListView<Object>, ListCell<Object>>() {
+                @Override
+                public ListCell<Object> call(ListView<Object> p) {
+                    ListCell cell = new ListCell<Object>() {
+                        @Override
+                        protected void updateItem(Object item, boolean empty) {
+                            super.updateItem(item, empty);
+                            if (empty) {
+                                setText("");
+                            } else {
+                                if (item instanceof Account) {
+                                    Account ac = (Account) item;
+
+                                    Label acType = new Label(ac.getAccountType().getName() + " Account");
+                                    acType.getStyleClass().add("accType");
+
+                                    Label acNo = new Label(ac.getAccountNo());
+                                    acNo.getStyleClass().add("accNo");
+
+                                    VBox accBox = new VBox();
+                                    accBox.setSpacing(5);
+                                    accBox.getChildren().addAll(acType, acNo);
+
+                                    setGraphic(accBox);
+                                } else {
+                                    VBox vBox = new VBox();
+                                    vBox.setPadding(new Insets(5, 0, 5, 0));  // top right bottom left
+                                    Label itemLabel = new Label((String) item);
+                                    vBox.getChildren().add(itemLabel);
+                                    setGraphic(vBox);
+                                }
+                            }
+                        }
+                    };
+                    return cell;
+                }
+            });
+        
+        
+        SessionManager.Account active = user.getActiveAccount();
+        if (active != null) {
+            accCombo.getSelectionModel().select(active);
+        }
+
+        // a/c change listener
+        accCombo.getSelectionModel().selectedItemProperty().addListener((ObservableValue<? extends Object> arg0, Object oldVal, Object newVal) -> {
+            if (newVal != null) {
+                //System.out.println("Acc changed: " + newVal.toString());
+
+                if (newVal instanceof Account) {
+                    System.out.println("Acc changed is ACCOUNT --------");
+                    
+                    user.setActiveAccount((Account) newVal);
+                    String accDisplay = SessionManager.getInstance().getUser().getActiveAccount().getNickname();
+                    activeAccLbl.setText(accDisplay);
+                    Portfolio.getInstance().initPortfolioServ();
+                    return;
+                }
+
+                if (newVal instanceof String) {
+                    System.out.println("Acc changed is STRING --------");
+                    
+                    String action = (String) newVal;
+                    
+                    if (action.equals("Profile")) {
+                        System.out.println("Profile ------ No profile yet");
+                    } else if (action.equals("Logout")) {
+                        // Cancel session
+                        // show login page
+                        System.out.println("Signout ------ ");
+                    }
+                }
+            }
+        });
+
+        return accCombo;
+    }
+    
+    
     public void initData (AccountSummaryModel accModel) {
         resetData();
 
