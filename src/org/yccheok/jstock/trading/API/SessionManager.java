@@ -19,6 +19,12 @@ import org.yccheok.jstock.engine.Pair;
  * @author shuwnyuan
  */
 public class SessionManager {
+    private User user = null;
+    private String sessionKey = null;
+
+    private String username;
+    private String password;
+    
 
     // avoid being instantiated as object instance
     private SessionManager () {}
@@ -29,23 +35,14 @@ public class SessionManager {
         return INSTANCE;
     }
 
-    public static class Session {
-        private final String sessionKey;
-        private final User user;
-
-        public Session (Map<String, Object> params) {
-            this.sessionKey = params.get("sessionKey").toString();
-            this.user = new User(params);
-        }
-        
-        public String getSessionKey () {
-            return this.sessionKey;
-        }
-        
-        public User getUser () {
-            return this.user;
-        }
+    public User getUser () {
+        return this.user;
     }
+    
+    public String getSessionKey () {
+        return this.sessionKey;
+    }
+
     
     public static class Commission {
         private final Double baseRate;
@@ -97,17 +94,19 @@ public class SessionManager {
         private Account activeAccount = null;
         private Commission commission = null;
 
+        private final String avatarUrl;
+        private final String emailAddress;
+        private final String displayName;
+        private final String firstName;
+        private final String lastName;
+
         
-        public User (Map<String, Object> params) {
-            this.userID = params.get("userID").toString(); 
+        public User (Map<String, Object> session, Map<String, Object> userParams) {
+            this.userID = session.get("userID").toString();
 
             // populate user accounts
-            List<Map<String, Object>> accs = (ArrayList) params.get("accounts");
+            List<Map<String, Object>> accs = (ArrayList) session.get("accounts");
             for (Map<String, Object> accMap : accs) {
-
-                System.out.println("Create session, class of accountType: "
-                        + accMap.get("accountType").getClass());
-
                 Account acc = new Account(accMap);
                 this.accounts.add(acc);
 
@@ -117,12 +116,38 @@ public class SessionManager {
                             (Double) comm.get("excessRate"), (Double) comm.get("fractionalRate"));
                 }
             }
+
+            this.avatarUrl    = userParams.get("avatarUrl").toString();
+            this.emailAddress = userParams.get("emailAddress").toString();
+            this.displayName  = userParams.get("displayName").toString();
+            this.firstName    = userParams.get("firstName").toString();
+            this.lastName     = userParams.get("lastName").toString();
         }
 
         public String getUserID () {
             return this.userID;
         }
 
+        public String getAvatarUrl () {
+            return this.avatarUrl;
+        }
+        
+        public String getEmailAddress () {
+            return this.emailAddress;
+        }
+        
+        public String getDisplayName () {
+            return this.displayName;
+        }
+        
+        public String getFirstName () {
+            return this.firstName;
+        }
+        
+        public String getLastName () {
+            return this.lastName;
+        }
+        
         public Commission getCommission () {
             return this.commission;
         }
@@ -235,32 +260,43 @@ public class SessionManager {
     }
 
 
-    public Pair<Session, DriveWealth.Error> login (String userName, String password) {
-        Pair<Session, DriveWealth.Error> createSession = create(userName, password);
-
-        if (this.session != null && this.user != null) {
-            // default to live a/c if available
-            Account active = null;
-            if (! user.getLiveAccounts().isEmpty()) {
-                active = user.getLiveAccounts().get(0);
-            } else if (! user.getPracticeAccounts().isEmpty()) {
-                active = user.getPracticeAccounts().get(0);
-            }
-
-            if (active != null) user.setActiveAccount(active);
-        }
-        
-        return createSession;
-    }
-
-    public Pair<Session, DriveWealth.Error> relogin () {
-        return login(this.userName, this.password);
-    }
-
-    private Pair<Session, DriveWealth.Error> create (String userName, String password) {
-        this.userName = userName;
+    public Pair<String, DriveWealth.Error> login (String username, String password) {
+        this.username = username;
         this.password = password;
 
+        Pair< Map<String, Object>, DriveWealth.Error> result = create(username, password);
+        Map<String, Object> session = result.first;
+        DriveWealth.Error error = result.second;
+
+        // create session failed
+        if (error != null) {
+            this.sessionKey = null;
+            return new Pair<>(null, error);
+        }
+        
+        this.sessionKey = session.get("sessionKey").toString();
+        
+        // call Get User API: get AvatarURL, first + last name, email, etc
+        Map<String, Object> userParams = getUserAPI(session.get("userID").toString());
+        this.user = new User(session, userParams);
+
+        // set active a/c: default to live a/c
+        Account active = null;
+        if (! user.getLiveAccounts().isEmpty()) {
+            active = user.getLiveAccounts().get(0);
+        } else if (! user.getPracticeAccounts().isEmpty()) {
+            active = user.getPracticeAccounts().get(0);
+        }
+        if (active != null) user.setActiveAccount(active);
+
+        return new Pair<>(this.sessionKey, null);
+    }
+
+    public Pair<String, DriveWealth.Error> relogin () {
+        return login(this.username, this.password);
+    }
+
+    public static Pair< Map<String, Object>, DriveWealth.Error> create (String userName, String password) {
         String url = "userSessions";
 
         List<String> INPUT_FIELDS = new ArrayList<>(Arrays.asList(
@@ -300,55 +336,89 @@ public class SessionManager {
         params.put("scrRes",        "1920x1080");
         params.put("ipAddress",     "1.1.1.1");
         
-        // debug only
+        /*
         for (String k: INPUT_FIELDS) {
             if (params.containsKey(k)) {
                 String v = params.get(k).toString();
-                //System.out.println("key: " + k + ", value: " + v);
+                System.out.println("key: " + k + ", value: " + v);
             }
         }
+        */
 
         Map<String, Object> respondMap = Http.post(url, params, null);
         String respond = respondMap.get("respond").toString();
-        Map<String, Object> result  = new Gson().fromJson(respond, HashMap.class);
+        Map<String, Object> session  = new Gson().fromJson(respond, HashMap.class);
 
         DriveWealth.Error error = null;
-
-        if ((int) respondMap.get("code") == 200) {
-            // debugging only
-            for (String k: OUTPUT_FIELDS) {
-                if (result.containsKey(k)) {
-                    Object v = result.get(k);
-                    System.out.println("key: " + k + ", value: " + v);
-                }
-            }
-
-            this.session = new Session(result);
-            this.user    = this.session.getUser();
-        } else {
-            error = DriveWealth.getError(result);
+        if ((int) respondMap.get("code") != 200) {
+            error = DriveWealth.getError(session);
         }
 
-        return new Pair<>(this.session, error);
+        return new Pair<>(session, error);
     }
 
-    public User getUser () {
-        return this.user;
+    public static Map<String, Object> getUserAPI (String userID) {
+        System.out.println("\n[getUser API]");
+ 
+        List<String> OUTPUT_FIELDS = new ArrayList<>(Arrays.asList(
+            "commissionRate",
+            "emailAddress1",
+            "languageID",
+            "referralCode",
+            "sessionKey",
+            "username",
+            "wlpID",
+            "status",
+            "lastLoginWhen",
+            "ackSignedWhen",
+            "addressLine1",
+            "avatarUrl",
+            "city",
+            "coinBalance",
+            "countryID",
+            "displayName",
+            "firstName",
+            "lastName",
+            "gender",
+            "phoneHome",
+            "stateProvince",
+            "userID",
+            "zipPostalCode",
+            "usCitizen",
+            "updatedWhen",
+            "rebateCfdValue",
+            "rebateEquityValue",
+            "rebateFxValue",
+            "brandAmbassador",
+            "employerBusiness",
+            "employmentStatus",
+            "statementPrint",
+            "confirmPrint",
+            "citizenship",
+            "createdWhen",
+            "addressProofReviewWhen",
+            "approvedWhen",
+            "approvedBy",
+            "kycWhen",
+            "pictureReviewBy",
+            "pictureReviewWhen",
+            "annualIncome",
+            "userAttributes"
+        ));     
+
+        Map<String, Object> respondMap = Http.get("users/" + userID, SessionManager.getInstance().getSessionKey());
+        Map<String, Object> result  = new Gson().fromJson(respondMap.get("respond").toString(), HashMap.class);
+
+        /*
+        for (String k: OUTPUT_FIELDS) {
+            if (result.containsKey(k)) {
+                Object v = result.get(k);
+                //System.out.println("key: " + k + ", value: " + v);
+            }
+        }
+        */
+
+        return result;
     }
     
-    public Session getSession () {
-        return this.session;
-    }
-    
-    public String getSessionKey () {
-        if (this.session == null) return null;
-        
-        return this.session.getSessionKey();
-    }
-
-    private User user = null;
-    private Session session = null;
-
-    private String userName;
-    private String password;
 }

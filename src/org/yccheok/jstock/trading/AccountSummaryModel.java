@@ -24,7 +24,7 @@ public class AccountSummaryModel {
     private final SimpleDoubleProperty totalUnrealizedPL;
     private final SimpleDoubleProperty totalUnrealizedPLPercent;
 
-    
+
     public AccountSummaryModel (Map<String, Object> acc) {
         this.equity             = new SimpleDoubleProperty((Double) acc.get("equity"));
         this.cashBalance        = new SimpleDoubleProperty((Double) acc.get("cashBalance"));
@@ -144,7 +144,7 @@ public class AccountSummaryModel {
     }
     
     private String cssClass (Double value) {
-        return (value > 0) ? "profit" : "loss";
+        return (value >= 0) ? "profit" : "loss";
     }
     
 }

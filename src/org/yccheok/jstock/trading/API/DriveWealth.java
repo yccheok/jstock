@@ -24,8 +24,6 @@ import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.yccheok.jstock.engine.Pair;
 
-import static org.yccheok.jstock.trading.API.SessionManager.Session;
-import static org.yccheok.jstock.trading.API.SessionManager.User;
 import static org.yccheok.jstock.trading.API.SessionManager.Account;
 
 
@@ -83,52 +81,6 @@ public final class DriveWealth {
         "utm_term"
     ));     
 
-    static final List<String> getUserFields = new ArrayList<>(Arrays.asList(
-        "commissionRate",
-        "emailAddress1",
-        "languageID",
-        "referralCode",
-        "sessionKey",
-        "username",
-        "wlpID",
-        "status",
-        "lastLoginWhen",
-        "ackSignedWhen",
-        "addressLine1",
-        "avatarUrl",
-        "city",
-        "coinBalance",
-        "countryID",
-        "displayName",
-        "firstName",
-        "lastName",
-        "gender",
-        "phoneHome",
-        "stateProvince",
-        "userID",
-        "zipPostalCode",
-        "usCitizen",
-        "updatedWhen",
-        "rebateCfdValue",
-        "rebateEquityValue",
-        "rebateFxValue",
-        "brandAmbassador",
-        "employerBusiness",
-        "employmentStatus",
-        "statementPrint",
-        "confirmPrint",
-        "citizenship",
-        "createdWhen",
-        "addressProofReviewWhen",
-        "approvedWhen",
-        "approvedBy",
-        "kycWhen",
-        "pictureReviewBy",
-        "pictureReviewWhen",
-        "annualIncome",
-        "userAttributes"
-    ));     
-    
     static final List<String> liveAccountFields = new ArrayList<>(Arrays.asList(
         "ownershipType",
         "userID",
@@ -466,7 +418,7 @@ public final class DriveWealth {
             String userID = args.get("userID").toString();
             
             // existing userMap requires SignIn: to create SessionKey
-            if (SessionManager.getInstance().getSession() == null) {
+            if (SessionManager.getInstance().getSessionKey() == null) {
                 System.out.println("Please Sign In, userID: " + userID);
                 return null;
             }
@@ -492,7 +444,7 @@ public final class DriveWealth {
             System.out.println("user already exist, created practice accountID: " + accountID);
 
             // Login to create sessionMap
-            Pair<Session, Error> login = SessionManager.getInstance().relogin();
+            Pair<String, Error> login = SessionManager.getInstance().relogin();
 
             if (login.second != null) {
                 return null;
@@ -528,7 +480,7 @@ public final class DriveWealth {
             String password = result.get("password").toString();
             
             // Create sessionMap for new User
-            Pair<Session, Error> login = SessionManager.getInstance().login(userName, password);
+            Pair<String, Error> login = SessionManager.getInstance().login(userName, password);
             // error
             if (login.second != null) {
                 return null;
@@ -629,25 +581,6 @@ public final class DriveWealth {
             userMap.put("username", result.get("username").toString());
         } else if (code == 400) {
             System.out.println("create user, error: " + result.get("message").toString());
-        }
-        return userMap;
-    }
-    
-    // NOTE:
-    // temporary rename to "getUserAPI" as method name clash with "getUser" which return API.User Object
-    public static Map<String, Object> getUserAPI(String userID) {
-        System.out.println("\n[getUser]");
-        
-        Map<String, Object> respondMap = Http.get("users/" + userID, getSessionKey());
-        Map<String, Object> result  = gson.fromJson(respondMap.get("respond").toString(), HashMap.class);
-
-        Map<String, Object> userMap = new HashMap<>();
-        for (String k: getUserFields) {
-            if (result.containsKey(k)) {
-                Object v = result.get(k);
-                userMap.put(k, v);
-                //System.out.println("key: " + k + ", value: " + v);
-            }
         }
         return userMap;
     }

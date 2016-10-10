@@ -6,10 +6,7 @@
 package org.yccheok.jstock.gui.trading;
 
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import static javafx.concurrent.Worker.State.FAILED;
@@ -23,7 +20,6 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
@@ -48,9 +44,7 @@ import javafx.scene.web.WebView;
 import org.yccheok.jstock.trading.API.DriveWealth;
 import org.yccheok.jstock.trading.API.SessionManager;
 import org.yccheok.jstock.engine.Pair;
-import static org.yccheok.jstock.trading.API.SessionManager.Session;
 import static org.yccheok.jstock.trading.API.SessionManager.User;
-import static org.yccheok.jstock.trading.API.SessionManager.Account;
 
 /**
  *
@@ -246,9 +240,9 @@ public class SignIn {
     
     private Task createLoginTask (String userName, String password) {
         
-        Task< Pair<Session, DriveWealth.Error> > loginTask = new Task< Pair<Session, DriveWealth.Error> >() {
-            @Override protected Pair<Session, DriveWealth.Error> call() throws Exception {
-                Pair<Session, DriveWealth.Error> login = SessionManager.getInstance().login(userName, password);
+        Task< Pair<String, DriveWealth.Error> > loginTask = new Task< Pair<String, DriveWealth.Error> >() {
+            @Override protected Pair<String, DriveWealth.Error> call() throws Exception {
+                Pair<String, DriveWealth.Error> login = SessionManager.getInstance().login(userName, password);
                 return login;
             }
         };
@@ -256,9 +250,9 @@ public class SignIn {
         loginTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
             public void handle(WorkerStateEvent t) {
-                Pair<Session, DriveWealth.Error> login = loginTask.getValue();
+                Pair<String, DriveWealth.Error> login = loginTask.getValue();
 
-                Session session         = login.first;
+                String sessionKey       = login.first;
                 DriveWealth.Error error = login.second;
 
                 if (error != null) {
@@ -273,7 +267,7 @@ public class SignIn {
                     return;
                 }
 
-                User user = session.getUser();
+                User user = SessionManager.getInstance().getUser();
                 System.out.println("Successfully Sign In, userID: " + user.getUserID());
 
                 VBox tradingView = Trading.getInstance().show();
