@@ -17,6 +17,7 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableView;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.yccheok.jstock.trading.API.InstrumentManager;
 import org.yccheok.jstock.trading.API.SessionManager;
@@ -53,8 +54,8 @@ public class Portfolio {
         vBox.setPrefWidth(1000);
 
         // Account Summary
-        final BorderPane accBorderPane = this.accSummaryBuilder.build();
-        vBox.getChildren().add(accBorderPane);
+        final HBox accHBox = this.accSummaryBuilder.build();
+        vBox.getChildren().add(accHBox);
 
         // Open Positions
         final TableView posTable = this.posTableBuilder.build();

@@ -270,10 +270,10 @@ public class SignIn {
                 User user = SessionManager.getInstance().getUser();
                 System.out.println("Successfully Sign In, userID: " + user.getUserID());
 
-                VBox tradingView = Trading.getInstance().show();
+                VBox portfolio = Portfolio.getInstance().show();
 
                 signInGrid.setVisible(false);
-                stack.getChildren().add(tradingView);
+                stack.getChildren().add(portfolio);
             }
         });
 

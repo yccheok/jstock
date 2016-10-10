@@ -38,11 +38,15 @@ and open the template in the editor.
 }
 
 .profit {
-    -fx-text-fill: green;
+    -fx-text-fill: white;
+    -fx-background-color: #37BB9A;
+    -fx-background-radius: 5;
 }
 
 .loss {
-    -fx-text-fill: red;
+    -fx-text-fill: white;
+    -fx-background-color: red;
+    -fx-background-radius: 5;
 }
 
 .table-view .column-header{
@@ -67,5 +71,33 @@ and open the template in the editor.
 .bold-italic {
     -fx-font-weight: bold;
     -fx-font-style: italic;
+}
+
+#accHeader {
+    -fx-background-color: #FEC109;
+}
+
+#dwLabel {
+    -fx-background-color: transparent;
+    -fx-font-size: 35px;
+    -fx-text-fill: white;
+}
+
+#accSummaryBox {
+    -fx-background-color: white;
+}
+
+.headerTitle {
+    -fx-underline: true;
+    -fx-font-size: 10px;
+    -fx-text-fill: grey;
+}
+
+.cash {
+    -fx-font-size: 14px;
+}
+
+.bold {
+    -fx-font-weight: bold;
 }
 
