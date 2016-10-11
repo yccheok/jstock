@@ -516,8 +516,8 @@ public class CreateOrderDlg {
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
-        grid.setPadding(new Insets(20, 150, 10, 10));
-        
+        grid.setPadding(new Insets(30, 30, 30, 30));       // top right bottom left
+
         ColumnConstraints col1 = new ColumnConstraints(150);
         ColumnConstraints col2 = new ColumnConstraints(200);
         grid.getColumnConstraints().add(col1);
