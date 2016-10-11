@@ -15,7 +15,6 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -31,8 +30,6 @@ import org.yccheok.jstock.trading.AccountSummaryModel;
 import org.yccheok.jstock.trading.PositionModel;
 import javafx.scene.paint.ImagePattern;
 import javafx.util.Callback;
-import org.yccheok.jstock.engine.Pair;
-import org.yccheok.jstock.trading.API.OrderManager;
 
 /**
  *
