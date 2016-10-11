@@ -12,11 +12,14 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import static javafx.geometry.Orientation.VERTICAL;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableView;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import org.yccheok.jstock.trading.API.InstrumentManager;
 import org.yccheok.jstock.trading.API.SessionManager;
@@ -39,14 +42,25 @@ public class Portfolio {
         return INSTANCE;
     }
 
-    public VBox show () {
+    public void showLogout () {
+        // progress Indicator
+        ProgressIndicator progIn = new ProgressIndicator();
+        VBox progBox = new VBox(progIn);
+        progBox.setAlignment(Pos.CENTER);
+        
+        stackPane.getChildren().add(progBox);
+        vBox.setDisable(true);
+    }
+    
+    public StackPane show () {
         initUI();
         initPortfolioServ();
 
-        return this.vBox;
+        return this.stackPane;
     }
 
     private void initUI () {
+        stackPane = new StackPane();
         vBox = new VBox();
         vBox.setSpacing(5);
         vBox.setPadding(new Insets(5, 10, 5, 10));  // Insets: top, right, bottom, left
@@ -84,6 +98,8 @@ public class Portfolio {
         splitPane.getItems().addAll(vboxOpenPos, vboxOrder);
         splitPane.setPrefHeight(500);
         vBox.getChildren().add(splitPane);
+        
+        this.stackPane.getChildren().add(vBox);
         
         vboxOpenPos.prefWidthProperty().bind(splitPane.widthProperty());
         vboxOrder.prefWidthProperty().bind(splitPane.widthProperty());
@@ -184,6 +200,7 @@ public class Portfolio {
     private OrdersTableBuilder ordTableBuilder;
     private AccountSummaryBuilder accSummaryBuilder;
 
+    private StackPane stackPane;
     private VBox vBox;
     private final Map<String, Image> icons = new HashMap<>();
     

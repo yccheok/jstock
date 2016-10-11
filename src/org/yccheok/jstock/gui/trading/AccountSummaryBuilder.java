@@ -10,8 +10,12 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -27,6 +31,8 @@ import org.yccheok.jstock.trading.AccountSummaryModel;
 import org.yccheok.jstock.trading.PositionModel;
 import javafx.scene.paint.ImagePattern;
 import javafx.util.Callback;
+import org.yccheok.jstock.engine.Pair;
+import org.yccheok.jstock.trading.API.OrderManager;
 
 /**
  *
@@ -210,11 +216,28 @@ public class AccountSummaryBuilder {
                         System.out.println("Profile ------ No profile yet");
                     } else if (action.equals("Logout")) {
                         // Logout & show Login Page
-                        boolean success = SessionManager.cancelSession();
+                        Portfolio.getInstance().showLogout();
+                        
+                        Task task = new Task<Boolean>() {
+                            @Override
+                            protected Boolean call() throws Exception {
+                                return SessionManager.cancelSession();
+                            }
+                        };
 
-                        // stop Portfolio service
-                        Portfolio.getInstance().cancelPortfolioServ();
-                        SignIn.getInstance().showLogin();
+                        Thread thread = new Thread(task);
+                        thread.start();
+
+                        task.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+                            @Override
+                            public void handle(final WorkerStateEvent workerStateEvent) {
+                                Boolean result = (Boolean) workerStateEvent.getSource().getValue();
+
+                                Portfolio.getInstance().cancelPortfolioServ();
+                                SignIn.getInstance().showLogin();
+                            }
+                        });
+                        
                     }
                 }
             }

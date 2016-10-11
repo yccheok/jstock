@@ -298,5 +298,5 @@ public class SignIn {
     
     private StackPane stack;
     private final GridPane signInGrid = new GridPane();
-    private VBox portfolio = null;
+    private StackPane portfolio = null;
 }
