@@ -58,6 +58,7 @@ import org.yccheok.jstock.engine.Factories;
 import org.yccheok.jstock.engine.SimpleDate;
 import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.engine.StockServerFactory;
+import org.yccheok.jstock.gui.Constants;
 import org.yccheok.jstock.gui.JTableUtilities;
 import org.yccheok.jstock.gui.JStock;
 import org.yccheok.jstock.gui.PortfolioManagementJPanel;
@@ -254,6 +255,10 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
         JTableUtilities.setDateEditorAndRendererForRow(jTable1, 0);
         jTable1.setAutoCreateRowSorter(true);
         jTable1.addMouseListener(new TableRowPopupListener());
+
+        if (JStock.instance().getJStockOptions().useLargeFont()) {
+            this.jTable1.setRowHeight((int)(this.jTable1.getRowHeight() * Constants.FONT_ENLARGE_FACTOR));
+        }
         jTable1.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
             public void propertyChange(java.beans.PropertyChangeEvent evt) {
                 jTable1PropertyChange(evt);

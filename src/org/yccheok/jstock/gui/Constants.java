@@ -35,4 +35,6 @@ public class Constants {
     
     public static final int EXCHANGE_RATE_MONITOR_MAX_THREAD = 4;
     public static final int EXCHANGE_RATE_MONITOR_MAX_STOCK_SIZE_PER_SCAN = 20;
+    
+    public static final double FONT_ENLARGE_FACTOR = 1.2;
 }

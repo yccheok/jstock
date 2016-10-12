@@ -1,4 +1,4 @@
-<?xml version="1.1" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.5" maxVersion="1.6" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
   <NonVisualComponents>
@@ -25,6 +25,7 @@
   </Properties>
   <SyntheticProperties>
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
+    <SyntheticProperty name="generateCenter" type="boolean" value="false"/>
   </SyntheticProperties>
   <Events>
     <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="formMouseClicked"/>
@@ -122,7 +123,7 @@
                     </Property>
                   </Properties>
                   <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="this.jTable1.setDefaultRenderer(Symbol.class, new StockTableCellRenderer());&#xd;&#xa;this.jTable1.setDefaultRenderer(Code.class, new StockTableCellRenderer());"/>
+                    <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="this.jTable1.setDefaultRenderer(Symbol.class, new StockTableCellRenderer());&#xd;&#xa;this.jTable1.setDefaultRenderer(Code.class, new StockTableCellRenderer());&#xd;&#xa;&#xd;&#xa;if (JStock.instance().getJStockOptions().useLargeFont()) {&#xd;&#xa;    this.jTable1.setRowHeight((int)(this.jTable1.getRowHeight() * Constants.FONT_ENLARGE_FACTOR));&#xd;&#xa;}"/>
                   </AuxValues>
                 </Component>
               </SubComponents>
@@ -185,7 +186,7 @@
                     <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="jTable2KeyPressed"/>
                   </Events>
                   <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="this.jTable2.addMouseListener(new TableRowPopupListener());&#xd;&#xa;this.jTable2.setDefaultRenderer(Code.class, new StockTableCellRenderer());&#xd;&#xa;this.jTable2.setDefaultRenderer(Symbol.class, new StockTableCellRenderer());&#xd;&#xa;this.jTable2.setDefaultEditor(Code.class, this.getCellEditor(Code.class));&#xd;&#xa;this.jTable2.setDefaultEditor(Symbol.class, this.getCellEditor(Symbol.class));&#xd;&#xa;//this.jTable2.setDefaultEditor(Object.class, this.getSymbolCellEditor());"/>
+                    <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="this.jTable2.addMouseListener(new TableRowPopupListener());&#xd;&#xa;this.jTable2.setDefaultRenderer(Code.class, new StockTableCellRenderer());&#xd;&#xa;this.jTable2.setDefaultRenderer(Symbol.class, new StockTableCellRenderer());&#xd;&#xa;this.jTable2.setDefaultEditor(Code.class, this.getCellEditor(Code.class));&#xd;&#xa;this.jTable2.setDefaultEditor(Symbol.class, this.getCellEditor(Symbol.class));&#xd;&#xa;//this.jTable2.setDefaultEditor(Object.class, this.getSymbolCellEditor());&#xd;&#xa;&#xd;&#xa;if (JStock.instance().getJStockOptions().useLargeFont()) {&#xd;&#xa;    this.jTable2.setRowHeight((int)(this.jTable2.getRowHeight() * Constants.FONT_ENLARGE_FACTOR));&#xd;&#xa;}"/>
                   </AuxValues>
                 </Component>
               </SubComponents>

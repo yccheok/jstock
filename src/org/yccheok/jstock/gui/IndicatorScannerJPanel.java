@@ -116,6 +116,10 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         this.jTable1.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(2));
         this.jTable1.addMouseListener(new TableRowPopupListener());
         this.jTable1.addKeyListener(new TableKeyEventListener());
+
+        if (JStock.instance().getJStockOptions().useLargeFont()) {
+            this.jTable1.setRowHeight((int)(this.jTable1.getRowHeight() * Constants.FONT_ENLARGE_FACTOR));
+        }
         jScrollPane1.setViewportView(jTable1);
 
         jPanel2.add(jScrollPane1, java.awt.BorderLayout.CENTER);

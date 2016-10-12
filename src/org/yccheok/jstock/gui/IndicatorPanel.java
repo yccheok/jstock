@@ -208,7 +208,7 @@ public class IndicatorPanel extends JPanel {
         setLayout(new java.awt.BorderLayout());
 
         // Priority give to left component.
-        jSplitPane1.setResizeWeight(1.0);
+        jSplitPane1.setResizeWeight(0.9);
 
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("IndicatorPanel_StockIndicator"))); // NOI18N

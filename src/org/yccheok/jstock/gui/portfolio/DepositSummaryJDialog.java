@@ -31,6 +31,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.table.TableCellEditor;
+import org.yccheok.jstock.gui.Constants;
 import org.yccheok.jstock.gui.JTableUtilities;
 import org.yccheok.jstock.gui.JStock;
 import org.yccheok.jstock.internationalization.GUIBundle;
@@ -139,6 +140,10 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
         JTableUtilities.setDateEditorAndRendererForRow(jTable1, 0);
         jTable1.setAutoCreateRowSorter(true);
         jTable1.addMouseListener(new TableRowPopupListener());
+
+        if (JStock.instance().getJStockOptions().useLargeFont()) {
+            this.jTable1.setRowHeight((int)(this.jTable1.getRowHeight() * Constants.FONT_ENLARGE_FACTOR));
+        }
         jTable1.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
             public void propertyChange(java.beans.PropertyChangeEvent evt) {
                 jTable1PropertyChange(evt);
@@ -217,8 +222,8 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-306)/2, (screenSize.height-373)/2, 306, 373);
+        setSize(new java.awt.Dimension(355, 412));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
