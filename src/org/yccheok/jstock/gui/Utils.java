@@ -1797,8 +1797,9 @@ public class Utils {
         }
         catch (Exception exp) {
             log.error(null, exp);
-        }
-        finally {
+        } catch (java.lang.Error err) {
+            log.error(null, err);
+        } finally {
             org.yccheok.jstock.file.Utils.close(reader);
             org.yccheok.jstock.file.Utils.close(inputStream);
         }

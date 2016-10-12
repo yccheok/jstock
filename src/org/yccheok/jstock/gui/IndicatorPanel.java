@@ -606,6 +606,8 @@ public class IndicatorPanel extends JPanel {
                 return;
             }
 
+            projectName = projectName.trim();
+            
             if (projectName.length() == 0) {
                 JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_need_to_specific_alert_indicator_name"), MessagesBundle.getString("warning_title_you_need_to_specific_alert_indicator_name"), JOptionPane.WARNING_MESSAGE);
                 continue;
@@ -642,6 +644,8 @@ public class IndicatorPanel extends JPanel {
                 return;
             }
 
+            projectName = projectName.trim();
+            
             if (projectName.length() == 0) {
                 JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_need_to_specific_module_indicator_name"), MessagesBundle.getString("warning_title_you_need_to_specific_module_indicator_name"), JOptionPane.WARNING_MESSAGE);
                 continue;
@@ -692,6 +696,8 @@ public class IndicatorPanel extends JPanel {
                     return;
                 }
 
+                projectName = projectName.trim();
+                
                 if (projectName.length() == 0) {
                     JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_need_to_specific_alert_indicator_name"), MessagesBundle.getString("warning_title_you_need_to_specific_alert_indicator_name"), JOptionPane.WARNING_MESSAGE);
                     continue;
@@ -749,6 +755,8 @@ public class IndicatorPanel extends JPanel {
                     return;
                 }
 
+                projectName = projectName.trim();
+                
                 if (projectName.length() == 0) {
                     JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_need_to_specific_module_indicator_name"), MessagesBundle.getString("warning_title_you_need_to_specific_module_indicator_name"), JOptionPane.WARNING_MESSAGE);
                     continue;
@@ -927,6 +935,8 @@ public class IndicatorPanel extends JPanel {
                 return;
             }
 
+            newProjectName = newProjectName.trim();
+            
             if (newProjectName.length() == 0) {
                 JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_need_to_specific_alert_indicator_name"), MessagesBundle.getString("warning_title_you_need_to_specific_alert_indicator_name"), JOptionPane.WARNING_MESSAGE);
                 continue;
@@ -981,6 +991,8 @@ public class IndicatorPanel extends JPanel {
                 return;
             }
 
+            newProjectName = newProjectName.trim();
+            
             if (newProjectName.length() == 0) {
                 JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_you_need_to_specific_module_indicator_name"), MessagesBundle.getString("warning_title_you_need_to_specific_module_indicator_name"), JOptionPane.WARNING_MESSAGE);
                 continue;

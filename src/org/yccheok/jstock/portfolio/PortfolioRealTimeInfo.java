@@ -120,7 +120,6 @@ public class PortfolioRealTimeInfo {
         }
     }
 
-
     public boolean load(File file) {
         assert(file != null);
 

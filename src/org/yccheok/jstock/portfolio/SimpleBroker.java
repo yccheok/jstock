@@ -24,6 +24,13 @@ package org.yccheok.jstock.portfolio;
  */
 public class SimpleBroker implements Broker {
 
+    public SimpleBroker(double maximumRate, double minimumRate, double rate) {
+        this.maximumRate = maximumRate;
+        this.minimumRate = minimumRate;
+        this.rate = rate;        
+    }
+    
+    @Deprecated
     public SimpleBroker(String name, double maximumRate, double minimumRate, double rate) {        
         this.name = name;
         this.maximumRate = maximumRate;
@@ -58,7 +65,8 @@ public class SimpleBroker implements Broker {
     private double maximumRate;
     private double minimumRate;
     private double rate;
-    private String name;
+    @Deprecated
+    private transient String name;
     
     public double getMaximumRate() {
         return maximumRate;

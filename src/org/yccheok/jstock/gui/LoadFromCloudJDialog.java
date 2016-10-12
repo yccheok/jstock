@@ -21,9 +21,21 @@ package org.yccheok.jstock.gui;
 
 import org.yccheok.jstock.engine.Pair;
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.reflect.TypeToken;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
@@ -37,9 +49,17 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.yccheok.jstock.file.ThreadSafeFileLock;
 import org.yccheok.jstock.gui.analysis.MemoryLogJDialog;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.internationalization.MessagesBundle;
+import org.yccheok.jstock.portfolio.Broker;
+import org.yccheok.jstock.portfolio.BrokingFirm;
+import org.yccheok.jstock.portfolio.ClearingFee;
+import org.yccheok.jstock.portfolio.SimpleBroker;
+import org.yccheok.jstock.portfolio.SimpleClearingFee;
+import org.yccheok.jstock.portfolio.SimpleStampDuty;
+import org.yccheok.jstock.portfolio.StampDuty;
 
 /**
  *
@@ -380,6 +400,9 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
                     return null;
                 }
 
+                // json from Android might contain latest configuration.
+                loadBrokingFirmsFromJson(jStockOptions);
+                
                 publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_Success"), Icons.OK));
 
                 return jStockOptions;
@@ -388,6 +411,102 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
         return worker;
     }
 
+    private static class SimpleBrokerDeserializer implements JsonDeserializer<SimpleBroker> {
+        @Override
+        public SimpleBroker deserialize(JsonElement json, java.lang.reflect.Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            final JsonObject jsonObject = json.getAsJsonObject();
+
+            final double maximumRate = jsonObject.get("maximumRate").getAsDouble();
+            final double minimumRate = jsonObject.get("minimumRate").getAsDouble();
+            final double rate = jsonObject.get("rate").getAsDouble();
+            
+            return new SimpleBroker(maximumRate, minimumRate, rate);
+        }
+    }
+
+    private static class SimpleClearingFeeDeserializer implements JsonDeserializer<SimpleClearingFee> {
+        @Override
+        public SimpleClearingFee deserialize(JsonElement json, java.lang.reflect.Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            final JsonObject jsonObject = json.getAsJsonObject();
+
+            final double maximumRate = jsonObject.get("maximumRate").getAsDouble();
+            final double minimumRate = jsonObject.get("minimumRate").getAsDouble();
+            final double rate = jsonObject.get("rate").getAsDouble();
+            
+            return new SimpleClearingFee(maximumRate, minimumRate, rate);
+        }
+    }
+    
+    private static class SimpleStampDutyDeserializer implements JsonDeserializer<SimpleStampDuty> {
+        @Override
+        public SimpleStampDuty deserialize(JsonElement json, java.lang.reflect.Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            final JsonObject jsonObject = json.getAsJsonObject();
+
+            final double maximumRate = jsonObject.get("maximumRate").getAsDouble();
+            final double fraction = jsonObject.get("fraction").getAsDouble();
+            final double rate = jsonObject.get("rate").getAsDouble();
+            
+            return new SimpleStampDuty(maximumRate, fraction, rate);
+        }
+    }
+    
+    private boolean loadBrokingFirmsFromJson(JStockOptions jStockOptions) {        
+        File brokingFirmsFile = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "android" + File.separator + "brokingfirms.json");
+
+        if (false == brokingFirmsFile.isFile()) {
+            return false;
+        }
+
+        List<BrokingFirm> brokingFirms = null;
+        
+        GsonBuilder builder = new GsonBuilder();
+        Gson gson = builder
+            .registerTypeAdapter(Broker.class, new SimpleBrokerDeserializer())
+            .registerTypeAdapter(ClearingFee.class, new SimpleClearingFeeDeserializer())
+            .registerTypeAdapter(StampDuty.class, new SimpleStampDutyDeserializer())
+            .create();
+        
+        final ThreadSafeFileLock.Lock lock = ThreadSafeFileLock.getLock(brokingFirmsFile);
+        if (lock == null) {
+            return false;
+        }
+        // http://stackoverflow.com/questions/10868423/lock-lock-before-try
+        ThreadSafeFileLock.lockRead(lock);
+                
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(brokingFirmsFile), "UTF-8"));
+            try {
+                brokingFirms = gson.fromJson(reader, new TypeToken<List<BrokingFirm>>(){}.getType());
+
+                if (brokingFirms == null) {
+                    return false;
+                }
+            } finally {
+                reader.close();
+            }
+        } catch (IOException ex){
+            log.error(null, ex);
+        } catch (com.google.gson.JsonSyntaxException ex) {
+            log.error(null, ex);
+        } catch (Exception ex) {
+            log.error(null, ex);
+        } finally {
+            ThreadSafeFileLock.unlockRead(lock);
+            ThreadSafeFileLock.releaseLock(lock);
+        }
+
+        if (brokingFirms == null) {
+            return false;
+        }
+
+        jStockOptions.clearBrokingFirms();
+        for (BrokingFirm brokingFirm : brokingFirms) {
+            jStockOptions.addBrokingFirm(brokingFirm);
+        }
+        
+        return true;
+    }
+    
     private void writeToMemoryLog(String message) {
         // http://www.leepoint.net/notes-java/io/10file/sys-indep-newline.html
         // public static String newline = System.getProperty("line.separator");

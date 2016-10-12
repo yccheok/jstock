@@ -21,9 +21,10 @@ package org.yccheok.jstock.gui;
 
 import org.yccheok.jstock.engine.Pair;
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -36,7 +37,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import javafx.application.Platform;
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.table.*;
 import org.apache.commons.logging.Log;
@@ -45,7 +45,6 @@ import org.yccheok.jstock.alert.GoogleMail;
 import org.yccheok.jstock.analysis.Indicator;
 import org.yccheok.jstock.analysis.OperatorIndicator;
 import org.yccheok.jstock.engine.*;
-import org.yccheok.jstock.engine.ResultType;
 import org.yccheok.jstock.engine.Industry;
 import org.yccheok.jstock.file.Atom;
 import org.yccheok.jstock.file.GUIBundleWrapper;
@@ -67,6 +66,7 @@ import org.yccheok.jstock.watchlist.WatchlistInfo;
 import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.StockInfo;
+import org.yccheok.jstock.file.ThreadSafeFileLock;
 import org.yccheok.jstock.gui.news.StockNewsJFrame;
 
 import org.yccheok.jstock.gui.trading.TradingJPanel;
@@ -144,7 +144,6 @@ public class JStock extends javax.swing.JFrame {
         this.initAlwaysOnTop();
         this.initStockHistoryMonitor();
         this.initOthersStockHistoryMonitor();
-        this.initBrokingFirmLogos();
         this.initGUIOptions();
         this.initChartJDialogOptions();
         this.initLanguageMenuItemsSelection();        
@@ -996,7 +995,6 @@ public class JStock extends javax.swing.JFrame {
         this.saveJStockOptions();
         this.saveGUIOptions();
         this.saveChartJDialogOptions();
-        this.saveBrokingFirmLogos();
         this.saveWatchlist();
         this.indicatorPanel.saveAlertIndicatorProjectManager();
         this.indicatorPanel.saveModuleIndicatorProjectManager();
@@ -2354,7 +2352,6 @@ public class JStock extends javax.swing.JFrame {
         
         this.saveGUIOptions();
         this.saveChartJDialogOptions();
-        this.saveBrokingFirmLogos();
         this.saveWatchlist();
         this.indicatorPanel.saveAlertIndicatorProjectManager();
         this.indicatorPanel.saveModuleIndicatorProjectManager();
@@ -2368,8 +2365,46 @@ public class JStock extends javax.swing.JFrame {
         solveCaseSensitiveFoldersIssue();
         
         saveWatchlistAndPortfolioInfos();
+        saveBrokingFirmsAsJson();
     }
 
+    private boolean saveBrokingFirmsAsJson() {    
+        if (Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "android") == false)
+        {
+            return false;
+        }
+        
+        GsonBuilder builder = new GsonBuilder();
+        Gson gson = builder.create();
+        
+        String string = gson.toJson(this.getJStockOptions().getBrokingFirms());
+
+        File brokingFirmsFile = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "android" + File.separator + "brokingfirms.json");
+        final ThreadSafeFileLock.Lock lock = ThreadSafeFileLock.getLock(brokingFirmsFile);
+        if (lock == null) {
+            return false;
+        }
+        // http://stackoverflow.com/questions/10868423/lock-lock-before-try
+        ThreadSafeFileLock.lockWrite(lock);
+        
+        try {
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(brokingFirmsFile), "UTF-8"));
+            try {
+                writer.write(string);
+            } finally {
+                writer.close();
+            }
+        } catch (IOException ex){
+            log.error(null, ex);
+            return false;
+        } finally {
+            ThreadSafeFileLock.unlockWrite(lock);
+            ThreadSafeFileLock.releaseLock(lock);
+        }
+
+        return true;
+    }
+    
     private void solveCaseSensitiveFoldersIssue() {
         final Country currentCountry = this.jStockOptions.getCountry();
         final String currentWatchlist = this.jStockOptions.getWatchlistName();
@@ -3716,21 +3751,6 @@ public class JStock extends javax.swing.JFrame {
         this.portfolioManagementJPanel.initRealTimeStockMonitor();
     }
 
-    // Only call after initJStockOptions.
-    private void initBrokingFirmLogos() {
-        final int size = jStockOptions.getBrokingFirmSize();
-
-        for (int i=0; i<size; i++) {
-            try {
-                BufferedImage bufferedImage = ImageIO.read(new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "logos" + File.separator + i + ".png"));
-
-                jStockOptions.getBrokingFirm(i).setLogo(bufferedImage);
-            } catch (IOException exp) {
-                log.error(null, exp);
-            }
-        }
-    }
-
     private void initGUIOptions() {
         final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "mainframe.xml");
         GUIOptions guiOptions = Utils.fromXML(GUIOptions.class, f);
@@ -3907,36 +3927,6 @@ public class JStock extends javax.swing.JFrame {
         return this.saveCSVWathclist();
     }
     
-    private boolean saveBrokingFirmLogos() {
-        if (Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "logos") == false)
-        {
-            return false;
-        }
-        
-        if (Utils.deleteDir(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "logos", false) == false) {
-            return false;
-        }
-        
-        final int size = this.jStockOptions.getBrokingFirmSize();
-
-        for(int i=0; i<size; i++) {
-            final Image image = jStockOptions.getBrokingFirm(i).getLogo();
-            
-            if(image == null) continue;
-            
-            File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "logos" + File.separator + i + ".png");
-                       
-            try {
-                ImageIO.write(Utils.toBufferedImage(image), "png", f);
-            }
-            catch (java.io.IOException exp) {
-                log.error(null, exp);
-            }
-        }
-        
-        return true;
-    }
-
     private boolean saveDatabase() {
         final Country country = jStockOptions.getCountry();
             

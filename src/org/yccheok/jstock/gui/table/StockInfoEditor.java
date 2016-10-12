@@ -28,6 +28,7 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
 import javax.swing.JTable;
 import org.yccheok.jstock.engine.StockInfo;
+import org.yccheok.jstock.gui.BoundsPopupMenuListener;
 
 /**
  *
@@ -61,6 +62,10 @@ public class StockInfoEditor extends DefaultCellEditor {
         JComboBox _comboBox = (JComboBox) super.getTableCellEditorComponent(table, value, isSelected, row, column);
         StockInfo stockInfo = (StockInfo)value;
         _comboBox.setSelectedItem(stockInfo.symbol);
+        
+         BoundsPopupMenuListener listener = new BoundsPopupMenuListener(true, false);
+         _comboBox.addPopupMenuListener(listener);
+
         return _comboBox;
     }
 

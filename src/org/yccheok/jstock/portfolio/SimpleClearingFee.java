@@ -24,6 +24,13 @@ package org.yccheok.jstock.portfolio;
  */
 public class SimpleClearingFee implements ClearingFee {
 
+    public SimpleClearingFee(double maximumRate, double minimumRate, double rate) {
+        this.maximumRate = maximumRate;
+        this.minimumRate = minimumRate;
+        this.rate = rate;
+    }
+
+    @Deprecated
     public SimpleClearingFee(String name, double maximumRate, double minimumRate, double rate) {        
         this.name = name;
         this.maximumRate = maximumRate;
@@ -59,7 +66,8 @@ public class SimpleClearingFee implements ClearingFee {
     private double maximumRate;
     private double minimumRate;
     private double rate;
-    private String name;
+    @Deprecated
+    private transient String name;
     
     public double getMaximumRate() {
         return maximumRate;

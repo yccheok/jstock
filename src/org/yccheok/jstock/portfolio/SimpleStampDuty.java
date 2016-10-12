@@ -23,6 +23,14 @@ package org.yccheok.jstock.portfolio;
  * @author Owner
  */
 public class SimpleStampDuty implements StampDuty {
+    
+    public SimpleStampDuty(double maximumRate, double fraction, double rate) { 
+        this.maximumRate = maximumRate;
+        this.fraction = fraction;
+        this.rate = rate;        
+    }
+    
+    @Deprecated
     public SimpleStampDuty(String name, double maximumRate, double fraction, double rate) {        
         this.name = name;
         this.maximumRate = maximumRate;
@@ -64,7 +72,8 @@ public class SimpleStampDuty implements StampDuty {
     private double maximumRate;
     private double fraction;
     private double rate;
-    private String name;
+    @Deprecated
+    private transient String name;
     
     public double getMaximumRate() {
         return maximumRate;
