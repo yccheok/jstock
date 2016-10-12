@@ -231,7 +231,7 @@ public class AccountSummaryBuilder {
                                 Boolean result = (Boolean) workerStateEvent.getSource().getValue();
 
                                 Portfolio.getInstance().cancelPortfolioServ();
-                                SignIn.getInstance().showLogin();
+                                TradingView.getInstance().showLogin();
                             }
                         });
                         

@@ -43,10 +43,14 @@ public class TradingJPanel extends javax.swing.JPanel {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                stack = new StackPane();
-                SignIn.build(stack).show();
+                // stackPane = SignIn.getInstance().show();
+                // scene = new Scene(stackPane, 500, 500);
 
-                scene = new Scene(stack, 500, 500);
+                TradingView tradingView = TradingView.getInstance();
+                tradingView.showLogin();
+                
+                stackPane = tradingView.getStackPane();
+                scene = new Scene(stackPane, 500, 500);
 
                 scene.getStylesheets().add(TradingJPanel.class.getResource("trading.css").toExternalForm());
                 jfxPanel.setScene(scene);
@@ -66,5 +70,5 @@ public class TradingJPanel extends javax.swing.JPanel {
     private final JScrollPane jScrollPane = new javax.swing.JScrollPane();
     private final JFXPanel jfxPanel = new JFXPanel();
     private Scene scene;
-    private StackPane stack;
+    private StackPane stackPane;
 }

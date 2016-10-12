@@ -31,11 +31,11 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
@@ -59,23 +59,23 @@ public class SignIn {
         return INSTANCE;
     }
 
-    public static SignIn build (StackPane stack) {
-        INSTANCE.stack = stack;
-        return INSTANCE;
-    }
-
-    public void show () {
+    public GridPane show () {
         initUI();
         signInHandler();
         licenceHandler();
+
+        return signInGrid;
     }
 
-    public void showLogin () {
-        if (portfolio != null) portfolio.setVisible(false);
-        signInGrid.setVisible(true);
-    }
-    
     private void initUI () {
+        licenceLink = new Hyperlink("Drive Wealth's Terms of Use");
+        signInBtn   = new Button("Sign in");
+        userField   = new TextField();
+        pwdField    = new PasswordField();
+        errorText   = new Label();
+        progressIn  = new ProgressIndicator();
+        signInGrid  = new GridPane();
+
         signInGrid.setAlignment(Pos.CENTER);
         signInGrid.setHgap(10);
         signInGrid.setVgap(15);
@@ -148,8 +148,6 @@ public class SignIn {
         rr.setVgrow(Priority.ALWAYS);
         signInGrid.getRowConstraints().setAll(rr, rr, rr, rr, rr, rr, rr);
 
-        stack.getChildren().add(signInGrid);
-        
         // focus on username
         Platform.runLater(() -> userField.requestFocus());
     }
@@ -278,25 +276,18 @@ public class SignIn {
                 User user = SessionManager.getInstance().getUser();
                 System.out.println("Successfully Sign In, userID: " + user.getUserID());
 
-                portfolio = Portfolio.getInstance().show();
-
-                signInGrid.setVisible(false);
-                stack.getChildren().add(portfolio);
+                TradingView.getInstance().showPortfolio();
             }
         });
 
         return loginTask;
     }
 
-    private final Hyperlink licenceLink = new Hyperlink("Drive Wealth's Terms of Use");
-    
-    private final Button signInBtn = new Button("Sign in");
-    private final TextField userField = new TextField();
-    private final PasswordField pwdField = new PasswordField();
-    private final Label errorText = new Label();
-    private final ProgressIndicator progressIn = new ProgressIndicator();
-    
-    private StackPane stack;
-    private final GridPane signInGrid = new GridPane();
-    private StackPane portfolio = null;
+    private Hyperlink licenceLink;
+    private Button signInBtn;
+    private TextField userField;
+    private PasswordField pwdField;
+    private Label errorText;
+    private ProgressIndicator progressIn;
+    private GridPane signInGrid;
 }
