@@ -108,3 +108,6 @@ and open the template in the editor.
     -fx-background-radius: 30;
 }
 
+.hyperlink {
+    -fx-focus-color: transparent;
+}

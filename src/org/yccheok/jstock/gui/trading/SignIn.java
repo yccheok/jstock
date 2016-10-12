@@ -17,6 +17,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
@@ -36,7 +37,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.web.WebEngine;
@@ -75,6 +75,7 @@ public class SignIn {
         errorText   = new Label();
         progressIn  = new ProgressIndicator();
         signInGrid  = new GridPane();
+        openAcLink  = new Hyperlink("Open an Account");
 
         signInGrid.setAlignment(Pos.CENTER);
         signInGrid.setHgap(10);
@@ -105,22 +106,23 @@ public class SignIn {
         errorText.setVisible(false);
         signInGrid.add(errorText, 0, 3);
 
-        // Sign In button
+        // Sign In button & Progress Indicator
         signInBtn.setId("green");
         signInBtn.setMaxWidth(Double.MAX_VALUE);
         signInBtn.setMaxHeight(Double.MAX_VALUE);
         signInBtn.setTextAlignment(TextAlignment.CENTER);
-        
-        signInGrid.add(signInBtn, 0, 4);
-        GridPane.setHalignment(signInBtn, HPos.CENTER);
 
-        // progress indicator
         progressIn.setVisible(false);
-        final VBox progressBox = new VBox();
-        progressBox.setPrefHeight(5);
-        progressBox.getChildren().addAll(progressIn);
-
-        signInGrid.add(progressBox, 0, 5);
+        progressIn.setMaxHeight(30);
+        progressIn.setMaxWidth(30);
+        StackPane.setAlignment(signInBtn, Pos.CENTER);
+        StackPane.setAlignment(progressIn, Pos.CENTER);
+        
+        StackPane signInStack = new StackPane();
+        signInStack.getChildren().addAll(signInBtn, progressIn);
+        
+        signInGrid.add(signInStack, 0, 4);
+        GridPane.setHalignment(signInStack, HPos.CENTER);
         
         // Licence
         HBox licenceHBox = new HBox(0);
@@ -134,9 +136,12 @@ public class SignIn {
         licenceHBox.getChildren().addAll(licenceLabel, licenceLink);
         // HBox max size will follow max size of all children nodes
         licenceHBox.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE );
-        signInGrid.add(licenceHBox, 0, 6);
+        signInGrid.add(licenceHBox, 0, 5);
         GridPane.setHalignment(licenceHBox, HPos.CENTER);
-
+        
+        signInGrid.add(openAcLink, 0, 6);
+        GridPane.setValignment(openAcLink, VPos.TOP);
+        GridPane.setHalignment(openAcLink, HPos.CENTER);
         
         // make components auto resize
         ColumnConstraints cc = new ColumnConstraints();
@@ -290,4 +295,5 @@ public class SignIn {
     private Label errorText;
     private ProgressIndicator progressIn;
     private GridPane signInGrid;
+    private Hyperlink openAcLink;
 }
