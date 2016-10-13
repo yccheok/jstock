@@ -477,6 +477,10 @@ public class JStock extends javax.swing.JFrame {
         this.jTable1.getTableHeader().addMouseListener(new TableColumnSelectionPopupListener(1));
         this.jTable1.addMouseListener(new TableMouseAdapter());
         this.jTable1.addKeyListener(new TableKeyEventListener());
+
+        if (jStockOptions.useLargeFont()) {
+            this.jTable1.setRowHeight((int)(this.jTable1.getRowHeight() * Constants.FONT_ENLARGE_FACTOR));
+        }
         jTable1.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 jTable1KeyPressed(evt);
@@ -1818,7 +1822,27 @@ public class JStock extends javax.swing.JFrame {
         // before we manually change the system properties according to
         // JStockOptions.
         ProxyDetector.getInstance();      
-                
+              
+        /***********************************************************************
+         * Apply large font if possible.
+         **********************************************************************/
+        if (jStockOptions.useLargeFont()) {
+            java.util.Enumeration keys = UIManager.getDefaults().keys();
+            while (keys.hasMoreElements()) {
+                Object key = keys.nextElement();
+                Object value = UIManager.get (key);
+                if (value != null && value instanceof javax.swing.plaf.FontUIResource) {
+                    javax.swing.plaf.FontUIResource fr = (javax.swing.plaf.FontUIResource)value;
+                    UIManager.put(key, new javax.swing.plaf.FontUIResource(fr.deriveFont((float)fr.getSize2D() * (float)Constants.FONT_ENLARGE_FACTOR)));
+                }
+            } 
+        }
+        
+        /***********************************************************************
+         * GA tracking.
+         **********************************************************************/
+        GA.trackAsynchronously("main");
+        
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {

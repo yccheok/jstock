@@ -162,6 +162,10 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
         jTable1.setModel(getSystemDefinedStockInfoTableModel());
         this.jTable1.setDefaultRenderer(Symbol.class, new StockTableCellRenderer());
         this.jTable1.setDefaultRenderer(Code.class, new StockTableCellRenderer());
+
+        if (JStock.instance().getJStockOptions().useLargeFont()) {
+            this.jTable1.setRowHeight((int)(this.jTable1.getRowHeight() * Constants.FONT_ENLARGE_FACTOR));
+        }
         jScrollPane1.setViewportView(jTable1);
 
         jPanel1.add(jScrollPane1, java.awt.BorderLayout.CENTER);
@@ -198,6 +202,10 @@ public class StockDatabaseJDialog extends javax.swing.JDialog {
             this.jTable2.setDefaultEditor(Code.class, this.getCellEditor(Code.class));
             this.jTable2.setDefaultEditor(Symbol.class, this.getCellEditor(Symbol.class));
             //this.jTable2.setDefaultEditor(Object.class, this.getSymbolCellEditor());
+
+            if (JStock.instance().getJStockOptions().useLargeFont()) {
+                this.jTable2.setRowHeight((int)(this.jTable2.getRowHeight() * Constants.FONT_ENLARGE_FACTOR));
+            }
             jTable2.addKeyListener(new java.awt.event.KeyAdapter() {
                 public void keyPressed(java.awt.event.KeyEvent evt) {
                     jTable2KeyPressed(evt);

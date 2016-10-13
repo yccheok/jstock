@@ -323,6 +323,8 @@ public class JStockOptions {
     
     private boolean isFeeCalculationEnabled = false;
         
+    private boolean useLargeFont = false;
+    
     private boolean isDynamicChartVisible = false;
     
     private List<Country> recentCountries = new ArrayList<>();    
@@ -440,6 +442,8 @@ public class JStockOptions {
         this.chartTheme = jStockOptions.getChartTheme();
         
         this.isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled;
+        
+        this.useLargeFont = jStockOptions.useLargeFont;
         
         this.isDynamicChartVisible = jStockOptions.isDynamicChartVisible;
     }
@@ -1427,6 +1431,10 @@ public class JStockOptions {
         return isFeeCalculationEnabled;
     }
 
+    public boolean useLargeFont() {
+        return useLargeFont;
+    }
+    
     /**
      * @return the isDynamicChartVisible
      */    
@@ -1441,6 +1449,10 @@ public class JStockOptions {
         this.isFeeCalculationEnabled = isFeeCalculationEnabled;
     } 
 
+    public void setUseLargeFont(boolean useLargeFont) {
+        this.useLargeFont = useLargeFont;
+    }
+    
     /**
      * @param isDynamicChartVisible the isDynamicChartVisible to set
      */    

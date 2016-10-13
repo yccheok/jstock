@@ -24,6 +24,7 @@ import java.awt.*;
 import java.awt.event.*;
 import com.l2fprod.common.swing.*;
 import org.yccheok.jstock.internationalization.GUIBundle;
+import org.yccheok.jstock.internationalization.MessagesBundle;
 
 /**
  *
@@ -144,6 +145,7 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
             return false;
         }
 
+        final boolean oldUseLargeFont = jStockOptions.useLargeFont();        
         if (optionsGUIJPanel.apply(jStockOptions) == false)
         {
             final JToggleButton button = map.get(GUIBundle.getString("OptionsJPanel_GUI"));
@@ -152,7 +154,8 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
             button.doClick();
             return false;
         }
-
+        final boolean newUseLargeFont = jStockOptions.useLargeFont();
+        
         if (optionsColorJPanel.apply(jStockOptions) == false)
         {
             final JToggleButton button = map.get(GUIBundle.getString("OptionsJPanel_Color"));
@@ -214,6 +217,13 @@ public class OptionsJPanel extends javax.swing.JPanel implements JStockOptionsOb
             button.setSelected(true);
             button.doClick();
             return false;
+        }
+        
+        if (oldUseLargeFont != newUseLargeFont) {
+            final int result = JOptionPane.showConfirmDialog(this, MessagesBundle.getString("question_message_restart_now"), MessagesBundle.getString("question_title_restart_now"), JOptionPane.YES_NO_OPTION);
+            if (result == JOptionPane.YES_OPTION) {
+                org.yccheok.jstock.gui.Utils.restartApplication(JStock.instance());
+            }
         }
         
         return true;
