@@ -51,6 +51,12 @@ public class WatchlistJDialog extends javax.swing.JDialog {
     public WatchlistJDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        
+        // Hackish way to make Mac works.
+        pack();        
+        setSize(new java.awt.Dimension(398, 380));
+        setLocationRelativeTo(null);
+        
         init();
     }
 

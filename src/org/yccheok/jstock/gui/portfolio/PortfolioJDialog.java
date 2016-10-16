@@ -38,7 +38,6 @@ import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.ListCellRenderer;
-import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.JStock;
 import org.yccheok.jstock.gui.Utils;
@@ -54,6 +53,12 @@ public class PortfolioJDialog extends javax.swing.JDialog {
     public PortfolioJDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+
+        // Hackish way to make Mac works.
+        pack();        
+        setSize(new java.awt.Dimension(398, 380));
+        setLocationRelativeTo(null);
+        
         init();
     }
 

@@ -88,6 +88,11 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
         this.dividendSummary = new DividendSummary(dividendSummary);
         this.dividendSummaryAfterPressingOK = null;
         initComponents();
+      
+        // Hackish way to make Mac works.
+        pack();        
+        setSize(new java.awt.Dimension(339, 373));
+        setLocationRelativeTo(null);
         
         ((TableRowSorter)this.jTable1.getRowSorter()).setStringConverter(new TableStringConverter() {
 

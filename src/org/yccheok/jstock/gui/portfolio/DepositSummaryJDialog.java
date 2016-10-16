@@ -53,6 +53,11 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
         this.depositSummary = new DepositSummary(depositSummary);
         this.depositSummaryAfterPressingOK = null;
         initComponents();
+        
+        // Hackish way to make Mac works.
+        pack();        
+        setSize(new java.awt.Dimension(355, 412));
+        setLocationRelativeTo(null);
     }
 
     /** This method is called from within the constructor to

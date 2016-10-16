@@ -58,6 +58,12 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
     public SaveToCloudJDialog(java.awt.Frame parent, boolean modal, Pair<Credential, String> credentialEx, boolean credentialFromDisk) {
         super(parent, modal);
         initComponents();
+        
+        // Hackish way to make Mac works.
+        pack();        
+        setSize(new java.awt.Dimension(420, 271));
+        setLocationRelativeTo(null);
+        
         this.credentialEx = credentialEx;
         this.jLabel10.setText(credentialEx.second);        
         this.jLabel4.setVisible(false);

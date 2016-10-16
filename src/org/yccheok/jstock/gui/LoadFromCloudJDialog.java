@@ -71,6 +71,12 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
     public LoadFromCloudJDialog(java.awt.Frame parent, boolean modal, Pair<Credential, String> credentialEx, boolean credentialFromDisk) {
         super(parent, modal);
         initComponents();
+
+        // Hackish way to make Mac works.
+        pack();        
+        setSize(new java.awt.Dimension(420, 243));
+        setLocationRelativeTo(null);
+
         this.credentialEx = credentialEx;
         this.jLabel1.setText(credentialEx.second);
         this.jLabel4.setVisible(false);
