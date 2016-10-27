@@ -47,7 +47,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ListCell;
 import javafx.util.Callback;
-import javafx.scene.layout.VBox;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Text;
 import javafx.scene.control.Label;
@@ -57,8 +56,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.text.TextFlow;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
-import javafx.scene.text.TextAlignment;
-import javafx.geometry.Insets;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;

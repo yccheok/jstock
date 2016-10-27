@@ -1,0 +1,113 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Jun 16, 2016, 2:22:21 AM
+    Author     : shuwnyuan
+*/
+
+
+.table-view:focused {
+  -fx-background-color: transparent, -fx-box-border, -fx-control-inner-background;
+  -fx-background-insets: -1.4, 0, 1;
+  -fx-background-radius: 1.4, 0, 0;
+  -fx-padding: 1;   /* 0.083333em; */
+}
+
+#green {
+    -fx-font-size: 18px;
+    -fx-background-color: #37BB9A;
+    -fx-background-radius: 6, 5;
+    -fx-background-insets: 0, 1;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.4) , 5, 0.0 , 0 , 1 );
+    -fx-text-fill: #FFFFFF;
+}
+
+#grid {
+    -fx-background-color: #FFFFFF;
+}
+
+.right {
+    -fx-alignment: center-right; 
+}
+
+.left {
+    -fx-alignment: center-left; 
+}
+
+.profit {
+    -fx-text-fill: white;
+    -fx-background-color: #37BB9A;
+    -fx-background-radius: 5;
+}
+
+.loss {
+    -fx-text-fill: white;
+    -fx-background-color: red;
+    -fx-background-radius: 5;
+}
+
+.table-view .column-header{
+    -fx-font-size: 12px;
+}
+
+.table-cell {
+    -fx-font-size: 12px;
+}
+
+#accBorderPane .label {
+    -fx-font-size: 14px;
+}
+
+#order-msg {
+    -fx-font-size: 16px;
+    -fx-background-color: #FFFFFF;
+    -fx-padding: 12 10 12 10;       /* top right bottom left */
+    -fx-margin: 10 0 0 0;
+}
+
+.bold-italic {
+    -fx-font-weight: bold;
+    -fx-font-style: italic;
+}
+
+#accHeader {
+    -fx-background-color: #FEC109;
+}
+
+#dwLabel {
+    -fx-background-color: transparent;
+    -fx-font-size: 35px;
+    -fx-text-fill: white;
+}
+
+#accSummaryBox {
+    -fx-background-color: white;
+}
+
+.smallFont {
+    -fx-underline: true;
+    -fx-font-size: 10px;
+}
+
+.grey {
+    -fx-text-fill: grey;
+}
+
+.bigFont {
+    -fx-font-size: 14px;
+}
+
+.bold {
+    -fx-font-weight: bold;
+}
+
+.rounded {
+    -fx-background-radius: 30;
+}
+
+.hyperlink {
+    -fx-focus-color: transparent;
+}

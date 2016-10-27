@@ -69,6 +69,9 @@ import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.file.ThreadSafeFileLock;
 import org.yccheok.jstock.gui.news.StockNewsJFrame;
 
+import org.yccheok.jstock.gui.trading.TradingJPanel;
+
+
 
 /**
  *
@@ -113,6 +116,7 @@ public class JStock extends javax.swing.JFrame {
         createStockIndicatorEditor();
         createIndicatorScannerJPanel();
         createPortfolioManagementJPanel();
+        createTradingJPanel();
 
         createIconsAndToolTipTextForJTabbedPane();
 
@@ -2090,7 +2094,23 @@ public class JStock extends javax.swing.JFrame {
         portfolioManagementJPanel = new PortfolioManagementJPanel();        
         jTabbedPane1.addTab(GUIBundle.getString("PortfolioManagementJPanel_Title"), portfolioManagementJPanel);
     }
-    
+
+    // Drive Wealth integration tab
+    public TradingJPanel getTradingJPanel() {
+        return this.tradingJPanel;
+    }
+
+    private void createTradingJPanel() {
+        System.out.println("tab count: " + jTabbedPane1.getTabCount());
+        
+        tradingJPanel = new TradingJPanel();
+        ImageIcon icon = new javax.swing.ImageIcon(getClass().getResource("/images/16x16/drivewealth_logo.png"));
+        
+        jTabbedPane1.addTab(GUIBundle.getString("TradingJPanel_Title"), icon, tradingJPanel);
+        
+        System.out.println("trading panel height: " + tradingJPanel.getHeight() + ", width: " + tradingJPanel.getWidth());
+    }
+
     private void createStockIndicatorEditor() {
         indicatorPanel = new IndicatorPanel();                
         jTabbedPane1.addTab(GUIBundle.getString("IndicatorPanel_Title"), indicatorPanel);
@@ -4971,6 +4991,7 @@ public class JStock extends javax.swing.JFrame {
     private IndicatorPanel indicatorPanel;
     private IndicatorScannerJPanel indicatorScannerJPanel;
     private PortfolioManagementJPanel portfolioManagementJPanel;
+    private TradingJPanel tradingJPanel;
 
     private final AlertStateManager alertStateManager = new AlertStateManager();
     private final ExecutorService emailAlertPool = Executors.newFixedThreadPool(1);
