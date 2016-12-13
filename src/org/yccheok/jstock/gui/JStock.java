@@ -3214,12 +3214,12 @@ public class JStock extends javax.swing.JFrame {
 
     // This is the workaround to overcome Erasure by generics. We are unable to make MainFrame to
     // two observers at the same time.
-    private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> getRealTimeStockMonitorObserver() {
-        return new org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>>() {
+    private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, RealTimeStockMonitor.Result> getRealTimeStockMonitorObserver() {
+        return new org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, RealTimeStockMonitor.Result>() {
             @Override
-            public void update(RealTimeStockMonitor monitor, java.util.List<Stock> stocks)
+            public void update(RealTimeStockMonitor monitor, RealTimeStockMonitor.Result result)
             {
-                JStock.this.update(monitor, stocks);
+                JStock.this.update(monitor, result);
             }
         };
     }
@@ -4240,7 +4240,9 @@ public class JStock extends javax.swing.JFrame {
         System.gc();
     }
         
-    private void update(RealTimeStockMonitor monitor, final java.util.List<Stock> stocks) { 
+    private void update(RealTimeStockMonitor monitor, final RealTimeStockMonitor.Result result) { 
+        final java.util.List<Stock> stocks = result.stocks;
+        
         // We need to ignore symbol names given by stock server. Replace them
         // with database's.
         final boolean isSymbolImmutable = org.yccheok.jstock.engine.Utils.isSymbolImmutable();                
@@ -4301,9 +4303,11 @@ public class JStock extends javax.swing.JFrame {
             }   // if (isSymbolImmutable || new_stock.symbol.toString().isEmpty())
         }   // for (int i = 0, size = stocks.size(); i < size; i++)
         
-        // Update status bar with current time string.
-        this.timestamp = System.currentTimeMillis();
-        ((StockTableModel)jTable1.getModel()).setTimestamp(this.timestamp);
+        if (false == stocks.isEmpty()) {
+            // Update status bar with current time string.
+            this.timestamp = System.currentTimeMillis();
+            ((StockTableModel)jTable1.getModel()).setTimestamp(this.timestamp);
+        }
         
         JStock.instance().updateStatusBarWithLastUpdateDateMessageIfPossible();
 
@@ -4977,7 +4981,7 @@ public class JStock extends javax.swing.JFrame {
     private final ExecutorService systemTrayAlertPool = Executors.newFixedThreadPool(1);
     private volatile ExecutorService stockInfoDatabaseMetaPool = Executors.newFixedThreadPool(1);
             
-    private final org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
+    private final org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, RealTimeStockMonitor.Result> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
     private final org.yccheok.jstock.engine.Observer<RealTimeIndexMonitor, java.util.List<Market>> realTimeIndexMonitorObserver = this.getRealTimeIndexMonitorObserver();
     private final org.yccheok.jstock.engine.Observer<StockHistoryMonitor, StockHistoryMonitor.StockHistoryRunnable> stockHistoryMonitorObserver = this.getStockHistoryMonitorObserver();
     private final org.yccheok.jstock.engine.Observer<Indicator, Boolean> alertStateManagerObserver = this.getAlertStateManagerObserver();

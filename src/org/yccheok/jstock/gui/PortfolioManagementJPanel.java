@@ -2640,12 +2640,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
     // This is the workaround to overcome Erasure by generics. We are unable to make MainFrame to
     // two observers at the same time.
-    private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> getRealTimeStockMonitorObserver() {
-        return new org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>>() {
+    private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, RealTimeStockMonitor.Result> getRealTimeStockMonitorObserver() {
+        return new org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, RealTimeStockMonitor.Result>() {
             @Override
-            public void update(RealTimeStockMonitor monitor, java.util.List<Stock> stocks)
+            public void update(RealTimeStockMonitor monitor, RealTimeStockMonitor.Result result)
             {
-                PortfolioManagementJPanel.this.update(monitor, stocks);
+                PortfolioManagementJPanel.this.update(monitor, result);
             }
         };
     }
@@ -2668,7 +2668,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return Math.max(0.0, prevPrice);
     }
     
-    private void update(RealTimeStockMonitor monitor, final java.util.List<Stock> stocks) {
+    private void update(RealTimeStockMonitor monitor, final RealTimeStockMonitor.Result result) {
         final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModel = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
         final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel = (SellPortfolioTreeTableModelEx)sellTreeTable.getTreeTableModel();
         
@@ -2678,7 +2678,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final Set<Code> buyCodes = this.getBuyCodes();
         final Set<Code> sellCodes = this.getSellCodes();
         
-        for (Stock stock : stocks) {            
+        for (Stock stock : result.stocks) {            
             final Code code = stock.code;
             final Currency currency = stock.getCurrency();
             
@@ -3108,7 +3108,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     
     private ExchangeRateMonitor exchangeRateMonitor = null;
     
-    private final org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
+    private final org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, RealTimeStockMonitor.Result> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
     private final org.yccheok.jstock.engine.Observer<ExchangeRateMonitor, List<ExchangeRate>> exchangeRateMonitorObserver = this.getExchangeRateMonitorObserver();
 
     private PortfolioRealTimeInfo portfolioRealTimeInfo = new PortfolioRealTimeInfo();

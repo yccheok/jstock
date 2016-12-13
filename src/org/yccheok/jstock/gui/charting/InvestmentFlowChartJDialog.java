@@ -51,7 +51,6 @@ import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYDataset;
 import org.yccheok.jstock.engine.Code;
-import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.engine.Observer;
 import org.yccheok.jstock.engine.RealTimeStockMonitor;
 import org.yccheok.jstock.engine.SimpleDate;
@@ -78,7 +77,7 @@ import org.yccheok.jstock.portfolio.TransactionSummary;
  *
  * @author yccheok
  */
-public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements Observer<RealTimeStockMonitor, java.util.List<Stock>> {
+public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements Observer<RealTimeStockMonitor, RealTimeStockMonitor.Result> {
 
     /** Creates new form InvestmentFlowChartJDialog */
     public InvestmentFlowChartJDialog(java.awt.Frame parent, boolean modal, PortfolioManagementJPanel portfolioManagementJPanel) {
@@ -580,8 +579,8 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
     }
 
     @Override
-    public void update(RealTimeStockMonitor subject, List<Stock> arg) {
-        for (Stock stock : arg) {
+    public void update(RealTimeStockMonitor subject,RealTimeStockMonitor.Result result) {
+        for (Stock stock : result.stocks) {
             this.codeToPrice.put(stock.code, stock.getLastPrice());
             this.lookUpCodes.remove(stock.code);
         }

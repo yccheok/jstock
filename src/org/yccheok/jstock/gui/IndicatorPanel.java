@@ -1412,13 +1412,10 @@ public class IndicatorPanel extends JPanel {
                         continue;
                     }
                     
-                    try {
-                        s = server.getStock(code);
+                    s = server.getStock(code);
+                    if (s != null) {
                         success = true;
                         break;
-                    }
-                    catch (StockNotFoundException exp) {
-                        log.error(null, exp);
                     }
 
                     if (isCancelled()) {
@@ -1436,6 +1433,7 @@ public class IndicatorPanel extends JPanel {
             }
             
             publish(s);
+            
             return success;
          }
 

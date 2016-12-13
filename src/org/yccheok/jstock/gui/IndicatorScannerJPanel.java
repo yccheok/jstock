@@ -44,6 +44,22 @@ import org.yccheok.jstock.internationalization.MessagesBundle;
  */
 public class IndicatorScannerJPanel extends javax.swing.JPanel implements ChangeListener, org.yccheok.jstock.engine.Observer<Indicator, Boolean> {
     
+    private static final class ScannedResult {
+        public final int expected;
+        public final int pass;
+        public final int fail;        
+        
+        public ScannedResult(int expected, int pass, int fail) {
+            this.pass = pass;
+            this.fail = fail;
+            this.expected = expected;
+        }
+        
+        public int getTotal() {
+            return this.pass + this.fail;
+        }
+    }
+    
     /** Creates new form IndicatorScannerJPanel */
     public IndicatorScannerJPanel() {
         initComponents();
@@ -243,7 +259,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                 return;
             }
 
-            final java.util.List<OperatorIndicator> result = new java.util.ArrayList<OperatorIndicator>();
+            final java.util.List<OperatorIndicator> result = new java.util.ArrayList<>();
 
             this.operatorIndicators.put(stockInfo.code, result);
 
@@ -257,23 +273,26 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
 
                     result.add(operatorIndicator);
                 }
-                try {
-                    /* Some users with low computer spec, complain that their CPUs usage are high.
-                     * My experience is that, 200ms sleep time will be enough to rest their CPUs.
-                     * I am not too sure about 50ms. Let's just wait and see...
-                     * When user runs this Indicator Scanner, he is expecting that he needs to wait.
-                     * So, it doesn't matter that we let him "wait" for extra 50ms seconds every round.
-                     * Some more, he shall feel more happy, to see his computer more responsive.
-                     */
-                    Thread.sleep(50);
-                } catch (InterruptedException ex) {
-                    log.error(null, ex);
-                    break;
-                }
             }   /* for(String project : projects) */
-
-            this.submitOperatorIndicatorToMonitor(result);
-        }   /* for(String code : codes) */
+        }   /* for (final StockInfo stockInfo : stockInfos) */
+        
+        for (final StockInfo stockInfo : stockInfos) {
+            if (this.stop_button_pressed) {
+                return;
+            }
+            
+            List<OperatorIndicator> result = this.operatorIndicators.get(stockInfo.code);
+            if (result != null) {
+                this.submitOperatorIndicatorToMonitor(result);
+            }
+            
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException ex) {
+                log.error(null, ex);
+                break;
+            }
+        }
     }
 
     private void submitOperatorIndicatorToMonitor(java.util.List<OperatorIndicator> indicators)
@@ -656,6 +675,21 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             // Probably the network is down. Do not ever retry infinityly. Go 
             // green. :)
             //monitor.addStockCode(code);
+
+            Symbol symbol = m.getStockInfoDatabase().codeToSymbol(code);
+    
+            final String template = GUIBundle.getString("IndicatorScannerJPanel_IndicatorScannerFoundHistory_template");
+            final ScannedResult scannedResult = this.getScannedResult();
+            
+            final String message = MessageFormat.format(
+                template, 
+                symbol != null ? symbol : code, 
+                scannedResult.getTotal(),
+                scannedResult.expected,
+                getCompleteScannedStocksPercentage(scannedResult)
+            );
+            this.updateStatusBarIfStopButtonIsNotPressed(message);
+
             return;
         }
 
@@ -664,7 +698,15 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         Symbol symbol = m.getStockInfoDatabase().codeToSymbol(code);
 
         final String template = GUIBundle.getString("IndicatorScannerJPanel_IndicatorScannerFoundHistory_template");
-        final String message = MessageFormat.format(template, symbol != null ? symbol : code, getCompleteScannedStocksPercentage());
+        final ScannedResult scannedResult = this.getScannedResult();
+        
+        final String message = MessageFormat.format(
+            template, 
+            symbol != null ? symbol : code, 
+            scannedResult.getTotal(),
+            scannedResult.expected,
+            getCompleteScannedStocksPercentage(scannedResult)
+        );
         this.updateStatusBarIfStopButtonIsNotPressed(message);
 
         for (OperatorIndicator operatorIndicator : indicators)
@@ -785,17 +827,17 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
       
     // This is the workaround to overcome Erasure by generics. We are unable to make MainFrame to
     // two observers at the same time.
-    private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> getRealTimeStockMonitorObserver() {
-        return new org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>>() {
+    private org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, RealTimeStockMonitor.Result> getRealTimeStockMonitorObserver() {
+        return new org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, RealTimeStockMonitor.Result>() {
             @Override
-            public void update(RealTimeStockMonitor monitor, java.util.List<Stock> stocks)
+            public void update(RealTimeStockMonitor monitor, RealTimeStockMonitor.Result result)
             {
-                IndicatorScannerJPanel.this.update(monitor, stocks);
+                IndicatorScannerJPanel.this.update(monitor, result);
             }
         };
     }
 
-    private void updateStatusBarIfStopButtonIsNotPressed(String message) {
+    private void updateStatusBarIfStopButtonIsNotPressed(String message) {        
         // Do we need to apply lock right here?
         if (this.stop_button_pressed) {
             return;
@@ -803,13 +845,14 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         JStock.instance().setStatusBar(true, message);
     }
 
-    private void update(RealTimeStockMonitor monitor, final java.util.List<Stock> stocks) {
+    private void update(RealTimeStockMonitor monitor, final RealTimeStockMonitor.Result result) {
         // Use local variables, to ensure we do not consume the newly
         // initialized variables after stop(). The code should be placed before
         // "if (this.stop_button_pressed)" check.
         AlertStateManager _alertStateManager = null;
         Set<Code> _successCodes = null;
-
+        Set<Code> _failedCodes = null;
+        
         // There are 2 reasons why we are applying lock right here.
         // 1) Ensure visibility, as we do not apply volatile in all member 
         //    variables.
@@ -818,6 +861,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         try {
             _alertStateManager = this.alertStateManager;
             _successCodes = this.successCodes;
+            _failedCodes = this.failedCodes;
             RealTimeStockMonitor _realTimeStockMonitor = this.realTimeStockMonitor;
 
             // Perform "_realTimeStockMonitor != monitor" check, to ensure we
@@ -837,7 +881,9 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             reader.unlock();
         }
 
-        final boolean isSymbolImmutable = org.yccheok.jstock.engine.Utils.isSymbolImmutable();
+
+        final boolean isSymbolImmutable = org.yccheok.jstock.engine.Utils.isSymbolImmutable();        
+        final List<Stock> stocks = result.stocks;
         for (int i = 0, size = stocks.size(); i < size; i++) {
             final Stock stock = stocks.get(i);
             Stock new_stock = stock;
@@ -863,12 +909,19 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             } // if (org.yccheok.jstock.engine.Utils.isSymbolImmutable() || new_stock.symbol.toString().isEmpty())
         }   // for (int i = 0, size = stocks.size(); i < size; i++)
 
-        if (stocks.size() > 0)
+        if (false == stocks.isEmpty())
         {
             // We only print out the first stock, to avoid too many different
             // messages within a short duration.
             final String template = GUIBundle.getString("IndicatorScannerJPanel_IndicatorScannerIsScanning..._template");
-            final String message = MessageFormat.format(template, stocks.get(0).symbol, getCompleteScannedStocksPercentage());
+            final ScannedResult scannedResult = this.getScannedResult();
+            final String message = MessageFormat.format(
+                template, 
+                stocks.get(0).symbol, 
+                scannedResult.getTotal(),
+                scannedResult.expected,
+                getCompleteScannedStocksPercentage(scannedResult)
+            );
             updateStatusBarIfStopButtonIsNotPressed(message);
         }
 
@@ -899,29 +952,40 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
 
             // Indicates we has finished scanning this stock.
             _successCodes.add(stock.code);
+            _failedCodes.remove(stock.code);
+        }
+        
+        for (Code code : result.failedCodes) {
+            _failedCodes.add(code);
+            _successCodes.remove(code);
         }
         
         // Display the same message again, so that we will get the most updated
         // complete percentage. Should we use back the same message template?
-        if (stocks.size() > 0)
+        if (false == stocks.isEmpty())
         {
             final String template = GUIBundle.getString("IndicatorScannerJPanel_IndicatorScannerIsScanning..._template");
-            final String message = MessageFormat.format(template, stocks.get(0).symbol, getCompleteScannedStocksPercentage());
+            final ScannedResult scannedResult = this.getScannedResult();
+            final String message = MessageFormat.format(
+                template, 
+                stocks.get(0).symbol, 
+                scannedResult.getTotal(),
+                scannedResult.expected,
+                getCompleteScannedStocksPercentage(scannedResult)
+            );
             updateStatusBarIfStopButtonIsNotPressed(message);
         }
     }  
 
-    private int getCompleteScannedStocksPercentage() {
-        int expected = operatorIndicators.size();
-        int failedCodesSize = failedCodes.size();
-        int successCodesSize = successCodes.size();
-        // As long as there is a least 1 success stock, we will consider failed
-        // stocks as well. This is a very crude way, to determine Internet
-        // connection is available, and the failed stocks are just caused by
-        // incorrect stock codes.
-        if ((successCodesSize > 0) && (expected > 0)) {
-            return (successCodesSize + failedCodesSize) * 100 / expected;
-        }
+    private ScannedResult getScannedResult() {
+        return new ScannedResult(operatorIndicators.size(), successCodes.size(), failedCodes.size());
+    }
+    
+    private int getCompleteScannedStocksPercentage(ScannedResult scannedResult) {
+        if (scannedResult.expected > 0) {
+            final int percentage = (scannedResult.getTotal()) * 100 / scannedResult.expected;
+            return percentage;
+        }            
         return 0;
     }
 
@@ -1159,7 +1223,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
     
     private Wizard wizard;
     private RealTimeStockMonitor realTimeStockMonitor;
-    private final org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, java.util.List<Stock>> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
+    private final org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, RealTimeStockMonitor.Result> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
     private final java.util.Map<Code, java.util.List<OperatorIndicator>> operatorIndicators = new java.util.concurrent.ConcurrentHashMap<Code, java.util.List<OperatorIndicator>>();
 
     private Set<Code> successCodes;
