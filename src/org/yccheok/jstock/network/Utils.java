@@ -48,6 +48,7 @@ public class Utils {
         ANDROID_HTML,
         STOCK_INFO_DATABASE_META,
         ANDROID_FAQ,
+        DRIVEWEALTH_LOG
     }
 
     private Utils() {
@@ -103,6 +104,7 @@ public class Utils {
         map.put(Type.ANDROID_HTML, "http://goo.gl/VAm6Mx");
         map.put(Type.STOCK_INFO_DATABASE_META, JSTOCK_STATIC_SERVER + "stocks_information/stock-info-database-meta.json");
         map.put(Type.ANDROID_FAQ, "http://faq.jstock.co/?utm_source=jstock-android&utm_medium=settings");
+        map.put(Type.DRIVEWEALTH_LOG, "https://jstock-drivewealth.appspot.com/log");
 
         zh_map.put(Type.CHAT_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/chat_server.txt");
         zh_map.put(Type.NTP_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/ntp_server.txt");
@@ -124,6 +126,7 @@ public class Utils {
         zh_map.put(Type.ANDROID_HTML, "http://goo.gl/VAm6Mx");
         zh_map.put(Type.STOCK_INFO_DATABASE_META, JSTOCK_STATIC_SERVER + "stocks_information/stock-info-database-meta.json");
         zh_map.put(Type.ANDROID_FAQ, "http://faq.jstock.co/zh/?utm_source=jstock-android&utm_medium=settings");
+        zh_map.put(Type.DRIVEWEALTH_LOG, "https://jstock-drivewealth.appspot.com/log");
 
         zh_Hant_map.put(Type.CHAT_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/chat_server.txt");
         zh_Hant_map.put(Type.NTP_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/ntp_server.txt");
@@ -145,6 +148,7 @@ public class Utils {
         zh_Hant_map.put(Type.ANDROID_HTML, "http://goo.gl/VAm6Mx");
         zh_Hant_map.put(Type.STOCK_INFO_DATABASE_META, JSTOCK_STATIC_SERVER + "stocks_information/stock-info-database-meta.json");
         zh_Hant_map.put(Type.ANDROID_FAQ, "http://faq.jstock.co/zh-Hant/?utm_source=jstock-android&utm_medium=settings");
+        zh_Hant_map.put(Type.DRIVEWEALTH_LOG, "https://jstock-drivewealth.appspot.com/log");
 
         assert(map.size() == Type.values().length);
         assert(zh_map.size() == Type.values().length);

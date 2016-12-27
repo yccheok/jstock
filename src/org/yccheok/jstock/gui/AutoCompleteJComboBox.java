@@ -288,6 +288,7 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
 
                     if (shouldShowPopup) {
                         AutoCompleteJComboBox.this.showPopup();
+                        //AutoCompleteJComboBox.this.requestFocusInWindow();
                     }
                     else {
 

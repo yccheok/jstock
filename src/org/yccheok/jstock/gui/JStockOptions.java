@@ -125,6 +125,7 @@ public class JStockOptions {
         this.proxyPort = -1;
         // In milliseconds.
         this.scanningSpeed = 1*60*1000;
+        this.indicatorScanningSpeed = 30*1000;
         // In seconds.
         this.alertSpeed = 5;
         this.looknFeel = null;
@@ -170,6 +171,8 @@ public class JStockOptions {
         this.locale = Locale.getDefault();
 
         this.boundsEx = null;
+        
+        initRecentCountries();
     }
 
     private boolean soundEnabled;
@@ -195,8 +198,12 @@ public class JStockOptions {
     private transient String indicatorPassword;
     private String proxyServer;
     private int proxyPort;
+    
     // In milliseconds.
     private int scanningSpeed;
+    // In milliseconds.
+    private int indicatorScanningSpeed;
+    
     // In seconds.
     private int alertSpeed;
     // Opps! Spelling mistake (Should be lookNFeel). However, due to XML
@@ -345,6 +352,7 @@ public class JStockOptions {
         //this.proxyServer = jStockOptions.proxyServer;
         //this.proxyPort = jStockOptions.proxyPort;
         this.scanningSpeed = jStockOptions.scanningSpeed;
+        this.indicatorScanningSpeed = jStockOptions.indicatorScanningSpeed;
         this.alertSpeed = jStockOptions.alertSpeed;
         this.looknFeel = jStockOptions.looknFeel;
         this.alwaysOnTop = jStockOptions.alwaysOnTop;
@@ -457,6 +465,34 @@ public class JStockOptions {
         return jStockOptions;
     }
 
+    private void initRecentCountries() {
+        if (this.recentCountries == null) {
+            this.recentCountries = new ArrayList<>();            
+        }
+        
+        Country[] countries = {
+            Country.UnitedState, 
+            Country.Canada,
+            Country.Malaysia,
+            Country.UnitedKingdom,
+            Country.Singapore
+        };
+    
+        if (recentCountries.size() != DEFAULT_RECENT_COUNTRY_SIZE) {
+            if (recentCountries.size() < DEFAULT_RECENT_COUNTRY_SIZE) {
+                for (Country country : countries) {
+                    recentCountries.add(country);
+                }
+            }
+            Set<Country> c = new HashSet<>(recentCountries);
+            recentCountries = new ArrayList<>(c);
+            int k = recentCountries.size();
+            if (k > DEFAULT_RECENT_COUNTRY_SIZE) {
+                recentCountries.subList(DEFAULT_RECENT_COUNTRY_SIZE, k).clear();
+            }
+        }
+    }
+    
     private Object readResolve() {
         /* For backward compatible */
         if (lastSelectedPageIndex < 0) {
@@ -486,31 +522,7 @@ public class JStockOptions {
             }
         }
 
-        if (this.recentCountries == null) {
-            this.recentCountries = new ArrayList<>();            
-        }
-        
-        Country[] countries = {
-            Country.UnitedState, 
-            Country.Canada,
-            Country.Malaysia,
-            Country.UnitedKingdom,
-            Country.Singapore
-        };
-    
-        if (recentCountries.size() != DEFAULT_RECENT_COUNTRY_SIZE) {
-            if (recentCountries.size() < DEFAULT_RECENT_COUNTRY_SIZE) {
-                for (Country country : countries) {
-                    recentCountries.add(country);
-                }
-            }
-            Set<Country> c = new HashSet<>(recentCountries);
-            recentCountries = new ArrayList<>(c);
-            int k = recentCountries.size();
-            if (k > DEFAULT_RECENT_COUNTRY_SIZE) {
-                recentCountries.subList(DEFAULT_RECENT_COUNTRY_SIZE, k).clear();
-            }
-        }
+        this.initRecentCountries();
         
         if (historyDuration <= 0) {
             historyDuration = DEFAULT_HISTORY_DURATION;
@@ -648,6 +660,12 @@ public class JStockOptions {
             this.scanningSpeed = 10000;
         }
         
+        if (this.indicatorScanningSpeed <= 0) {
+            // In previous version, it is possible for scanningSpeed <= 1000.
+            // This is some how wasting CPU and network resource. Let's go green.
+            this.indicatorScanningSpeed = 30*1000;
+        }
+        
         return this;
     }    
     
@@ -746,8 +764,16 @@ public class JStockOptions {
         return scanningSpeed;
     }
 
+    public int getIndicatorScanningSpeed() {
+        return indicatorScanningSpeed;
+    }
+    
     public int getAlertSpeed() {
         return alertSpeed;
+    }
+
+    public void setIndicatorScanningSpeed(int indicatorScanningSpeed) {
+        this.indicatorScanningSpeed = indicatorScanningSpeed;
     }
     
     public void setScanningSpeed(int scanningSpeed) {

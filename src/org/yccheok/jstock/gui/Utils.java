@@ -85,10 +85,12 @@ import java.util.Date;
 import java.util.EnumMap;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
@@ -1838,6 +1840,14 @@ public class Utils {
         return toXML(object, new File(filePath));
     }
 
+    private static String getDriveWealthDirectory() {
+        return Utils.getUserDataDirectory() + "drive-wealth" + File.separator;
+    }
+    
+    private static File getDriveWealthCodesFile() {
+        return new File(org.yccheok.jstock.gui.Utils.getDriveWealthDirectory() + "codes.json");
+    }
+
     public static File getStockInfoDatabaseMetaFile() {
         return new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "stock-info-database-meta.json");
     }
@@ -2464,8 +2474,6 @@ public class Utils {
         // Czech and Hungary are only for currency exchange purpose.
         countries.remove(Country.Czech);
         countries.remove(Country.Hungary);
-        // Spain are no longer supported.
-        countries.remove(Country.Spain);
         return countries;
     }
     
@@ -2485,6 +2493,57 @@ public class Utils {
         }
         
         return stockInfoDatabaseMeta;
+    }
+    
+    public static boolean saveDriveWealthCodes(Set<Code> codes) {
+        final Gson gson = new Gson();
+        String string = gson.toJson(codes);
+        
+        Utils.createCompleteDirectoryHierarchyIfDoesNotExist(Utils.getDriveWealthDirectory());
+        
+        try {            
+            //If the constructor throws an exception, the finally block will NOT execute
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(Utils.getDriveWealthCodesFile()), "UTF-8"));
+            try {
+                writer.write(string);
+            } finally {
+                writer.close();
+            }
+        } catch (IOException ex){
+            log.error(null, ex);
+            return false;
+        }
+        
+        return true;        
+    }
+
+    public static Set<Code> loadDriveWealthCodes() {
+        final Gson gson = new Gson();
+        Set<Code> codes = null;
+
+        try {
+            //If the constructor throws an exception, the finally block will NOT execute
+            //BufferedReader reader = new BufferedReader(new FileReader(file));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(Utils.getDriveWealthCodesFile()), "UTF-8"));            
+            try {
+                codes = gson.fromJson(reader, new TypeToken<HashSet<Code>>(){}.getType());
+            } finally {
+                //no need to check for null
+                //any exceptions thrown here will be caught by 
+                //the outer catch block
+                reader.close();
+            }
+        } catch (IOException ex){
+            log.error(null, ex);
+        } catch (com.google.gson.JsonSyntaxException ex) {
+            log.error(null, ex);
+        }            
+
+        if (codes == null) {
+            return java.util.Collections.emptySet();
+        }
+        
+        return codes;
     }
     
     public static Map<Country, Long> loadStockInfoDatabaseMeta(File stockInfoDatabaseMetaFile) {
@@ -2688,11 +2747,11 @@ public class Utils {
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7.17";
+    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7.18";
 
-    // 1.0.7.17
+    // 1.0.7.18
     // For About box comparision on latest version purpose.
-    private static final int APPLICATION_VERSION_ID = 1146;
+    private static final int APPLICATION_VERSION_ID = 1147;
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     

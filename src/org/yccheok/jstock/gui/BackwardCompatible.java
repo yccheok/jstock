@@ -12,17 +12,27 @@ import java.io.File;
  */
 public class BackwardCompatible {
     public static String toGoogleCodeIfPossible(String code) {
-        String string = code.toString().trim().toUpperCase();
+        final String string = code.toString().trim().toUpperCase();
         final int string_length = string.length();
         
         if (string.endsWith(".NS") && string_length > ".NS".length()) {
-            string = string.substring(0, string_length - ".NS".length());
-            String newString = org.yccheok.jstock.engine.Utils.toGoogleFormatThroughAutoComplete(string, "NSE");
+            final String s = string.substring(0, string_length - ".NS".length());
+            String newString = org.yccheok.jstock.engine.Utils.toGoogleFormatThroughAutoComplete(s, "NSE");
             if (newString != null) {
                 return newString + ".N";
             }
         }
-        
+
+        if (string.endsWith(".FI") && string_length > ".FI".length()) {
+            final String s = string.substring(0, string_length - ".FI".length());
+            return s + ".HE";
+        }
+
+        if (string.endsWith(".RU") && string_length > ".RU".length()) {
+            final String s = string.substring(0, string_length - ".ME".length());
+            return s + ".ME";
+        }
+
         return code;
     }
     

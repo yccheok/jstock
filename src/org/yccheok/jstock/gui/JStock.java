@@ -1,6 +1,6 @@
 /*
  * JStock - Free Stock Market Software
- * Copyright (C) 2015 Yan Cheng Cheok <yccheok@yahoo.com>
+ * Copyright (C) 2016 Yan Cheng Cheok <yccheok@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -68,6 +69,11 @@ import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.file.ThreadSafeFileLock;
 import org.yccheok.jstock.gui.news.StockNewsJFrame;
+
+import org.yccheok.jstock.gui.trading.TradingJPanel;
+import org.yccheok.jstock.gui.trading.TradingView;
+import org.yccheok.jstock.trading.api.InstrumentManager;
+
 
 
 /**
@@ -113,6 +119,7 @@ public class JStock extends javax.swing.JFrame {
         createStockIndicatorEditor();
         createIndicatorScannerJPanel();
         createPortfolioManagementJPanel();
+        createTradingJPanel();
 
         createIconsAndToolTipTextForJTabbedPane();
 
@@ -145,7 +152,8 @@ public class JStock extends javax.swing.JFrame {
         this.initLanguageMenuItemsSelection();        
         this.initJXLayerOnJComboBox();
         this.initKeyBindings();
-        
+        this.initDriveWealthInstruments();
+                
         // Turn to the last viewed page.
         final int lastSelectedPageIndex = this.getJStockOptions().getLastSelectedPageIndex();
         if (this.jTabbedPane1.getTabCount() > lastSelectedPageIndex) {
@@ -174,16 +182,6 @@ public class JStock extends javax.swing.JFrame {
         }
         
         installShutdownHook();
-        
-        // Spain no longer supported. Sad...
-        if (this.jStockOptions.getCountry() == Country.Spain) {
-            JOptionPane.showMessageDialog(
-                null, 
-                MessagesBundle.getString("info_message_spain_not_supported"), 
-                MessagesBundle.getString("info_title_spain_not_supported"), 
-                JOptionPane.INFORMATION_MESSAGE
-            );
-        }
     }
 
     private void requestFocusOnJComboBox() {
@@ -937,7 +935,14 @@ public class JStock extends javax.swing.JFrame {
             this.jMenuItem4.setEnabled(false);  // Add Stocks...
             this.jMenuItem7.setEnabled(false);  // Clear All Stocks...
             this.jMenuItem15.setEnabled(true);  // Refresh Stock Prices            
-        }   
+        }
+        else if(pane.getSelectedComponent() == this.tradingJPanel) {
+            this.jMenuItem2.setEnabled(false);  // Load
+            this.jMenuItem9.setEnabled(false);  // Save
+            this.jMenuItem4.setEnabled(false);  // Add Stocks...
+            this.jMenuItem7.setEnabled(false);  // Clear All Stocks...
+            this.jMenuItem15.setEnabled(true);  // Refresh Stock Prices            
+        }
         
         if (this.isStatusBarBusy == false) {
             this.setStatusBar(false, this.getBestStatusBarMessage());
@@ -1028,11 +1033,18 @@ public class JStock extends javax.swing.JFrame {
         isFormWindowClosedCalled = true;
         
         try {
+            ExecutorService _driveWealthInstrumentsPool = this.driveWealthInstrumentsPool;
+            this.driveWealthInstrumentsPool = null;
+            if (_driveWealthInstrumentsPool != null) {
+                _driveWealthInstrumentsPool.shutdownNow();
+            }
+
             ExecutorService _stockInfoDatabaseMetaPool = this.stockInfoDatabaseMetaPool;
             this.stockInfoDatabaseMetaPool = null;
-        
-            _stockInfoDatabaseMetaPool.shutdownNow();
-            
+            if (_stockInfoDatabaseMetaPool != null) {
+                _stockInfoDatabaseMetaPool.shutdownNow();
+            }
+
             // Always be the first statement. As no matter what happen, we must
             // save all the configuration files.
             this.save();
@@ -1608,6 +1620,7 @@ public class JStock extends javax.swing.JFrame {
         refreshAllRealTimeStockMonitors();
         refreshRealTimeIndexMonitor();
         refreshExchangeRateMonitor();
+        TradingView.getInstance().refreshPortfolio();
         
         // Only update UI when there is at least one stock.
         if (this.getStocks().isEmpty() == false) {
@@ -1752,6 +1765,9 @@ public class JStock extends javax.swing.JFrame {
          * UI Manager initialization via JStockOptions.
          **********************************************************************/
         final JStockOptions jStockOptions = getJStockOptionsViaXML();
+
+        // allow CORS in JavaFX WebView
+        System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
 
         // OSX menu bar at top.
         if (Utils.isMacOSX()) {
@@ -2090,7 +2106,19 @@ public class JStock extends javax.swing.JFrame {
         portfolioManagementJPanel = new PortfolioManagementJPanel();        
         jTabbedPane1.addTab(GUIBundle.getString("PortfolioManagementJPanel_Title"), portfolioManagementJPanel);
     }
-    
+
+    // Drive Wealth integration tab
+    public TradingJPanel getTradingJPanel() {
+        return this.tradingJPanel;
+    }
+
+    private void createTradingJPanel() {
+        tradingJPanel = new TradingJPanel();
+        ImageIcon icon = new javax.swing.ImageIcon(getClass().getResource("/images/16x16/drivewealth_logo.png"));
+
+        jTabbedPane1.addTab(GUIBundle.getString("TradingJPanel_Title"), icon, tradingJPanel);
+    }
+
     private void createStockIndicatorEditor() {
         indicatorPanel = new IndicatorPanel();                
         jTabbedPane1.addTab(GUIBundle.getString("IndicatorPanel_Title"), indicatorPanel);
@@ -2146,7 +2174,9 @@ public class JStock extends javax.swing.JFrame {
             }
         }
         
-        jMenu6.add(new javax.swing.JPopupMenu.Separator(), index++);
+        if (index > 0) {
+            jMenu6.add(new javax.swing.JPopupMenu.Separator(), index++);
+        }
     }
     
     public void createCountryMenuItems() {        
@@ -2771,15 +2801,6 @@ public class JStock extends javax.swing.JFrame {
         saveWatchlist();
         this.portfolioManagementJPanel.savePortfolio();
 
-        // Spain no longer supported. Sad...
-        if (country == Country.Spain) {
-            JOptionPane.showMessageDialog(
-                null, 
-                MessagesBundle.getString("info_message_spain_not_supported"), 
-                MessagesBundle.getString("info_title_spain_not_supported"), 
-                JOptionPane.INFORMATION_MESSAGE
-            );
-        }        
         jStockOptions.setCountry(country);
         jStockOptions.addRecentCountry(country);
         JStock.this.statusBar.setCountryIcon(country.icon, country.humanString);
@@ -3317,7 +3338,7 @@ public class JStock extends javax.swing.JFrame {
         popup.addSeparator();        
         
         if (jTable1.getSelectedRowCount() == 1) {
-            menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_Buy..."), this.getImageIcon("/images/16x16/inbox.png"));
+            menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_Buy..."), this.getImageIcon("/images/16x16/calc.png"));
 
             menuItem.addActionListener(new ActionListener() {
                 @Override
@@ -3343,6 +3364,20 @@ public class JStock extends javax.swing.JFrame {
             });  
             
             popup.add(menuItem);            
+
+            final int row = jTable1.getSelectedRow();
+            final int modelIndex = jTable1.getRowSorter().convertRowIndexToModel(row);
+            final Stock stock = ((StockTableModel)tableModel).getStock(modelIndex);
+            if (isDriveWealthCodes(stock.code)) {
+                menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_DriveWealthBuy..."), this.getImageIcon("/images/16x16/drivewealth_logo.png"));    
+                
+                menuItem.addActionListener((ActionEvent evt) -> {
+                    jTabbedPane1.setSelectedComponent(this.tradingJPanel);
+                    TradingView.getInstance().showBuyDialog(stock.code.toString());
+                });
+
+                popup.add(menuItem);
+            }
             
             popup.addSeparator();
         }                
@@ -4111,6 +4146,57 @@ public class JStock extends javax.swing.JFrame {
         this.indicatorPanel.initAjaxProvider();
     }
     
+    public boolean isDriveWealthCodes(Code code) {
+        return this.driveWealthCodes.contains(code);
+    }
+    
+    private void initDriveWealthInstruments() {  
+        Runnable runnable = () -> {
+            Set<Code> codes = Utils.loadDriveWealthCodes();
+            if (false == codes.isEmpty()) {
+                driveWealthCodes.clear();
+                driveWealthCodes.addAll(codes);
+            }
+        };
+        
+        Executor driveWealthInstrumentsPool = this.driveWealthInstrumentsPool;
+        if (driveWealthInstrumentsPool != null) {
+            driveWealthInstrumentsPool.execute(runnable);
+        }
+    }
+    
+    public void downloadDriveWealthInstruments() {        
+        Runnable runnable = () -> {
+            java.util.List<Map<String, String>> instruments = InstrumentManager.listAllInstruments();
+            if (instruments == null) {
+                return;
+            }
+            
+            Set<Code> codes = new HashSet<>();
+            
+            for (Map<String, String> instrument : instruments) {
+                if (instrument.containsKey("symbol")) {
+                    String s = instrument.get("symbol");
+                    if (false == Utils.isNullOrEmpty(s)) {
+                        Code code = Code.newInstance(s);
+                        codes.add(code);
+                    }
+                }
+            }
+            
+            if (false == codes.isEmpty()) {
+                driveWealthCodes.clear();
+                driveWealthCodes.addAll(codes);
+                Utils.saveDriveWealthCodes(driveWealthCodes);
+            }            
+        };
+        
+        Executor driveWealthInstrumentsPool = this.driveWealthInstrumentsPool;
+        if (driveWealthInstrumentsPool != null) {
+            driveWealthInstrumentsPool.execute(runnable);
+        }
+    }
+
     private void initStockInfoDatabaseMeta() {
 
         Runnable runnable = new Runnable() {
@@ -4446,7 +4532,8 @@ public class JStock extends javax.swing.JFrame {
             return;
         }
         
-        if (this.getSelectedComponent() != this.jPanel8 && this.getSelectedComponent() != this.portfolioManagementJPanel) {
+        Component selected = this.getSelectedComponent();
+        if (selected != this.jPanel8 && selected != this.portfolioManagementJPanel && selected != this.tradingJPanel) {
             return;
         }
         
@@ -4459,13 +4546,19 @@ public class JStock extends javax.swing.JFrame {
     public String getBestStatusBarMessage() {        
         final String currentName;
         final long _timestamp;
+        
+        Component selected = this.getSelectedComponent();
+        
         // MainFrame
-        if (this.getSelectedComponent() == this.jPanel8) {
+        if (selected == this.jPanel8) {
             currentName = this.getJStockOptions().getWatchlistName();
             _timestamp = this.timestamp;
-        } else if (this.getSelectedComponent() == this.portfolioManagementJPanel) {
+        } else if (selected == this.portfolioManagementJPanel) {
             currentName = this.getJStockOptions().getPortfolioName();
             _timestamp = this.portfolioManagementJPanel.getTimestamp();
+        } else if (selected == this.tradingJPanel) {
+            currentName = "DriveWealth - Market data is provided by BATS";
+            _timestamp = TradingView.getInstance().getTimestamp();
         } else {
             return GUIBundle.getString("MainFrame_Connected");
         }
@@ -4975,12 +5068,16 @@ public class JStock extends javax.swing.JFrame {
     private IndicatorPanel indicatorPanel;
     private IndicatorScannerJPanel indicatorScannerJPanel;
     private PortfolioManagementJPanel portfolioManagementJPanel;
+    private TradingJPanel tradingJPanel;
 
     private final AlertStateManager alertStateManager = new AlertStateManager();
     private final ExecutorService emailAlertPool = Executors.newFixedThreadPool(1);
     private final ExecutorService systemTrayAlertPool = Executors.newFixedThreadPool(1);
     private volatile ExecutorService stockInfoDatabaseMetaPool = Executors.newFixedThreadPool(1);
-            
+
+    private volatile ExecutorService driveWealthInstrumentsPool = Executors.newFixedThreadPool(1);
+    private final Set<Code> driveWealthCodes = ConcurrentHashMap.newKeySet();
+    
     private final org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, RealTimeStockMonitor.Result> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
     private final org.yccheok.jstock.engine.Observer<RealTimeIndexMonitor, java.util.List<Market>> realTimeIndexMonitorObserver = this.getRealTimeIndexMonitorObserver();
     private final org.yccheok.jstock.engine.Observer<StockHistoryMonitor, StockHistoryMonitor.StockHistoryRunnable> stockHistoryMonitorObserver = this.getStockHistoryMonitorObserver();

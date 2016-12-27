@@ -35,6 +35,7 @@ import org.yccheok.jstock.alert.GoogleMail;
 import org.yccheok.jstock.analysis.*;
 import org.yccheok.jstock.analysis.Indicator;
 import org.yccheok.jstock.engine.*;
+import org.yccheok.jstock.gui.trading.TradingView;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.internationalization.MessagesBundle;
 
@@ -152,8 +153,20 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         // before we can press "start" button.
         assert(this.startScanThread == null);
         
-        JOptionPane.showMessageDialog(this, MessagesBundle.getString("info_message_stop_indicator_scanner_once_done"), MessagesBundle.getString("info_title_stop_indicator_scanner_once_done"), JOptionPane.INFORMATION_MESSAGE);
+        final JStock mainFrame = JStock.instance();
+        FairUsagePolicyJDialog fairUsagePolicyJDialog = new FairUsagePolicyJDialog(mainFrame, true);
+        fairUsagePolicyJDialog.setLocationRelativeTo(this);
+        fairUsagePolicyJDialog.setVisible(true);
 
+        final int speed = fairUsagePolicyJDialog.getSpeed();
+        if (speed == 0) {
+            return;
+        }
+        
+        JStock.instance().getJStockOptions().setIndicatorScanningSpeed(speed);;
+
+        this.realTimeStockMonitor.setDelay(speed);
+        
         stop_button_pressed = false;
 
         final JStock m = JStock.instance();
@@ -287,7 +300,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             }
             
             try {
-                Thread.sleep(500);
+                Thread.sleep(JStock.instance().getJStockOptions().getIndicatorScanningSpeed());
             } catch (InterruptedException ex) {
                 log.error(null, ex);
                 break;
@@ -405,13 +418,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                             Utils.playAlertSound();
                         }
                         try {
-                            // Make it rest for 2 minute. Yahoo does have quota
-                            // for every ip. If we are too greedy, we will get
-                            // Error message: "Unable to process request at this time -- error 999"
-                            // https://help.yahoo.com/kb/SLN2253.html
-                            Thread.sleep(2*60*1000);
-                            
-                            //Thread.sleep(jStockOptions.getAlertSpeed() * 1000);
+                            Thread.sleep(jStockOptions.getAlertSpeed() * 1000);
                         }
                         catch (InterruptedException exp) {
                             log.error(null, exp);
@@ -820,7 +827,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         this.realTimeStockMonitor = new RealTimeStockMonitor(
                 Constants.REAL_TIME_STOCK_MONITOR_MAX_THREAD, 
                 Constants.REAL_TIME_STOCK_MONITOR_MAX_STOCK_SIZE_PER_SCAN, 
-                JStock.instance().getJStockOptions().getScanningSpeed());
+                JStock.instance().getJStockOptions().getIndicatorScanningSpeed());
         
         this.realTimeStockMonitor.attach(this.realTimeStockMonitorObserver);
     }
@@ -1146,6 +1153,21 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             });
 
             popup.add(menuItem);
+            
+            final int row = jTable1.getSelectedRow();
+            final int modelIndex = jTable1.getRowSorter().convertRowIndexToModel(row);
+            final IndicatorTableModel tableModel = (IndicatorTableModel)jTable1.getModel();
+            final Indicator indicator = tableModel.getIndicator(modelIndex);
+            final Stock stock = indicator.getStock();
+            if (JStock.instance().isDriveWealthCodes(stock.code)) {
+                menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_DriveWealthBuy..."), this.getImageIcon("/images/16x16/drivewealth_logo.png"));    
+                
+                menuItem.addActionListener((ActionEvent evt) -> {
+                    TradingView.getInstance().showBuyDialog(stock.code.toString());
+                });
+
+                popup.add(menuItem);
+            }
         }
 
         return popup;
