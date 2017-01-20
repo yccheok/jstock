@@ -72,6 +72,7 @@ import org.yccheok.jstock.gui.news.StockNewsJFrame;
 
 import org.yccheok.jstock.gui.trading.TradingJPanel;
 import org.yccheok.jstock.gui.trading.TradingView;
+import org.yccheok.jstock.internationalization.DriveWealthBundle;
 import org.yccheok.jstock.trading.api.InstrumentManager;
 
 
@@ -153,7 +154,7 @@ public class JStock extends javax.swing.JFrame {
         this.initJXLayerOnJComboBox();
         this.initKeyBindings();
         this.initDriveWealthInstruments();
-                
+
         // Turn to the last viewed page.
         final int lastSelectedPageIndex = this.getJStockOptions().getLastSelectedPageIndex();
         if (this.jTabbedPane1.getTabCount() > lastSelectedPageIndex) {
@@ -4557,7 +4558,7 @@ public class JStock extends javax.swing.JFrame {
             currentName = this.getJStockOptions().getPortfolioName();
             _timestamp = this.portfolioManagementJPanel.getTimestamp();
         } else if (selected == this.tradingJPanel) {
-            currentName = "DriveWealth - Market data is provided by BATS";
+            currentName = DriveWealthBundle.getString("Drivewealth_data_by_BATS");
             _timestamp = TradingView.getInstance().getTimestamp();
         } else {
             return GUIBundle.getString("MainFrame_Connected");

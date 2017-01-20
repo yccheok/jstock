@@ -1,6 +1,10 @@
 ﻿This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.7.19 - 2017-01-21
+  Feature: Added millisecond speed option for indicator scanning.
+  Bugfix:  Various bug fixes and improvements for U.S. stock trading.
+  
 JStock 1.0.7.18 - 2016-12-27
   Feature: JStock is partnering with DriveWealth, to provide U.S. stock trading
            service.

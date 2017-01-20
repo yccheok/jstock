@@ -22,7 +22,9 @@ package org.yccheok.jstock.gui;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -32,14 +34,26 @@ import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.NTCredentials;
 import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.engine.PriceSource;
+import org.yccheok.jstock.gui.trading.CreateOrderDlg.AmountQty;
 import org.yccheok.jstock.portfolio.BrokingFirm;
 import org.yccheok.jstock.portfolio.DecimalPlace;
+import org.yccheok.jstock.trading.api.OrderManager.OrderType;
 
 /**
  *
  * @author yccheok
  */
 public class JStockOptions {
+    public static class DriveWealthBuySellOption {
+        public final OrderType orderType;
+        public final AmountQty amountQty;
+        
+        public DriveWealthBuySellOption(OrderType orderType, AmountQty amountQty) {
+            this.orderType = orderType;
+            this.amountQty = amountQty;
+        }
+    }
+
     /**
      * Data structure to carry location, size and state of a JFrame.
      */
@@ -264,6 +278,12 @@ public class JStockOptions {
     private String proxyAuthUserName = "";
     private boolean isProxyAuthEnabled = false;
 
+    private boolean driveWealthRememberLogin = false;
+    private String driveWealthSessionKey = null;
+    private Map<String, Long> driveWealthLastTxnTimestamp = new HashMap<>();
+    private DriveWealthBuySellOption driveWealthBuyOption = null;
+    private DriveWealthBuySellOption driveWealthSellOption = null;
+    
     @Deprecated
     private transient boolean rememberGoogleAccountEnabled = false;
     @Deprecated
@@ -402,6 +422,12 @@ public class JStockOptions {
         //this.proxyAuthPassword = jStockOptions.proxyAuthPassword;
         //this.proxyAuthUserName = jStockOptions.proxyAuthUserName;
         //this.isProxyAuthEnabled = jStockOptions.isProxyAuthEnabled;
+
+        //this.driveWealthSessionKey = jStockOptions.driveWealthSessionKey;
+        this.driveWealthRememberLogin = jStockOptions.driveWealthRememberLogin;
+        this.driveWealthLastTxnTimestamp = jStockOptions.driveWealthLastTxnTimestamp;
+        this.driveWealthBuyOption = jStockOptions.driveWealthBuyOption;
+        this.driveWealthSellOption = jStockOptions.driveWealthSellOption;
 
         /* For UK client. */
         //this.penceToPoundConversionEnabled = jStockOptions.penceToPoundConversionEnabled;
@@ -665,7 +691,11 @@ public class JStockOptions {
             // This is some how wasting CPU and network resource. Let's go green.
             this.indicatorScanningSpeed = 30*1000;
         }
-        
+
+        if (this.driveWealthLastTxnTimestamp == null) {
+            this.driveWealthLastTxnTimestamp = new HashMap<>();
+        }
+
         return this;
     }    
     
@@ -995,6 +1025,46 @@ public class JStockOptions {
     public void setEnableColorAlert(boolean enableColorAlert) {
         this.enableColorAlert = enableColorAlert;
     }
+
+    public String getDriveWealthSessionKey() {
+        return this.driveWealthSessionKey;
+    }
+    
+    public void setDriveWealthSessionKey(String driveWealthSessionKey) {
+        this.driveWealthSessionKey = driveWealthSessionKey;
+    }
+    
+    public boolean isDriveWealthRememberLogin () {
+        return this.driveWealthRememberLogin;
+    }
+    
+    public void setDriveWealthRememberLogin (boolean driveWealthRememberLogin) {
+        this.driveWealthRememberLogin = driveWealthRememberLogin;
+    }
+
+    public Long getDriveWealthLastTxnTimestamp(String accountID) {
+        return this.driveWealthLastTxnTimestamp.get(accountID);
+    }
+
+    public void setDriveWealthLastTxnTimestamp (String accountID, long timestamp) {
+        this.driveWealthLastTxnTimestamp.put(accountID, timestamp);
+    }
+
+    public DriveWealthBuySellOption getDriveWealthBuyOption () {
+        return this.driveWealthBuyOption;
+    } 
+
+    public void setDriveWealthBuyOption (OrderType ordType, AmountQty amtQty) {
+        this.driveWealthBuyOption = new DriveWealthBuySellOption(ordType, amtQty);
+    } 
+
+    public DriveWealthBuySellOption getDriveWealthSellOption () {
+        return this.driveWealthSellOption;        
+    } 
+
+    public void setDriveWealthSellOption (OrderType ordType, AmountQty amtQty) {
+        this.driveWealthSellOption = new DriveWealthBuySellOption(ordType, amtQty);
+    } 
 
     /**
      * @return the proxyAuthPassword
