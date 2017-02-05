@@ -1,0 +1,267 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Jun 16, 2016, 2:22:21 AM
+    Author     : shuwnyuan
+*/
+
+
+.table-view:focused {
+  -fx-background-color: transparent, -fx-box-border, -fx-control-inner-background;
+  -fx-background-insets: -1.4, 0, 1;
+  -fx-background-radius: 1.4, 0, 0;
+  -fx-padding: 1;   /* 0.083333em; */
+}
+
+.green-btn {
+    -fx-font-size: 18px;
+    -fx-background-color: #37BB9A;
+    -fx-background-radius: 6, 5;
+    -fx-background-insets: 0, 1;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.4) , 5, 0.0 , 0 , 1 );
+    -fx-text-fill: #FFFFFF;
+    
+    -fx-cursor: hand;       /* hover over button, change cursor to Hand */
+}
+
+.green-btn-small-font {
+    -fx-font-size: 14px;
+    -fx-background-color: #37BB9A;
+    -fx-background-radius: 6, 5;
+    -fx-background-insets: 0, 1;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.4) , 5, 0.0 , 0 , 1 );
+    -fx-text-fill: #FFFFFF;
+    
+    -fx-cursor: hand;       /* hover over button, change cursor to Hand */
+}
+
+#slogan-banner {
+    -fx-font-size: 14px;
+    -fx-background-color: #4285F4;
+    -fx-text-fill: #FFFFFF;
+}
+
+.blue-background {
+    -fx-background-color: #4285F4;
+}
+
+#open-acc-link {
+    -fx-font-size: 14px;
+}
+
+#signin-grid {
+    -fx-background-color: #FFFFFF;
+}
+
+.right {
+    -fx-alignment: center-right; 
+}
+
+.left {
+    -fx-alignment: center-left; 
+}
+
+.profit {
+    -fx-text-fill: white;
+    -fx-background-color: #37BB9A;
+    -fx-background-radius: 5;
+}
+
+.loss {
+    -fx-text-fill: white;
+    -fx-background-color: red;
+    -fx-background-radius: 5;
+}
+
+.table-view .column-header{
+    -fx-font-size: 12px;
+}
+
+.table-cell {
+    -fx-font-size: 12px;
+}
+
+#order-msg {
+    -fx-font-size: 16px;
+    -fx-background-color: #FFFFFF;
+    -fx-padding: 12 10 12 10;       /* top right bottom left */
+    -fx-margin: 10 0 0 0;
+}
+
+.bold-italic {
+    -fx-font-weight: bold;
+    -fx-font-style: italic;
+}
+
+#acc-header {
+    -fx-background-color: #FEC109;
+}
+
+#acc-summary-box {
+    -fx-background-color: white;
+}
+
+.small-font {
+    -fx-font-size: 10px;
+}
+
+.underline {
+    -fx-underline: true;
+}
+
+.italic {
+    -fx-font-style: italic;
+}
+
+.grey {
+    -fx-text-fill: grey;
+}
+
+.big-font {
+    -fx-font-size: 14px;
+}
+
+.bold {
+    -fx-font-weight: bold;
+}
+
+.rounded {
+    -fx-background-radius: 30;
+}
+
+.hyperlink {
+    -fx-focus-color: transparent;
+    -fx-underline: true;
+}
+
+
+/* 
+
+for: -fx-background-color, -fx-background-insets, -fx-background-radius
+Doc: https://docs.oracle.com/javase/8/javafx/api/javafx/scene/doc-files/cssref.html
+Also refer: http://stackoverflow.com/questions/16856359/how-do-i-get-rid-of-the-border-around-a-split-pane-in-javafx
+
+*/
+
+.border-box {
+    -fx-background-color: -fx-box-border, -fx-background;
+    -fx-background-insets: 0, 1;
+}
+
+.rounded-white-box {
+    -fx-background-color: -fx-box-border, white;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 10, 10;
+}
+
+.title {
+    -fx-font-weight: bold;
+    -fx-font-size: 18px;
+}
+
+#fund-in {
+    -fx-font-size: 14px;
+}
+
+.lost-pwd-dlg:header .header-panel .label {
+    -fx-font-size: 13px;    /* smaller font: -1 px than original */
+    -fx-wrap-text: true;
+}
+
+.dialog-pane {
+    -fx-padding: 10;        /* Dialog content: padding of 10px */
+}
+
+.note-small {
+    -fx-font-size: 12px;
+    -fx-text-fill: grey;
+}
+
+.green-txt {
+    -fx-text-fill: #37BB9A;
+}
+
+.red-txt {
+    -fx-text-fill: red;
+}
+
+.wizard-header {
+    -fx-padding: 0.833em; /* 10px */
+    -fx-background-color: -fx-box-border, linear-gradient(-fx-background, derive(-fx-background, 30%));
+    -fx-background-insets: 0, 0 0 1 0;
+}
+
+.wizard-header1 {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.wizard-header2 {
+    -fx-font-size: 14px;
+    -fx-text-fill: grey;
+}
+
+.question {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+/*
+
+Refer links below for:
+    -fx-mid-text-color, -fx-dark-text-color, -fx-light-text-color, -fx-background
+
+http://stackoverflow.com/questions/26997008/javafx-apply-text-color-to-tablecell-using-custom-style-sheet
+https://gist.github.com/maxd/63691840fc372f22f470
+
+*/
+
+.table-row-cell:new-row {
+    -fx-background: darkseagreen;
+}
+
+.profit-txt-color {
+    -fx-mid-text-color: #37BB9A;
+    -fx-dark-text-color: black;     /* original */
+    -fx-light-text-color: white;    /* original */
+}
+
+.loss-txt-color {
+    -fx-mid-text-color: red;
+    -fx-dark-text-color: black;
+    -fx-light-text-color: white;    /* original */
+}
+
+.table-cell:up-cell-color {
+    -fx-background-color: #37BB9A;
+    -fx-background: #37BB9A;
+}
+
+.table-cell:down-cell-color {
+    -fx-background-color: red;
+    -fx-background: red;
+}
+
+.label:up-label-color {
+    -fx-background-color: #37BB9A;
+    -fx-text-fill: #FFFFFF;
+}
+
+.label:down-label-color {
+    -fx-background-color: red;
+    -fx-text-fill: #FFFFFF;
+}
+
+.disclaimer {
+    -fx-font-size: 10px;
+    -fx-padding: 4px 0px 4px 0px;
+    /*-fx-border-color: black;*/
+}
+
+#learn-more-link {
+    -fx-accent: #FFFFFF;    /* white text on blue background */
+    -fx-font-size: 14px;
+}
