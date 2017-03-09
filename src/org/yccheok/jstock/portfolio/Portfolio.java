@@ -50,7 +50,7 @@ public class Portfolio extends DefaultSortableMutableTreeTableNode implements Co
             
             final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
         
-            final Code code = transaction.getStock().code;
+            final Code code = transaction.getStockInfo().code;
             
             final double exchangeRate = org.yccheok.jstock.portfolio.Utils.getExchangeRate(portfolioRealTimeInfo, localCurrency, code);
 
@@ -74,7 +74,7 @@ public class Portfolio extends DefaultSortableMutableTreeTableNode implements Co
             
             final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
         
-            final Code code = transaction.getStock().code;
+            final Code code = transaction.getStockInfo().code;
             
             final double exchangeRate = org.yccheok.jstock.portfolio.Utils.getExchangeRate(portfolioRealTimeInfo, localCurrency, code);
 
@@ -98,7 +98,7 @@ public class Portfolio extends DefaultSortableMutableTreeTableNode implements Co
             
             final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
         
-            final Code code = transaction.getStock().code;
+            final Code code = transaction.getStockInfo().code;
             
             final double exchangeRate = org.yccheok.jstock.portfolio.Utils.getExchangeRate(portfolioRealTimeInfo, localCurrency, code);
 
@@ -122,7 +122,7 @@ public class Portfolio extends DefaultSortableMutableTreeTableNode implements Co
             
             final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
         
-            final Code code = transaction.getStock().code;
+            final Code code = transaction.getStockInfo().code;
             
             final double exchangeRate = org.yccheok.jstock.portfolio.Utils.getExchangeRate(portfolioRealTimeInfo, localCurrency, code);
 

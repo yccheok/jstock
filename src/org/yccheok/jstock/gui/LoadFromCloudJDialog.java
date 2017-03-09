@@ -383,6 +383,9 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
                     return null;
                 }
 
+                // Ensure no in-memory data loss.
+                JStock.instance().commitBeforeLoadFromCloud();
+                
                 publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_ExtractingData..."), Icons.BUSY));
                 boolean status = Utils.extractZipFile(cloudFile.file, true);
                 

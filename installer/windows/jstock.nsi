@@ -12,7 +12,7 @@ Name ${PRODUCT_NAME}
 RequestExecutionLevel admin ;Workaround for Vista
 
 ; The file to write
-OutFile "jstock-1.0.7.20-setup.exe"
+OutFile "jstock-1.0.7.21-setup.exe"
 LicenseData "gpl-2.0.txt"
  
 ; The default installation directory

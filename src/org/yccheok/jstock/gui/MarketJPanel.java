@@ -30,7 +30,7 @@ import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.engine.Index;
 import org.yccheok.jstock.engine.Market;
-import org.yccheok.jstock.engine.Stock;
+import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.engine.Symbol;
 import org.yccheok.jstock.internationalization.GUIBundle;
 
@@ -112,8 +112,8 @@ public class MarketJPanel extends javax.swing.JPanel {
                 public void mouseClicked(java.awt.event.MouseEvent evt) {
                     final Code code = index.code;
                     final JStock m = JStock.instance();
-                    final Stock stock = org.yccheok.jstock.engine.Utils.getEmptyStock(code, Symbol.newInstance(code.toString()));
-                    m.displayHistoryChart(stock);
+                    final StockInfo stockInfo = StockInfo.newInstance(code, Symbol.newInstance(code.toString()));
+                    m.displayHistoryChart(stockInfo);
                 }
             });
         }

@@ -43,6 +43,7 @@ import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.SimpleDate;
 import org.yccheok.jstock.engine.Stock;
+import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.engine.Symbol;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.portfolio.BrokingFirm;
@@ -885,12 +886,12 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         buyTransactions.clear();
         buyTransactions.addAll(transactions);
 
-        final Stock _stock = transactions.get(0).getStock();
-        final Symbol symbol = _stock.symbol;
+        final StockInfo _stockInfo = transactions.get(0).getStockInfo();
+        final Symbol symbol = _stockInfo.symbol;
         final Date date = java.util.Calendar.getInstance().getTime();
 
         JStock mainFrame = JStock.instance();
-        double price = mainFrame.getPortfolioManagementJPanel().getStockPrice(_stock.code);
+        double price = mainFrame.getPortfolioManagementJPanel().getStockPrice(_stockInfo.code);
 
         this.jTextField1.setText(symbol.toString());
         // So that the 1st character is being displayed.
@@ -908,7 +909,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         // Limit maximum sell quantity.
         setMaxSellQuantity(quantity);
 
-        this.stock = _stock;
+        this.stockInfo = _stockInfo;
         this.type = Contract.Type.Sell;
 
         updateBuyValueAfterSpinner(quantity);
@@ -1000,8 +1001,8 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
 
         this.sellTransaction = transaction;
 
-        final Stock _stock = transaction.getStock();
-        final Symbol symbol = _stock.symbol;
+        final StockInfo _stockInfo = transaction.getStockInfo();
+        final Symbol symbol = _stockInfo.symbol;
         final Date date = transaction.getDate().getCalendar().getTime();
         final double quantity = transaction.getQuantity();
         final double price = transaction.getPrice();
@@ -1019,7 +1020,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         this.jFormattedTextField5.setValue(clearingFee);
         this.jFormattedTextField7.setValue(stampDuty);
 
-        this.stock = transaction.getStock();
+        this.stockInfo = transaction.getStockInfo();
         this.type = Contract.Type.Sell;
         
         final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
@@ -1048,7 +1049,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
             final SimpleDate date = new SimpleDate((Date)dateField.getValue());
             final double unit = ((java.lang.Double)this.jSpinner1.getValue());
             final double price = ((Double)this.jFormattedTextField1.getValue());
-            Contract.ContractBuilder builder = new Contract.ContractBuilder(this.sellTransaction.getStock(), date);
+            Contract.ContractBuilder builder = new Contract.ContractBuilder(this.sellTransaction.getStockInfo(), date);
             final Contract oldContract = this.sellTransaction.getContract();
             final Contract contract = builder.type(type).quantity(unit).price(price).referencePrice(oldContract.getReferencePrice())
                     .referenceBroker(oldContract.getReferenceBroker())
@@ -1106,7 +1107,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
                     }
                 }
 
-                Contract.ContractBuilder builder = new Contract.ContractBuilder(buyTransaction.getStock(), date);
+                Contract.ContractBuilder builder = new Contract.ContractBuilder(buyTransaction.getStockInfo(), date);
                 final double referenceBroker = buyTransaction.getBroker();
                 final double referenceClearingFee = buyTransaction.getClearingFee();
                 final double referenceStampDuty = buyTransaction.getStampDuty();
@@ -1233,7 +1234,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
             final DateField dateField = (DateField)jPanel3;
             final Date date = (Date)dateField.getValue();
             // Stock and date information is not important at this moment.
-            Contract.ContractBuilder builder = new Contract.ContractBuilder(org.yccheok.jstock.engine.Utils.getEmptyStock(Code.newInstance(name), Symbol.newInstance(name)), new SimpleDate(date));
+            Contract.ContractBuilder builder = new Contract.ContractBuilder(StockInfo.newInstance(Code.newInstance(name), Symbol.newInstance(name)), new SimpleDate(date));
             Contract contract = builder.type(Contract.Type.Sell).quantity(unit).price(price).build();
 
             final double brokerFee = brokingFirm.brokerCalculate(contract);
@@ -1412,7 +1413,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         final double bestPrice = bestSellingValue / (double)unit;
 
         JStock mainFrame = JStock.instance();
-        double currentPrice = mainFrame.getPortfolioManagementJPanel().getStockPrice(stock.code);
+        double currentPrice = mainFrame.getPortfolioManagementJPanel().getStockPrice(stockInfo.code);
 
         return bestPrice > currentPrice ? bestPrice : currentPrice;
     }
@@ -1425,7 +1426,7 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
     private List<Transaction> buyTransactions = new ArrayList<Transaction>();
     private List<Transaction> resultSellTransactions = new ArrayList<Transaction>();
 
-    private Stock stock;                // immutable.
+    private StockInfo stockInfo;        // immutable.
     // private SimpleDate date;         // mutable
     private Contract.Type type;         // immutable
     // private int quantity;            // mutable for edit. immutable for batch update.

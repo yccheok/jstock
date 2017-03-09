@@ -314,9 +314,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        List<Stock> stocks = getSelectedStocks();
-        if (stocks.size() == 1) {
-            this.showNewBuyTransactionJDialog(stocks.get(0), this.getStockPrice(stocks.get(0).code), true);
+        List<StockInfo> stockInfos = getSelectedStockInfos();
+        if (stockInfos.size() == 1) {
+            this.showNewBuyTransactionJDialog(stockInfos.get(0), this.getStockPrice(stockInfos.get(0).code), true);
         } else {
             this.showNewBuyTransactionJDialog(null, 0.0, true);
         }
@@ -489,9 +489,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                         final Double stampDuty = statement.getValueAsDouble(guiBundleWrapper.getString("PortfolioManagementJPanel_StampDuty"));
                         final String _comment = statement.getValueAsString(guiBundleWrapper.getString("PortfolioManagementJPanel_Comment"));
 
-                        Stock stock = null;
+                        StockInfo stockInfo = null;
                         if (_code.length() > 0 && _symbol.length() > 0) {
-                            stock = org.yccheok.jstock.engine.Utils.getEmptyStock(Code.newInstance(_code), Symbol.newInstance(_symbol));
+                            stockInfo = StockInfo.newInstance(Code.newInstance(_code), Symbol.newInstance(_symbol));
                         }
                         else {
                             log.error("Unexpected empty stock. Ignore");
@@ -545,7 +545,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
                         final SimpleDate simpleDate = new SimpleDate(date);
                         final Contract.Type type = Contract.Type.Buy;
-                        final Contract.ContractBuilder builder = new Contract.ContractBuilder(stock, simpleDate);
+                        final Contract.ContractBuilder builder = new Contract.ContractBuilder(stockInfo, simpleDate);
                         final Contract contract = builder.type(type).quantity(units).price(purchasePrice).build();
                         final Transaction t = new Transaction(contract, broker, stampDuty, clearingFee);
                         t.setComment(org.yccheok.jstock.portfolio.Utils.replaceCSVLineFeedToSystemLineFeed(_comment));
@@ -574,7 +574,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
                     Map<String, String> metadatas = statements.getMetadatas();
                     for (Transaction transaction : transactions) {
-                        final Code code = transaction.getStock().code;
+                        final Code code = transaction.getStockInfo().code;
                         TransactionSummary transactionSummary = this.addBuyTransaction(transaction);
                         if (transactionSummary != null) {
                             String comment = metadatas.get(code.toString());
@@ -636,9 +636,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                         final Double stampDuty = statement.getValueAsDouble(guiBundleWrapper.getString("PortfolioManagementJPanel_StampDuty"));
                         final String _comment = statement.getValueAsString(guiBundleWrapper.getString("PortfolioManagementJPanel_Comment"));
 
-                        Stock stock = null;
+                        StockInfo stockInfo = null;
                         if (_code.length() > 0 && _symbol.length() > 0) {
-                            stock = org.yccheok.jstock.engine.Utils.getEmptyStock(Code.newInstance(_code), Symbol.newInstance(_symbol));
+                            stockInfo = StockInfo.newInstance(Code.newInstance(_code), Symbol.newInstance(_symbol));
                         }
                         else {
                             log.error("Unexpected empty stock. Ignore");
@@ -697,7 +697,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                         final SimpleDate simpleDate = new SimpleDate(date);
                         final SimpleDate simpleReferenceDate = new SimpleDate(referenceDate);
                         final Contract.Type type = Contract.Type.Sell;
-                        final Contract.ContractBuilder builder = new Contract.ContractBuilder(stock, simpleDate);
+                        final Contract.ContractBuilder builder = new Contract.ContractBuilder(stockInfo, simpleDate);
                         final Contract contract = builder.type(type).quantity(units).price(sellingPrice).referencePrice(purchasePrice).referenceDate(simpleReferenceDate)
                                 .referenceBroker(purchaseBroker)
                                 .referenceClearingFee(purchaseClearingFee)
@@ -731,7 +731,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                     Map<String, String> metadatas = statements.getMetadatas();
 
                     for (Transaction transaction : transactions) {
-                        final Code code = transaction.getStock().code;
+                        final Code code = transaction.getStockInfo().code;
                         TransactionSummary transactionSummary = this.addSellTransaction(transaction);
                         if (transactionSummary != null) {
                             String comment = metadatas.get(code.toString());
@@ -954,27 +954,27 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return true;
     }
 
-    private List<Stock> getSelectedStocks() {
-        List<Stock> stocks0 = this.getSelectedStocks(buyTreeTable);
-        List<Stock> stocks1 = this.getSelectedStocks(sellTreeTable);
-        Set<Code> c = new HashSet<Code>();
-        List<Stock> stocks = new ArrayList<Stock>();
+    private List<StockInfo> getSelectedStockInfos() {
+        List<StockInfo> stockInfos0 = this.getSelectedStockInfos(buyTreeTable);
+        List<StockInfo> stockInfos1 = this.getSelectedStockInfos(sellTreeTable);
+        Set<Code> c = new HashSet<>();
+        List<StockInfo> stockInfos = new ArrayList<>();
 
-        for (Stock stock : stocks0) {
-            if (c.contains(stock.code) == false) {
-                c.add(stock.code);
-                stocks.add(stock);
+        for (StockInfo stockInfo : stockInfos0) {
+            if (c.contains(stockInfo.code) == false) {
+                c.add(stockInfo.code);
+                stockInfos.add(stockInfo);
             }
         }
 
-        for (Stock stock : stocks1) {
-            if (c.contains(stock.code) == false) {
-                c.add(stock.code);
-                stocks.add(stock);
+        for (StockInfo stockInfo : stockInfos1) {
+            if (c.contains(stockInfo.code) == false) {
+                c.add(stockInfo.code);
+                stockInfos.add(stockInfo);
             }
         }
 
-        return Collections.unmodifiableList(stocks);
+        return Collections.unmodifiableList(stockInfos);
     }
     
     public double getStockPrice(Code code) {
@@ -1034,7 +1034,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             newTransactionJDialog.setStockSelectionEnabled(false);
             newTransactionJDialog.setTransaction(transaction);
             final String template = GUIBundle.getString("PortfolioManagementJPanel_EditBuy_template");
-            newTransactionJDialog.setTitle(MessageFormat.format(template, transaction.getStock().symbol));
+            newTransactionJDialog.setTitle(MessageFormat.format(template, transaction.getStockInfo().symbol));
             newTransactionJDialog.setLocationRelativeTo(this);
             newTransactionJDialog.setVisible(true);
 
@@ -1050,7 +1050,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             NewSellTransactionJDialog newTransactionJDialog = new NewSellTransactionJDialog(mainFrame, true);
             newTransactionJDialog.setSellTransaction(transaction);
             final String template = GUIBundle.getString("PortfolioManagementJPanel_EditSell_template");
-            newTransactionJDialog.setTitle(MessageFormat.format(template, transaction.getStock().symbol));
+            newTransactionJDialog.setTitle(MessageFormat.format(template, transaction.getStockInfo().symbol));
             newTransactionJDialog.setLocationRelativeTo(this);
             newTransactionJDialog.setVisible(true);
 
@@ -1062,7 +1062,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
     }
     
-    public void showNewBuyTransactionJDialog(Stock stock, double lastPrice, boolean JComboBoxEnabled) {
+    public void showNewBuyTransactionJDialog(StockInfo stockInfo, double lastPrice, boolean JComboBoxEnabled) {
 
         final JStock mainFrame = JStock.instance();
 
@@ -1075,7 +1075,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         
         NewBuyTransactionJDialog newTransactionJDialog = new NewBuyTransactionJDialog(mainFrame, true);
         newTransactionJDialog.setLocationRelativeTo(this);
-        newTransactionJDialog.setStock(stock);
+        newTransactionJDialog.setStockInfo(stockInfo);
         newTransactionJDialog.setPrice(lastPrice);
         newTransactionJDialog.setJComboBoxEnabled(JComboBoxEnabled);
         newTransactionJDialog.setStockInfoDatabase(stockInfoDatabase);
@@ -1184,8 +1184,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_formMouseClicked
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        final List<Stock> stocks = this.getSelectedStocks(buyTreeTable);
-        if (stocks.size() != 1) {
+        final List<StockInfo> stockInfos = this.getSelectedStockInfos(buyTreeTable);
+        if (stockInfos.size() != 1) {
             JOptionPane.showMessageDialog(this, java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("info_message_you_need_to_select_only_single_stock_from_buy_portfolio_to_perform_sell_transaction"), java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/messages").getString("info_title_you_need_to_select_only_single_stock_from_buy_portfolio_to_perform_sell_transaction"), JOptionPane.INFORMATION_MESSAGE);
             return;
         }
@@ -1254,9 +1254,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         DividendSummaryJDialog dividendSummaryJDialog = new DividendSummaryJDialog(mainFrame, true, this.getDividendSummary(), this);
         dividendSummaryJDialog.setLocationRelativeTo(this);
 
-        List<Stock> stocks = this.getSelectedStocks();
-        if (stocks.size() == 1) {
-            dividendSummaryJDialog.addNewDividend(org.yccheok.jstock.engine.StockInfo.newInstance(stocks.get(0)));
+        List<StockInfo> stockInfos = this.getSelectedStockInfos();
+        if (stockInfos.size() == 1) {
+            dividendSummaryJDialog.addNewDividend(stockInfos.get(0));
         }
         dividendSummaryJDialog.setVisible(true);
 
@@ -1524,10 +1524,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             menuItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent evt) {
-                    List<Stock> stocks = getSelectedStocks(sellTreeTable);
+                    List<StockInfo> stockInfos = getSelectedStockInfos(sellTreeTable);
 
-                    for(Stock stock : stocks) {
-                        m.displayHistoryChart(stock);
+                    for (StockInfo stockInfo : stockInfos) {
+                        m.displayHistoryChart(stockInfo);
                     }
                 }
             });
@@ -1541,10 +1541,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             menuItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent evt) {
-                    List<Stock> stocks = getSelectedStocks(sellTreeTable);
+                    List<StockInfo> stockInfos = getSelectedStockInfos(sellTreeTable);
 
-                    for(Stock stock : stocks) {
-                        m.displayStockNews(stock);
+                    for(StockInfo stockInfo : stockInfos) {
+                        m.displayStockNews(stockInfo);
                     }
                 }
             });
@@ -1582,12 +1582,12 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-                List<Stock> stocks = getSelectedStocks();
-                if (stocks.size() == 1) {
-                    PortfolioManagementJPanel.this.showNewBuyTransactionJDialog(stocks.get(0), PortfolioManagementJPanel.this.getStockPrice(stocks.get(0).code), true);
+                List<StockInfo> stockInfos = getSelectedStockInfos();
+                if (stockInfos.size() == 1) {
+                    PortfolioManagementJPanel.this.showNewBuyTransactionJDialog(stockInfos.get(0), PortfolioManagementJPanel.this.getStockPrice(stockInfos.get(0).code), true);
                 }
                 else {
-                    PortfolioManagementJPanel.this.showNewBuyTransactionJDialog(org.yccheok.jstock.engine.Utils.getEmptyStock(Code.newInstance(""), Symbol.newInstance("")), 0.0, true);
+                    PortfolioManagementJPanel.this.showNewBuyTransactionJDialog(StockInfo.newInstance(Code.newInstance(""), Symbol.newInstance("")), 0.0, true);
                 }
             }
         });
@@ -1595,9 +1595,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         popup.add(menuItem);
 
         final List<Transaction> transactions = getSelectedTransactions(this.buyTreeTable);
-        final List<Stock> stocks = this.getSelectedStocks(this.buyTreeTable);
+        final List<StockInfo> stockInfos = this.getSelectedStockInfos(this.buyTreeTable);
 
-        if (transactions.size() > 0 && stocks.size() == 1) {
+        if (transactions.size() > 0 && stockInfos.size() == 1) {
             menuItem = new JMenuItem(GUIBundle.getString("PortfolioManagement_Sell..."), this.getImageIcon("/images/16x16/outbox.png"));
             
             menuItem.addActionListener(new ActionListener() {
@@ -1672,14 +1672,14 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         // Split or merge only allowed, if there is one and only one stock
         // being selected.
-        final List<Stock> selectedStocks = this.getSelectedStocks();
-        if (selectedStocks.size() == 1) {
+        final List<StockInfo> selectedStockInfos = this.getSelectedStockInfos();
+        if (selectedStockInfos.size() == 1) {
             menuItem = new JMenuItem(GUIBundle.getString("PortfolioManagementJPanel_SplitOrMerge"), this.getImageIcon("/images/16x16/merge.png"));
 
             menuItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent evt) {
-                    PortfolioManagementJPanel.this.showSplitOrMergeJDialog(StockInfo.newInstance(selectedStocks.get(0)));
+                    PortfolioManagementJPanel.this.showSplitOrMergeJDialog(selectedStockInfos.get(0));
                 }
             });
 
@@ -1732,10 +1732,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             menuItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent evt) {
-                    List<Stock> stocks = getSelectedStocks(buyTreeTable);
+                    List<StockInfo> stockInfos = getSelectedStockInfos(buyTreeTable);
 
-                    for(Stock stock : stocks) {
-                        m.displayHistoryChart(stock);
+                    for (StockInfo stockInfo : stockInfos) {
+                        m.displayHistoryChart(stockInfo);
                     }
                 }
             });
@@ -1749,10 +1749,10 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             menuItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent evt) {
-                    List<Stock> stocks = getSelectedStocks(buyTreeTable);
+                    List<StockInfo> stockInfos = getSelectedStockInfos(buyTreeTable);
 
-                    for(Stock stock : stocks) {
-                        m.displayStockNews(stock);
+                    for (StockInfo stockInfo : stockInfos) {
+                        m.displayStockNews(stockInfo);
                     }
                 }
             });
@@ -1806,8 +1806,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             Enumeration<? extends MutableTreeTableNode> transactions = transactionSummary.children();
             if (transactions.hasMoreElements()) {
                 Transaction transaction = (Transaction)transactionSummary.children().nextElement();
-                Stock stock = transaction.getStock();
-                codes.add(stock.code);
+                StockInfo stockInfo = transaction.getStockInfo();
+                codes.add(stockInfo.code);
             }
         }
         
@@ -1873,7 +1873,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         // initRealTimeStockMonitor.
         final RealTimeStockMonitor _realTimeStockMonitor = this.realTimeStockMonitor;
         if (_realTimeStockMonitor != null) {
-            _realTimeStockMonitor.addStockCode(transaction.getStock().code);
+            _realTimeStockMonitor.addStockCode(transaction.getStockInfo().code);
             _realTimeStockMonitor.startNewThreadsIfNecessary();
             _realTimeStockMonitor.refresh();
         }
@@ -1882,7 +1882,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         if (_exchangeRateMonitor != null) {
             final Currency localCurrency = org.yccheok.jstock.portfolio.Utils.getLocalCurrency();
             if (localCurrency != null) {
-                final Currency stockCurrency = org.yccheok.jstock.portfolio.Utils.getStockCurrency(portfolioRealTimeInfo, transaction.getStock().code);
+                final Currency stockCurrency = org.yccheok.jstock.portfolio.Utils.getStockCurrency(portfolioRealTimeInfo, transaction.getStockInfo().code);
                 if (false == stockCurrency.equals(localCurrency)) {
                     _exchangeRateMonitor.addCurrencyPair(CurrencyPair.create(stockCurrency, localCurrency));
                     _exchangeRateMonitor.startNewThreadsIfNecessary();
@@ -1918,8 +1918,8 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         final Portfolio buyPortfolio = (Portfolio) buyPortfolioTreeTableModel.getRoot();
         final Portfolio sellPortfolio = (Portfolio) sellPortfolioTreeTableModel.getRoot();
 
-        Set<Code> codes = new HashSet<Code>();
-        List<StockInfo> stockInfos = new ArrayList<StockInfo>();
+        Set<Code> codes = new HashSet<>();
+        List<StockInfo> stockInfos = new ArrayList<>();
 
         final int count = buyPortfolio.getChildCount();
         TransactionSummary transactionSummary = null;
@@ -1930,11 +1930,11 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
             Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
 
-            Stock stock = transaction.getStock();
+            StockInfo stockInfo = transaction.getStockInfo();
 
-            if (codes.contains(stock.code) == false) {
-                codes.add(stock.code);
-                stockInfos.add(StockInfo.newInstance(stock));
+            if (codes.contains(stockInfo.code) == false) {
+                codes.add(stockInfo.code);
+                stockInfos.add(stockInfo);
             }
         }
 
@@ -1947,11 +1947,11 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
             Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
 
-            Stock stock = transaction.getStock();
+            StockInfo stockInfo = transaction.getStockInfo();
 
-            if (codes.contains(stock.code) == false) {
-                codes.add(stock.code);
-                stockInfos.add(StockInfo.newInstance(stock));
+            if (codes.contains(stockInfo.code) == false) {
+                codes.add(stockInfo.code);
+                stockInfos.add(stockInfo);
             }
         }
 
@@ -1968,7 +1968,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         if (_exchangeRateMonitor != null) {
             final Currency localCurrency = org.yccheok.jstock.portfolio.Utils.getLocalCurrency();
             if (localCurrency != null) {
-                final Currency stockCurrency = org.yccheok.jstock.portfolio.Utils.getStockCurrency(portfolioRealTimeInfo, transaction.getStock().code);
+                final Currency stockCurrency = org.yccheok.jstock.portfolio.Utils.getStockCurrency(portfolioRealTimeInfo, transaction.getStockInfo().code);
                 
                 if (false == stockCurrency.equals(localCurrency)) {
                     _exchangeRateMonitor.addCurrencyPair(CurrencyPair.create(stockCurrency, localCurrency));
@@ -2029,13 +2029,13 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         _realTimeStockMonitor.refresh();
     }
     
-    private List<Stock> getSelectedStocks(JXTreeTable treeTable) {
+    private List<StockInfo> getSelectedStockInfos(JXTreeTable treeTable) {
         final TreePath[] treePaths = treeTable.getTreeSelectionModel().getSelectionPaths();
-        List<Stock> stocks = new ArrayList<Stock>();
-        Set<Code> c = new HashSet<Code>();
+        List<StockInfo> stockInfos = new ArrayList<>();
+        Set<Code> c = new HashSet<>();
         
         if (treePaths == null) {
-            return Collections.unmodifiableList(stocks);
+            return Collections.unmodifiableList(stockInfos);
         }
         
         for (TreePath treePath : treePaths) {
@@ -2045,27 +2045,27 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 final TransactionSummary transactionSummary = (TransactionSummary)lastPathComponent;
                 assert(transactionSummary.getChildCount() > 0);
                 final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
-                final Stock stock = transaction.getStock();
-                final Code code = stock.code;
+                final StockInfo stockInfo = transaction.getStockInfo();
+                final Code code = stockInfo.code;
                 
                 if(c.contains(code)) continue;
                 
-                stocks.add(stock);
+                stockInfos.add(stockInfo);
                 c.add(code);
             }
             else if (lastPathComponent instanceof Transaction) {
                 final Transaction transaction = (Transaction)lastPathComponent;
-                final Stock stock = transaction.getStock();
-                final Code code = stock.code;
+                final StockInfo stockInfo = transaction.getStockInfo();
+                final Code code = stockInfo.code;
                 
                 if(c.contains(code)) continue;
                 
-                stocks.add(stock);
+                stockInfos.add(stockInfo);
                 c.add(code);
             }                        
         }
         
-        return Collections.unmodifiableList(stocks);
+        return Collections.unmodifiableList(stockInfos);
     }
 
     // Initialize portfolios through CSV files. This is the preferable method,

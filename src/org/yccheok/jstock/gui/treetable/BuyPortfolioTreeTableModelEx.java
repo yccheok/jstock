@@ -24,7 +24,6 @@ import org.jdesktop.swingx.treetable.*;
 import org.yccheok.jstock.portfolio.*;
 import javax.swing.tree.TreePath;
 import org.yccheok.jstock.engine.Code;
-import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.engine.currency.Currency;
 import org.yccheok.jstock.gui.JStockOptions;
@@ -118,7 +117,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
 
             final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
 
-            if (true == transaction.getStock().code.equals(stockInfo.code)) {
+            if (true == transaction.getStockInfo().code.equals(stockInfo.code)) {
                 break;
             }
         }
@@ -160,7 +159,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
             
             final Transaction transaction = (Transaction)ts.getChildAt(0);
             
-            if (true == transaction.getStock().code.equals(code)) {
+            if (true == transaction.getStockInfo().code.equals(code)) {
                 transactionSummary = ts;
                 break;
             }
@@ -189,7 +188,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
     }
     
     public double getCurrentValue(Transaction transaction) {
-        final Code code = transaction.getStock().code;
+        final Code code = transaction.getStockInfo().code;
         final Double price = this.portfolioRealTimeInfo.stockPrices.get(code);
 
         if (price == null) return 0.0;
@@ -200,7 +199,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
     public double getCurrentValue(TransactionSummary transactionSummary) {
         final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
         
-        final Code code = transaction.getStock().code;
+        final Code code = transaction.getStockInfo().code;
         
         final Double price = this.portfolioRealTimeInfo.stockPrices.get(code);
 
@@ -210,7 +209,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
     }
     
     public double getCurrentPrice(Transaction transaction) {
-        final Code code = transaction.getStock().code;
+        final Code code = transaction.getStockInfo().code;
         
         final Double price = this.portfolioRealTimeInfo.stockPrices.get(code);
 
@@ -222,7 +221,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
     public double getCurrentPrice(TransactionSummary transactionSummary) {
         final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
         
-        final Code code = transaction.getStock().code;
+        final Code code = transaction.getStockInfo().code;
 
         final Double price = this.portfolioRealTimeInfo.stockPrices.get(code);
 
@@ -315,7 +314,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
             
             final Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
         
-            final Code code = transaction.getStock().code;
+            final Code code = transaction.getStockInfo().code;
             
             final double exchangeRate = org.yccheok.jstock.portfolio.Utils.getExchangeRate(portfolioRealTimeInfo, localCurrency, code);
                                     
@@ -436,7 +435,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
             
             if (transactionSummary.getChildCount() <= 0) return null;
             
-            final Code code = ((Transaction)transactionSummary.getChildAt(0)).getStock().code;
+            final Code code = ((Transaction)transactionSummary.getChildAt(0)).getStockInfo().code;
             
             final boolean shouldConvertPenceToPound = org.yccheok.jstock.portfolio.Utils.shouldConvertPenceToPound(portfolioRealTimeInfo, code);
             
@@ -446,7 +445,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
             
             switch(column) {
                 case 0:
-                    return ((Transaction)transactionSummary.getChildAt(0)).getStock().symbol;
+                    return ((Transaction)transactionSummary.getChildAt(0)).getStockInfo().symbol;
                     
                 case 2:
                     return transactionSummary.getQuantity();
@@ -518,7 +517,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
         if (node instanceof Transaction) {
             final Transaction transaction = (Transaction)node;
             
-            final Code code = transaction.getStock().code;
+            final Code code = transaction.getStockInfo().code;
             
             final boolean shouldConvertPenceToPound = org.yccheok.jstock.portfolio.Utils.shouldConvertPenceToPound(portfolioRealTimeInfo, code);
             
@@ -528,7 +527,7 @@ public class BuyPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMode
 
             switch(column) {
                 case 0:
-                    return (transaction).getStock().symbol;
+                    return (transaction).getStockInfo().symbol;
 
                 case 1:
                     return transaction.getDate();

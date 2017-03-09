@@ -2352,6 +2352,10 @@ public class JStock extends javax.swing.JFrame {
         header.addMouseMotionListener(tips);        
     }
     
+    public void commitBeforeLoadFromCloud() {
+        save();
+    }
+    
     /* Save everything to disc, before perform uploading. */
     public void commitBeforeSaveToCloud() {
         // Previously, we will store the entire stockcodeandsymboldatabase.xml
@@ -2377,20 +2381,7 @@ public class JStock extends javax.swing.JFrame {
             }
         }
 
-        /* These codes are very similar to clean up code during application
-         * exit.
-         */
-                
-        jStockOptions.setApplicationVersionID(Utils.getApplicationVersionID());        
-
-        this.saveJStockOptions();
-        
-        this.saveGUIOptions();
-        this.saveChartJDialogOptions();
-        this.saveWatchlist();
-        this.indicatorPanel.saveAlertIndicatorProjectManager();
-        this.indicatorPanel.saveModuleIndicatorProjectManager();
-        this.portfolioManagementJPanel.savePortfolio();
+        save();
         
         // In Linux, "My Portfolio" and "my portfolio" are 2 different folders.
         // However, we cannot commit such folders to cloud. This will cause
@@ -3267,17 +3258,16 @@ public class JStock extends javax.swing.JFrame {
     }
     
     // Asynchronous call. Must be called by event dispatch thread.
-    public void displayHistoryChart(Stock stock) {
-        final StockHistoryServer stockHistoryServer = stockHistoryMonitor.getStockHistoryServer(stock.code);
+    public void displayHistoryChart(StockInfo stockInfo) {
+        final StockHistoryServer stockHistoryServer = stockHistoryMonitor.getStockHistoryServer(stockInfo.code);
         if (stockHistoryServer == null) {
-            if (stockCodeHistoryGUI.add(stock.code) && stockHistoryMonitor.addStockCode(stock.code)) {                                
+            if (stockCodeHistoryGUI.add(stockInfo.code) && stockHistoryMonitor.addStockCode(stockInfo.code)) {                                
                 final String template = GUIBundle.getString("MainFrame_LookingForHistory_template");
-                final String message = MessageFormat.format(template, stock.symbol, stockCodeHistoryGUI.size());
+                final String message = MessageFormat.format(template, stockInfo.symbol, stockCodeHistoryGUI.size());
                 setStatusBar(true, message);
             }
-        }
-        else {
-            ChartJDialog chartJDialog = new ChartJDialog(JStock.this, stock.symbol + " (" + stock.code + ")", false, stockHistoryServer);
+        } else {
+            ChartJDialog chartJDialog = new ChartJDialog(JStock.this, stockInfo.symbol + " (" + stockInfo.code + ")", false, stockHistoryServer);
             chartJDialog.setVisible(true);                            
         }        
     }
@@ -3289,15 +3279,14 @@ public class JStock extends javax.swing.JFrame {
         for (int row : rows) {
             final int modelIndex = jTable1.getRowSorter().convertRowIndexToModel(row);
             Stock stock = tableModel.getStock(modelIndex);
-            displayHistoryChart(stock);
+            displayHistoryChart(StockInfo.newInstance(stock));
         }
     }
 
-    public void displayStockNews(Stock stock) {
+    public void displayStockNews(StockInfo stockInfo) {
         assert(SwingUtilities.isEventDispatchThread());
 
-        final StockInfo stockInfo = StockInfo.newInstance(stock.code, stock.symbol);
-        final String title = stock.symbol + " (" + stock.code + ")";
+        final String title = stockInfo.symbol + " (" + stockInfo.code + ")";
         final StockNewsJFrame stockNewsJFrame = new StockNewsJFrame(this, stockInfo, title);
     }
 
@@ -3308,7 +3297,7 @@ public class JStock extends javax.swing.JFrame {
         for (int row : rows) {
             final int modelIndex = jTable1.getRowSorter().convertRowIndexToModel(row);
             final Stock stock = tableModel.getStock(modelIndex);
-            displayStockNews(stock);
+            displayStockNews(StockInfo.newInstance(stock));
         }
     }
 
@@ -3360,7 +3349,7 @@ public class JStock extends javax.swing.JFrame {
                     // [2790218] User unable to add new buy transaction in Spain
                     //
                     // Say no to : portfolioManagementJPanel.showNewBuyTransactionJDialog(stock.symbol, stock.getLastPrice(), false);
-                    portfolioManagementJPanel.showNewBuyTransactionJDialog(stock, stock.getLastPrice(), false);
+                    portfolioManagementJPanel.showNewBuyTransactionJDialog(StockInfo.newInstance(stock), stock.getLastPrice(), false);
                 }
             });  
             

@@ -193,8 +193,8 @@ public class BuyPortfolioChartJDialog extends javax.swing.JDialog {
             if(transactionSummary.getChildCount() <= 0) continue;
             
             Transaction transaction = (Transaction)transactionSummary.getChildAt(0);
-            final Symbol symbol = transaction.getStock().symbol;
-            final Code code =  transaction.getStock().code;
+            final Symbol symbol = transaction.getStockInfo().symbol;
+            final Code code =  transaction.getStockInfo().code;
 
             final boolean shouldConvertPenceToPound = org.yccheok.jstock.portfolio.Utils.shouldConvertPenceToPound(portfolioRealTimeInfo, code);
             

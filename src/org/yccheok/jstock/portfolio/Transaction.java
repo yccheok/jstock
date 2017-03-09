@@ -139,8 +139,8 @@ public class Transaction extends DefaultSortableMutableTreeTableNode implements 
         return contract.getType();
     }
     
-    public Stock getStock() {
-        return contract.getStock();
+    public StockInfo getStockInfo() {
+        return contract.getStockInfo();
     }
     
     public double getReferencePrice() {
@@ -197,7 +197,7 @@ public class Transaction extends DefaultSortableMutableTreeTableNode implements 
     
     @Override
     public String toString() {
-        return contract.getStock().symbol.toString();
+        return contract.getStockInfo().symbol.toString();
     }
 
 

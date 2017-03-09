@@ -85,10 +85,23 @@ public class Utils {
         return Pair.create(stockPrices, _timestamp);
     }
 
-    // Perhaps we should have a better naming.
+    public static boolean shouldConvertPenceToPound(Country country) {
+        Currency stockCurrency = country.stockCurrency;
+        return shouldConvertPenceToPound(stockCurrency);
+    }
+
     public static boolean shouldConvertPenceToPound(PortfolioRealTimeInfo portfolioRealTimeInfo, Code code) {
         final Currency stockCurrency = getStockCurrency(portfolioRealTimeInfo, code);
-        return stockCurrency.isGBX() || stockCurrency.isZAC();
+        return shouldConvertPenceToPound(stockCurrency);
+    }
+
+    // Perhaps we should have a better naming.
+    public static boolean shouldConvertPenceToPound(Currency currency) {
+        if (currency == null) {
+            return false;
+        }
+
+        return currency.isGBX() || currency.isZAC() || currency.isILA();
     }
     
     public static Currency getLocalCurrency() {
@@ -347,8 +360,8 @@ public class Utils {
     }
     
     public static boolean isTransactionWithEqualStockCode(Transaction t0, Transaction t1) {
-        final Code c0 = t0.getStock().code;
-        final Code c1 = t1.getStock().code;
+        final Code c0 = t0.getStockInfo().code;
+        final Code c1 = t1.getStockInfo().code;
         
         return c0.equals(c1);
     }
@@ -575,7 +588,7 @@ public class Utils {
                 final Transaction transaction = (Transaction)transactionSummary.getChildAt(i);
 
                 Contract.Type type = transaction.getType();
-                final StockInfo stockInfo = StockInfo.newInstance(transaction.getStock());
+                final StockInfo stockInfo = transaction.getStockInfo();
 
                 if (type == Contract.Type.Buy) {
                     final Activity activity = new Activity.Builder(Activity.Type.Buy, 

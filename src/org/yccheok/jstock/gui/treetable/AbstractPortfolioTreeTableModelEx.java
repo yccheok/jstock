@@ -98,14 +98,14 @@ public abstract class AbstractPortfolioTreeTableModelEx extends SortableTreeTabl
         
         final int size = portfolio.getChildCount();
         
-        final Code code = transaction.getStock().code;
+        final Code code = transaction.getStockInfo().code;
         
         TransactionSummary transactionSummary = null;
         
         for (int i = 0; i < size; i++) {
             TransactionSummary t = (TransactionSummary)portfolio.getChildAt(i);
             
-            if (((Transaction)t.getChildAt(0)).getStock().code.equals(code)) {
+            if (((Transaction)t.getChildAt(0)).getStockInfo().code.equals(code)) {
                 transactionSummary = t;
                 break;
             }
@@ -134,14 +134,14 @@ public abstract class AbstractPortfolioTreeTableModelEx extends SortableTreeTabl
         
         final int size = portfolio.getChildCount();
         
-        final Code code = transaction.getStock().code;
+        final Code code = transaction.getStockInfo().code;
         
         TransactionSummary transactionSummary = null;
         
         for (int i = 0; i < size; i++) {
             TransactionSummary t = (TransactionSummary)portfolio.getChildAt(i);
             
-            if (((Transaction)t.getChildAt(0)).getStock().code.equals(code)) {
+            if (((Transaction)t.getChildAt(0)).getStockInfo().code.equals(code)) {
                 transactionSummary = t;
                 break;
             }

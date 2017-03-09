@@ -280,7 +280,7 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
             
             if (transactionSummary.getChildCount() <= 0) return null;
             
-            final Code code = ((Transaction)transactionSummary.getChildAt(0)).getStock().code;
+            final Code code = ((Transaction)transactionSummary.getChildAt(0)).getStockInfo().code;
             
             final boolean shouldConvertPenceToPound = org.yccheok.jstock.portfolio.Utils.shouldConvertPenceToPound(portfolioRealTimeInfo, code);
             
@@ -290,7 +290,7 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
             
             switch(column) {
                 case 0:
-                    return ((Transaction)transactionSummary.getChildAt(0)).getStock().symbol;
+                    return ((Transaction)transactionSummary.getChildAt(0)).getStockInfo().symbol;
                     
                 case 2:
                     return transactionSummary.getQuantity();
@@ -370,7 +370,7 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
         if (node instanceof Transaction) {
             final Transaction transaction = (Transaction)node;
             
-            final Code code = transaction.getStock().code;
+            final Code code = transaction.getStockInfo().code;
             
             final boolean shouldConvertPenceToPound = org.yccheok.jstock.portfolio.Utils.shouldConvertPenceToPound(portfolioRealTimeInfo, code);
             
@@ -380,7 +380,7 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
 
             switch(column) {
                 case 0:
-                    return (transaction).getStock().symbol;
+                    return (transaction).getStockInfo().symbol;
 
                 case 1:
                     return transaction.getDate();
@@ -484,7 +484,7 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
             
             final Transaction transaction = (Transaction)ts.getChildAt(0);
             
-            if (true == transaction.getStock().code.equals(code)) {
+            if (true == transaction.getStockInfo().code.equals(code)) {
                 transactionSummary = ts;
                 break;
             }

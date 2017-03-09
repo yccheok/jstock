@@ -573,7 +573,7 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
             for (int i = 0, ei = transactionSummaries.size(); i < ei && !isCancelled(); i++) {
                 
                 final TransactionSummary transactionSummary = transactionSummaries.get(i);
-                final Code code = ((Transaction)transactionSummary.getChildAt(0)).getStock().code;
+                final Code code = ((Transaction)transactionSummary.getChildAt(0)).getStockInfo().code;
                 Dividend latestDividend = org.yccheok.jstock.portfolio.Utils.getLatestDividend(dividendSummary, code);                
 
                 final Duration duration;

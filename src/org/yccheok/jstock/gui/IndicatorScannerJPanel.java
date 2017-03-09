@@ -1085,7 +1085,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                     final int modelIndex = jTable1.convertRowIndexToModel(row);
                     final Indicator indicator = tableModel.getIndicator(modelIndex);
                     if (indicator != null) {
-                        m.displayHistoryChart(indicator.getStock());
+                        m.displayHistoryChart(StockInfo.newInstance(indicator.getStock()));
                     }
                 }
             }
@@ -1105,7 +1105,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                     final int modelIndex = jTable1.convertRowIndexToModel(row);
                     final Indicator indicator = tableModel.getIndicator(modelIndex);
                     if (indicator != null) {
-                        m.displayStockNews(indicator.getStock());
+                        m.displayStockNews(StockInfo.newInstance(indicator.getStock()));
                     }
                 }
             }
@@ -1148,7 +1148,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
                     final IndicatorTableModel tableModel = (IndicatorTableModel)jTable1.getModel();
                     final Indicator indicator = tableModel.getIndicator(modelIndex);
                     final Stock stock = indicator.getStock();
-                    JStock.instance().getPortfolioManagementJPanel().showNewBuyTransactionJDialog(stock, stock.getLastPrice(), false);
+                    JStock.instance().getPortfolioManagementJPanel().showNewBuyTransactionJDialog(StockInfo.newInstance(stock), stock.getLastPrice(), false);
                 }
             });
 

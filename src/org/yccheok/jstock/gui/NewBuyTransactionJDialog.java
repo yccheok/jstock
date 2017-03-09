@@ -42,7 +42,6 @@ import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.engine.DispType;
 import org.yccheok.jstock.engine.SimpleDate;
-import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.engine.StockInfoDatabase;
 import org.yccheok.jstock.engine.Symbol;
@@ -848,9 +847,9 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     public void setTransaction(Transaction transaction) {
-        this.stock = transaction.getStock();
-        final Code code = stock.code;
-        final Symbol symbol = stock.symbol;
+        this.stockInfo = transaction.getStockInfo();
+        final Code code = stockInfo.code;
+        final Symbol symbol = stockInfo.symbol;
         final Date date = transaction.getDate().getCalendar().getTime();
         final double quantity = transaction.getQuantity();
         final double price = transaction.getPrice();
@@ -881,7 +880,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         final double unit = ((java.lang.Double)this.jSpinner1.getValue());
         final double price = ((Double)this.jFormattedTextField1.getValue());
         
-        Contract.ContractBuilder builder = new Contract.ContractBuilder(this.stock.deriveStock(Symbol.newInstance(jTextField1.getText().trim())), date);
+        Contract.ContractBuilder builder = new Contract.ContractBuilder(new StockInfo(stockInfo.code, Symbol.newInstance(jTextField1.getText().trim())), date);
         
         Contract contract = builder.type(type).quantity(unit).price(price).build();
 
@@ -896,7 +895,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     }
     
     private boolean isValidInput() {
-        if (NewBuyTransactionJDialog.this.stock == null) {
+        if (NewBuyTransactionJDialog.this.stockInfo == null) {
             do {
                 // Perhaps user forgets to press enter? Let us help him to transfer
                 // the stock to text field.
@@ -931,7 +930,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
                     assert(symbol != null);
                     assert(code != null);
                     
-                    NewBuyTransactionJDialog.this.stock = org.yccheok.jstock.engine.Utils.getEmptyStock(code, symbol);
+                    NewBuyTransactionJDialog.this.stockInfo = StockInfo.newInstance(code, symbol);
                     this.jTextField2.setText(code.toString());
                     this.jTextField1.setText(symbol.toString());
                     // text fields now contain necessary info. Don't proceed first.
@@ -946,7 +945,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         }
 
         // Has user key in any stock?
-        if (NewBuyTransactionJDialog.this.stock == null)
+        if (NewBuyTransactionJDialog.this.stockInfo == null)
         {
             this.jComboBox1.requestFocus();
             JOptionPane.showMessageDialog(this, MessagesBundle.getString("warning_message_please_enter_stock_symbol"), MessagesBundle.getString("warning_title_please_enter_stock_symbol"), JOptionPane.WARNING_MESSAGE);
@@ -954,7 +953,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         }
 
         if (this.jTextField1.getText().trim().length() <= 0) {
-            this.jTextField1.setText(this.stock.symbol.toString());
+            this.jTextField1.setText(this.stockInfo.symbol.toString());
             return false;
         }
         
@@ -1040,7 +1039,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
             final DateField dateField = (DateField)jPanel3;
             final Date date = (Date)dateField.getValue();
             // Stock and date information is not important at this moment.
-            Contract.ContractBuilder builder = new Contract.ContractBuilder(org.yccheok.jstock.engine.Utils.getEmptyStock(Code.newInstance(name), Symbol.newInstance(name)), new SimpleDate(date));        
+            Contract.ContractBuilder builder = new Contract.ContractBuilder(StockInfo.newInstance(Code.newInstance(name), Symbol.newInstance(name)), new SimpleDate(date));        
             Contract contract = builder.type(Contract.Type.Buy).quantity(unit).price(price).build();
 
             final double brokerFee = brokingFirm.brokerCalculate(contract);
@@ -1155,10 +1154,10 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
         this.jComboBox1.setEnabled(enable);
     }
     
-    public void setStock(Stock stock) {
-        if (stock != null) {
-            Symbol symbol = stock.symbol;
-            Code code = stock.code;
+    public void setStockInfo(StockInfo stockInfo) {
+        if (stockInfo != null) {
+            Symbol symbol = stockInfo.symbol;
+            Code code = stockInfo.code;
             this.jTextField1.setText(symbol.toString());
             this.jTextField2.setText(code.toString());
             // So that the 1st character is being displayed.
@@ -1168,7 +1167,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
             this.jTextField1.setText("");
             this.jTextField2.setText("");            
         }
-        this.stock = stock;
+        this.stockInfo = stockInfo;
     }
     
     public void setStockSelectionEnabled(boolean flag) {
@@ -1225,9 +1224,9 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     }
 
     private void addStockInfoFromAutoCompleteJComboBox(StockInfo stockInfo) {
-        NewBuyTransactionJDialog.this.stock = org.yccheok.jstock.engine.Utils.getEmptyStock(stockInfo);
-        NewBuyTransactionJDialog.this.jTextField1.setText(NewBuyTransactionJDialog.this.stock.symbol.toString());
-        NewBuyTransactionJDialog.this.jTextField2.setText(NewBuyTransactionJDialog.this.stock.code.toString());
+        NewBuyTransactionJDialog.this.stockInfo = stockInfo;
+        NewBuyTransactionJDialog.this.jTextField1.setText(NewBuyTransactionJDialog.this.stockInfo.symbol.toString());
+        NewBuyTransactionJDialog.this.jTextField2.setText(NewBuyTransactionJDialog.this.stockInfo.code.toString());
         // So that the 1st character is being displayed.
         NewBuyTransactionJDialog.this.jTextField1.setCaretPosition(0);
         NewBuyTransactionJDialog.this.jTextField2.setCaretPosition(0);
@@ -1237,7 +1236,7 @@ public class NewBuyTransactionJDialog extends javax.swing.JDialog {
     
     private Transaction transaction = null;
     private String transactionComment = "";
-    private Stock stock = null;
+    private StockInfo stockInfo = null;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;

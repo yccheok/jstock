@@ -454,7 +454,7 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
         for (TransactionSummary transactionSummary : transactionSummaries) {
             for (int i = 0, count = transactionSummary.getChildCount(); i < count; i++) {
                 final Transaction transaction = (Transaction)transactionSummary.getChildAt(i);
-                StockInfo stockInfo = StockInfo.newInstance(transaction.getStock());
+                StockInfo stockInfo = transaction.getStockInfo();
                 if (stockInfos.contains(stockInfo) == false) {
                     stockInfos.add(stockInfo);
                 }
@@ -501,12 +501,12 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
                 if (selectedIndex != 0) {
                     // selectedIndex - 1, as the first item in combo box is "All Stock(s)".
                     final Code code = this.stockInfos.get(selectedIndex - 1).code;
-                    if (false == transaction.getStock().code.equals(code)) {
+                    if (false == transaction.getStockInfo().code.equals(code)) {
                         continue;
                     }
                 }
                 Contract.Type type = transaction.getType();
-                final StockInfo stockInfo = StockInfo.newInstance(transaction.getStock());
+                final StockInfo stockInfo = transaction.getStockInfo();
 
                 if (type == Contract.Type.Buy) {
                     final Activity activity = new Activity.Builder(Activity.Type.Buy, 

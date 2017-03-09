@@ -134,20 +134,20 @@ public class Statements {
             // Metadatas will be used to store TransactionSummary's comment.
             final String comment = transactionSummary.getComment().trim();
             if (comment.isEmpty() == false) {
-                final Stock stock = ((Transaction)transactionSummary.getChildAt(0)).getStock();
-                statements.metadatas.put(stock.code.toString(), comment);
+                final StockInfo stockInfo = ((Transaction)transactionSummary.getChildAt(0)).getStockInfo();
+                statements.metadatas.put(stockInfo.code.toString(), comment);
             }
             
             final int transactionCount = transactionSummary.getChildCount();
             for (int j = 0; j < transactionCount; j++)
             {
                 final Transaction transaction = (Transaction)transactionSummary.getChildAt(j);
-                final Stock stock = transaction.getStock();
-                final boolean shouldConvertPenceToPound = org.yccheok.jstock.portfolio.Utils.shouldConvertPenceToPound(portfolioRealTimeInfo, stock.code);
+                final StockInfo stockInfo = transaction.getStockInfo();
+                final boolean shouldConvertPenceToPound = org.yccheok.jstock.portfolio.Utils.shouldConvertPenceToPound(portfolioRealTimeInfo, stockInfo.code);
                 
                 final List<Atom> atoms = new ArrayList<>();
-                atoms.add(new Atom(stock.code.toString(), tmp[0]));
-                atoms.add(new Atom(stock.symbol.toString(), tmp[1]));
+                atoms.add(new Atom(stockInfo.code.toString(), tmp[0]));
+                atoms.add(new Atom(stockInfo.symbol.toString(), tmp[1]));
                 
                 final String dateString = transaction.getDate() != null ? org.yccheok.jstock.gui.Utils.commonDateFormat(transaction.getDate().getTime()) : "";                        
                 atoms.add(new Atom(dateString, tmp[2]));
@@ -844,19 +844,19 @@ public class Statements {
             // Metadatas will be used to store TransactionSummary's comment.
             final String comment = transactionSummary.getComment().trim();
             if (comment.isEmpty() == false) {
-                final Stock stock = ((Transaction)transactionSummary.getChildAt(0)).getStock();
-                statements.metadatas.put(stock.code.toString(), comment);
+                final StockInfo stockInfo = ((Transaction)transactionSummary.getChildAt(0)).getStockInfo();
+                statements.metadatas.put(stockInfo.code.toString(), comment);
             }
 
             final int transactionCount = transactionSummary.getChildCount();
             for (int j = 0; j < transactionCount; j++)
             {
                 final Transaction transaction = (Transaction)transactionSummary.getChildAt(j);
-                final Stock stock = transaction.getStock();
-                final boolean shouldConvertPenceToPound = org.yccheok.jstock.portfolio.Utils.shouldConvertPenceToPound(portfolioRealTimeInfo, stock.code);
+                final StockInfo stockInfo = transaction.getStockInfo();
+                final boolean shouldConvertPenceToPound = org.yccheok.jstock.portfolio.Utils.shouldConvertPenceToPound(portfolioRealTimeInfo, stockInfo.code);
                 final List<Atom> atoms = new ArrayList<>();
-                atoms.add(new Atom(stock.code.toString(), tmp[0]));
-                atoms.add(new Atom(stock.symbol.toString(), tmp[1]));
+                atoms.add(new Atom(stockInfo.code.toString(), tmp[0]));
+                atoms.add(new Atom(stockInfo.symbol.toString(), tmp[1]));
                 
                 final String referenceDateString = transaction.getReferenceDate() != null ? org.yccheok.jstock.gui.Utils.commonDateFormat(transaction.getReferenceDate().getTime()) : "";
                 atoms.add(new Atom(referenceDateString, tmp[2]));

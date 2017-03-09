@@ -28,7 +28,7 @@ import org.yccheok.jstock.engine.*;
 public class Contract {
 
     public static class ContractBuilder implements Builder<Contract> {
-        private final Stock stock;
+        private final StockInfo stockInfo;
         private final SimpleDate date;
         
         // Optional parameters - initialized to default values
@@ -41,8 +41,8 @@ public class Contract {
         private double referenceStampDuty = 0.0;
         private SimpleDate referenceDate = new SimpleDate();
 
-        public ContractBuilder(Stock stock, SimpleDate date) {
-            this.stock = stock;
+        public ContractBuilder(StockInfo stockInfo, SimpleDate date) {
+            this.stockInfo = stockInfo;
             this.date = date;
         }
         
@@ -93,8 +93,8 @@ public class Contract {
         
     }
     
-    public Stock getStock() {
-        return stock;
+    public StockInfo getStockInfo() {
+        return stockInfo;
     }
 
     public SimpleDate getDate() {
@@ -149,7 +149,7 @@ public class Contract {
     
     private Contract(ContractBuilder builder)
     {
-        this.stock = builder.stock;
+        this.stockInfo = builder.stockInfo;
         this.date = builder.date;
         this.type = builder.type;
         this.quantity = builder.quantity;
@@ -171,7 +171,7 @@ public class Contract {
      * @return a contract with new quantity derived from this contract
      */
     public Contract deriveWithQuantity(double quantity) {
-        ContractBuilder builder = new ContractBuilder(stock, date);
+        ContractBuilder builder = new ContractBuilder(stockInfo, date);
         return builder.type(type).quantity(quantity).price(price).referencePrice(referencePrice)
                 .referenceBroker(referenceBroker)
                 .referenceClearingFee(referenceClearingFee)
@@ -186,7 +186,7 @@ public class Contract {
      * @return a contract with new price derived from this contract
      */
     public Contract deriveWithPrice(double price) {
-        ContractBuilder builder = new ContractBuilder(stock, date);
+        ContractBuilder builder = new ContractBuilder(stockInfo, date);
         return builder.type(type).quantity(quantity).price(price).referencePrice(referencePrice)
                 .referenceBroker(referenceBroker)
                 .referenceClearingFee(referenceClearingFee)
@@ -195,8 +195,8 @@ public class Contract {
     }
 
     public Contract(Contract contract) {
-        stock = new Stock(contract.stock);
-        date = new SimpleDate(contract.date);
+        stockInfo = contract.stockInfo;
+        date = contract.date;
         type = contract.type;
         quantity = contract.quantity;
         price = contract.price;
@@ -220,7 +220,7 @@ public class Contract {
         return this;
     }
 
-    private final Stock stock;
+    private final StockInfo stockInfo;
     private final SimpleDate date;
     private final Type type;
     private final double quantity;
