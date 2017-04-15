@@ -154,7 +154,7 @@ public class NewsServerFactory {
         hongkongList.add(new GoogleFinanceNewsServer());
         indiaList.add(new GoogleFinanceNewsServer());
         indonesiaList.add(new YahooFinanceNewsServer());
-        indonesiaList.add(new GoogleSearchNewsServer());
+        indonesiaList.add(new GoogleFinanceNewsServer());
         israelList.add(new YahooFinanceNewsServer());
         israelList.add(new GoogleFinanceNewsServer());
         italyList.add(new YahooFinanceNewsServer());
