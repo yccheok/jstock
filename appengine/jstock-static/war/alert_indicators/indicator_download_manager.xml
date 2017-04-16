@@ -92,6 +92,13 @@
       <descriptionURL>https://raw.githubusercontent.com/yccheok/jstock/master/appengine/jstock-static/war/alert_indicators/TopLosers.html</descriptionURL>
     </org.yccheok.jstock.gui.analysis.IndicatorDownloadManager_-Info>
     <org.yccheok.jstock.gui.analysis.IndicatorDownloadManager_-Info>
+      <projectName>Bullish Engulfing Pattern</projectName>
+      <type>AlertIndicator</type>
+      <checksum>815938117</checksum>
+      <fileURL>https://raw.githubusercontent.com/yccheok/jstock/master/appengine/jstock-static/war/alert_indicators/BullishEngulfingPattern.zip</fileURL>
+      <descriptionURL>https://raw.githubusercontent.com/yccheok/jstock/master/appengine/jstock-static/war/alert_indicators/BullishEngulfingPattern.html</descriptionURL>
+    </org.yccheok.jstock.gui.analysis.IndicatorDownloadManager_-Info>
+    <org.yccheok.jstock.gui.analysis.IndicatorDownloadManager_-Info>
       <projectName>Bearish Engulfing Pattern</projectName>
       <type>AlertIndicator</type>
       <checksum>3137292977</checksum>
