@@ -80,7 +80,8 @@ public class Utils {
     private static final Map<Type, String> zh_map = new EnumMap<>(Type.class);
     private static final Map<Type, String> zh_Hant_map = new EnumMap<>(Type.class);
 
-    private static final String JSTOCK_STATIC_SERVER = "http://jstock-static-hrd.appspot.com/";
+    //private static final String JSTOCK_STATIC_SERVER = "http://jstock-static-hrd.appspot.com/";
+    private static final String JSTOCK_STATIC_SERVER = "https://raw.githubusercontent.com/yccheok/jstock/master/appengine/jstock-static/war/";
     private static final String JSTOCK_WEBAPP_SERVER = "http://jstock-webapp.appspot.com/";
 
     static {
