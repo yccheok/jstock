@@ -10,3 +10,7 @@ handlers:
   
 - url: /get-ip\.py
   script: get-ip.py
+  
+- url: /missing-stock-code/.*
+  script: missing-stock-code.app
+  secure: always  
