@@ -132,7 +132,6 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
-import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.lang.CharUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -1507,16 +1506,6 @@ public class Utils {
         return _getResponseBodyAsStringBasedOnProxyAuthOption(httpClient, request);
     }
     
-    /**
-     * Request server response by sending request together with agent info.
-     * 
-     * @param request the request
-     * @return server response. null if fail.
-     */
-    public static String getResponseBodyAsStringBasedOnProxyAuthOptionWithAgentInfo(String request) {
-        return _getResponseBodyAsStringBasedOnProxyAuthOption(httpClientWithAgentInfo, request);        
-    }
-    
     // We prefer to have this method in gui package instead of engine. This is because it requires
     // access to JStockOptions.
     // Returns null if fail.
@@ -2747,11 +2736,11 @@ public class Utils {
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7.22";
+    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7.23";
 
-    // 1.0.7.22
+    // 1.0.7.23
     // For About box comparision on latest version purpose.
-    private static final int APPLICATION_VERSION_ID = 1151;
+    private static final int APPLICATION_VERSION_ID = 1152;
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     
@@ -2760,7 +2749,6 @@ public class Utils {
     private static final int NUM_OF_THREADS_ZOMBIE_POOL = 4;
 
     private static final HttpClient httpClient;
-    private static final HttpClient httpClientWithAgentInfo;
     
     /** Maximum loop count when creating temp directories. */
     private static final int TEMP_DIR_ATTEMPTS = 10000;
@@ -2774,19 +2762,6 @@ public class Utils {
         httpClient.getParams().setParameter("http.protocol.single-cookie-header", true);
         httpClient.getParams().setCookiePolicy(org.apache.commons.httpclient.cookie.CookiePolicy.BROWSER_COMPATIBILITY);
         multiThreadedHttpConnectionManager.getParams().setMaxConnectionsPerHost(httpClient.getHostConfiguration(), 128);
-
-    }
-    static {
-        MultiThreadedHttpConnectionManager multiThreadedHttpConnectionManager = new MultiThreadedHttpConnectionManager();
-        multiThreadedHttpConnectionManager.getParams().setMaxTotalConnections(128);
-        multiThreadedHttpConnectionManager.getParams().setDefaultMaxConnectionsPerHost(128);
-        httpClientWithAgentInfo = new HttpClient(multiThreadedHttpConnectionManager);
-        // Provide agent information, as requested by KLSEInfo owner.
-        httpClientWithAgentInfo.getParams().setParameter(HttpMethodParams.USER_AGENT, "JStock-1.0.6o");
-        // To prevent cookie warnings.
-        httpClientWithAgentInfo.getParams().setParameter("http.protocol.single-cookie-header", true);
-        httpClientWithAgentInfo.getParams().setCookiePolicy(org.apache.commons.httpclient.cookie.CookiePolicy.BROWSER_COMPATIBILITY);
-        multiThreadedHttpConnectionManager.getParams().setMaxConnectionsPerHost(httpClientWithAgentInfo.getHostConfiguration(), 128);    
     }
     
     // http://stackoverflow.com/questions/1360113/is-java-regex-thread-safe

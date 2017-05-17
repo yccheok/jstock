@@ -135,6 +135,7 @@ public class JStock extends javax.swing.JFrame {
         this.initMyJXStatusBarCountryLabelMouseAdapter();
         this.initMyJXStatusBarImageLabelMouseAdapter();
         this.initStockInfoDatabaseMeta();
+        this.initGoogleCodeDatabase();
         this.initDatabase(true);
         this.initAjaxProvider();
         this.initRealTimeIndexMonitor();
@@ -2777,6 +2778,8 @@ public class JStock extends javax.swing.JFrame {
             return;
         }
 
+        org.yccheok.jstock.engine.Utils.clearGoogleCodeDatabaseCache();
+        
         final Country oldCountry = jStockOptions.getCountry();
         
         if (needToSaveUserDefinedDatabase) {
@@ -2807,6 +2810,7 @@ public class JStock extends javax.swing.JFrame {
         this.indicatorScannerJPanel.stop();
         this.indicatorScannerJPanel.clear();
 
+        this.initGoogleCodeDatabase();
         this.initDatabase(true);
         this.initAjaxProvider();
         this.initRealTimeIndexMonitor();
@@ -4187,6 +4191,14 @@ public class JStock extends javax.swing.JFrame {
         }
     }
 
+    private void initGoogleCodeDatabase() {
+        final Country country = jStockOptions.getCountry();
+
+        if (org.yccheok.jstock.engine.Utils.isGoogleCodeDatabaseRequired(country)) {
+            this.googleCodeDatabasePool.submit(new GoogleCodeDatabaseRunnable(country));
+        }    
+    }
+    
     private void initStockInfoDatabaseMeta() {
 
         Runnable runnable = new Runnable() {
@@ -5064,6 +5076,7 @@ public class JStock extends javax.swing.JFrame {
     private final ExecutorService emailAlertPool = Executors.newFixedThreadPool(1);
     private final ExecutorService systemTrayAlertPool = Executors.newFixedThreadPool(1);
     private volatile ExecutorService stockInfoDatabaseMetaPool = Executors.newFixedThreadPool(1);
+    private volatile ExecutorService googleCodeDatabasePool = Executors.newFixedThreadPool(1);
 
     private volatile ExecutorService driveWealthInstrumentsPool = Executors.newFixedThreadPool(1);
     private final Set<Code> driveWealthCodes = ConcurrentHashMap.newKeySet();

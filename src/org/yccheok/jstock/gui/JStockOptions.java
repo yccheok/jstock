@@ -22,7 +22,6 @@ package org.yccheok.jstock.gui;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -326,6 +325,8 @@ public class JStockOptions {
     // Possile be null in entire application life cycle.
     private BoundsEx boundsEx;
 
+    private Map<Country, Long> googleCodeDatabaseMeta = new EnumMap<>(Country.class);
+    
     private Map<Country, PriceSource> priceSources = new EnumMap<Country, PriceSource>(Country.class);
     
     private Map<Country, String> currencies = new EnumMap<Country, String>(Country.class);
@@ -466,6 +467,7 @@ public class JStockOptions {
         // local.
         //this.boundsEx = jStockOptions.boundsEx;
 
+        //this.googleCodeDatabaseMeta = new EnumMap<>(jStockOptions.googleCodeDatabaseMeta);
         this.priceSources = new EnumMap<Country, PriceSource>(jStockOptions.priceSources);
         this.currencies = new EnumMap<Country, String>(jStockOptions.currencies);
         this.currencyExchangeEnable = new EnumMap<Country, Boolean>(jStockOptions.currencyExchangeEnable);
@@ -636,8 +638,12 @@ public class JStockOptions {
             this.setLocale(Locale.getDefault());
         }
         
+        if (this.googleCodeDatabaseMeta == null) {
+            this.googleCodeDatabaseMeta = new EnumMap<>(Country.class);
+        }
+        
         if (this.priceSources == null) {
-            this.priceSources = new EnumMap<Country, PriceSource>(Country.class);
+            this.priceSources = new EnumMap<>(Country.class);
         } else {
             // Still here for xstream backward compatible. Shall be removed
             // after a while.
@@ -1265,6 +1271,14 @@ public class JStockOptions {
         this.decimalPlaces.put(this.country, decimalPlace);
     }
 
+    public Long getGoogleCodeDatabaseMetaTimestamp(Country country) {
+        return this.googleCodeDatabaseMeta.get(country);
+    }
+
+    public void setGoogleCodeDatabaseMetaTimestamp(Country country, long timestamp) {
+        this.googleCodeDatabaseMeta.put(country, timestamp);
+    }
+    
     public PriceSource getPriceSource(Country country) {
         final PriceSource priceSource = this.priceSources.get(country);
         if (priceSource == null) {
