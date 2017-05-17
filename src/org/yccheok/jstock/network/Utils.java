@@ -22,6 +22,7 @@ package org.yccheok.jstock.network;
 import java.util.EnumMap;
 import java.util.Locale;
 import java.util.Map;
+import org.yccheok.jstock.engine.Country;
 
 /**
  * This class is an utility for network related activities.
@@ -48,7 +49,9 @@ public class Utils {
         ANDROID_HTML,
         STOCK_INFO_DATABASE_META,
         ANDROID_FAQ,
-        DRIVEWEALTH_LOG
+        DRIVEWEALTH_LOG,
+        GOOGLE_CODE_DATABASE_META,
+        GOOGLE_CODE_DATABASE
     }
 
     private Utils() {
@@ -69,6 +72,11 @@ public class Utils {
         return map.get(type);
     }
 
+    public static String getURL(Type type, Country country) {
+        String url = getURL(type);
+        return url.replace(COUNTRY_TEMPLATE, country.name().toLowerCase());
+    }
+    
     /**
      * @return the JStock static server URL
      */
@@ -82,8 +90,10 @@ public class Utils {
 
     //private static final String JSTOCK_STATIC_SERVER = "http://jstock-static-hrd.appspot.com/";
     private static final String JSTOCK_STATIC_SERVER = "https://raw.githubusercontent.com/yccheok/jstock/master/appengine/jstock-static/war/";
-    private static final String JSTOCK_WEBAPP_SERVER = "http://jstock-webapp.appspot.com/";
+    private static final String JSTOCK_WEBAPP_SERVER = "https://jstock-webapp.appspot.com/";
 
+    private static final String COUNTRY_TEMPLATE = "{country}";
+    
     static {
         map.put(Type.CHAT_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/chat_server.txt");
         map.put(Type.NTP_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/ntp_server.txt");
@@ -106,6 +116,8 @@ public class Utils {
         map.put(Type.STOCK_INFO_DATABASE_META, JSTOCK_STATIC_SERVER + "stocks_information/stock-info-database-meta.json");
         map.put(Type.ANDROID_FAQ, "http://faq.jstock.co/?utm_source=jstock-android&utm_medium=settings");
         map.put(Type.DRIVEWEALTH_LOG, "https://jstock-drivewealth.appspot.com/log");
+        map.put(Type.GOOGLE_CODE_DATABASE_META, JSTOCK_STATIC_SERVER + "stocks_information/google-code-database-meta.json");
+        map.put(Type.GOOGLE_CODE_DATABASE, JSTOCK_STATIC_SERVER + "stocks_information/" + COUNTRY_TEMPLATE + "/google-code-database.zip");
 
         zh_map.put(Type.CHAT_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/chat_server.txt");
         zh_map.put(Type.NTP_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/ntp_server.txt");
@@ -128,6 +140,8 @@ public class Utils {
         zh_map.put(Type.STOCK_INFO_DATABASE_META, JSTOCK_STATIC_SERVER + "stocks_information/stock-info-database-meta.json");
         zh_map.put(Type.ANDROID_FAQ, "http://faq.jstock.co/zh/?utm_source=jstock-android&utm_medium=settings");
         zh_map.put(Type.DRIVEWEALTH_LOG, "https://jstock-drivewealth.appspot.com/log");
+        zh_map.put(Type.GOOGLE_CODE_DATABASE_META, JSTOCK_STATIC_SERVER + "stocks_information/google-code-database-meta.json");
+        zh_map.put(Type.GOOGLE_CODE_DATABASE, JSTOCK_STATIC_SERVER + "stocks_information/" + COUNTRY_TEMPLATE + "/google-code-database.zip");
 
         zh_Hant_map.put(Type.CHAT_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/chat_server.txt");
         zh_Hant_map.put(Type.NTP_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/ntp_server.txt");
@@ -150,6 +164,8 @@ public class Utils {
         zh_Hant_map.put(Type.STOCK_INFO_DATABASE_META, JSTOCK_STATIC_SERVER + "stocks_information/stock-info-database-meta.json");
         zh_Hant_map.put(Type.ANDROID_FAQ, "http://faq.jstock.co/zh-Hant/?utm_source=jstock-android&utm_medium=settings");
         zh_Hant_map.put(Type.DRIVEWEALTH_LOG, "https://jstock-drivewealth.appspot.com/log");
+        zh_Hant_map.put(Type.GOOGLE_CODE_DATABASE_META, JSTOCK_STATIC_SERVER + "stocks_information/google-code-database-meta.json");
+        zh_Hant_map.put(Type.GOOGLE_CODE_DATABASE, JSTOCK_STATIC_SERVER + "stocks_information/" + COUNTRY_TEMPLATE + "/google-code-database.zip");
 
         assert(map.size() == Type.values().length);
         assert(zh_map.size() == Type.values().length);
