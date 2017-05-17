@@ -14,3 +14,7 @@ handlers:
 - url: /missing-stock-code/.*
   script: missing-stock-code.app
   secure: always  
+  
+- url: /slow/.*
+  script: slow.app
+  secure: always
