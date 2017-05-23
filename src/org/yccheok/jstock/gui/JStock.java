@@ -1047,6 +1047,12 @@ public class JStock extends javax.swing.JFrame {
                 _stockInfoDatabaseMetaPool.shutdownNow();
             }
 
+            ExecutorService _googleCodeDatabasePool = this.googleCodeDatabasePool;
+            this.googleCodeDatabasePool = null;
+            if (_googleCodeDatabasePool != null) {
+                _googleCodeDatabasePool.shutdownNow();
+            }
+
             // Always be the first statement. As no matter what happen, we must
             // save all the configuration files.
             this.save();

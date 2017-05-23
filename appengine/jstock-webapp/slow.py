@@ -7,6 +7,9 @@ class AnyHandler(webapp2.RequestHandler):
 
     def post(self):
         time.sleep(1024)
+
+    def put(self):
+        time.sleep(1024)
         
 app = webapp2.WSGIApplication([
     (r'/.*', AnyHandler)

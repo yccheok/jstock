@@ -1,6 +1,10 @@
 ﻿This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.7.24 - 2017-05-24
+  Feature: Swiss stock market supports Google Finance as price source.
+  Feature: Fix Yahoo stock history API.
+
 JStock 1.0.7.23 - 2017-05-18
   Feature: Support Google Finance for Malaysia.
   
