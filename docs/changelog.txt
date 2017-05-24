@@ -1,6 +1,11 @@
 ﻿This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.7.25 - 2017-05-25
+  Feature: Save changePrices and changePricePercentages to disk so we can have 
+           daily profit information even when internet is not available. This
+           is for Android app purpose only.
+
 JStock 1.0.7.24 - 2017-05-24
   Feature: Swiss stock market supports Google Finance as price source.
   Bugfix:  Fix Yahoo stock history API.

@@ -2400,16 +2400,21 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         
     private boolean savePortfolioRealTimeInfo(String directory, PortfolioRealTimeInfo portfolioRealTimeInfo) {
         PortfolioRealTimeInfo _portfolioRealTimeInfo = new PortfolioRealTimeInfo(portfolioRealTimeInfo);
-        
+
         Map<Code, Double> goodStockPrices = new HashMap<>();
+        Map<Code, Double> goodChangePrices = new HashMap<>();
+        Map<Code, Double> goodChangePricePercentages = new HashMap<>();
         Map<Code, Currency> goodCurrencies = new HashMap<>();
         Map<CurrencyPair, Double> goodExchangeRates = new HashMap<>();
-        
+
         ////////////////////////////////////////////////////////////////////////
         // goodStockPrices
         ////////////////////////////////////////////////////////////////////////
         for (Code code : getBuyCodes()) {
             final Double price = _portfolioRealTimeInfo.stockPrices.get(code);
+            final Double changePrice = _portfolioRealTimeInfo.changePrices.get(code);
+            final Double changePricePercentage = _portfolioRealTimeInfo.changePricePercentages.get(code);
+
             if (price == null) {
                 // Having 0 is important too, so that we can generate correct
                 // portfolioinfos.csv
@@ -2417,8 +2422,22 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             } else {
                 goodStockPrices.put(code, price);
             }
+
+            if (changePrice == null) {
+                // Having 0 is not really that important. We just mimic what is being done on goodStockPrices.
+                goodChangePrices.put(code, 0.0);
+            } else {
+                goodChangePrices.put(code, changePrice);
+            }
+
+            if (changePricePercentage == null) {
+                // Having 0 is not really that important. We just mimic what is being done on goodStockPrices.
+                goodChangePricePercentages.put(code, 0.0);
+            } else {
+                goodChangePricePercentages.put(code, changePricePercentage);
+            }
         }
-        
+
         ////////////////////////////////////////////////////////////////////////
         // goodCurrencies. Don't use getBuyCodes, as we need to perform currency
         // conversion on sell stocks too.
@@ -2429,7 +2448,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 goodCurrencies.put(code, currency);
             }
         }
-        
+
         ////////////////////////////////////////////////////////////////////////
         // goodExchangeRates
         ////////////////////////////////////////////////////////////////////////
@@ -2439,15 +2458,19 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                 goodExchangeRates.put(currencyPair, rate);
             }
         }
-        
+
         _portfolioRealTimeInfo.stockPrices.clear();
         _portfolioRealTimeInfo.currencies.clear();
         _portfolioRealTimeInfo.exchangeRates.clear();
-        
+        _portfolioRealTimeInfo.changePrices.clear();
+        _portfolioRealTimeInfo.changePricePercentages.clear();
+
         _portfolioRealTimeInfo.stockPrices.putAll(goodStockPrices);
         _portfolioRealTimeInfo.currencies.putAll(goodCurrencies);
         _portfolioRealTimeInfo.exchangeRates.putAll(goodExchangeRates);
-        
+        _portfolioRealTimeInfo.changePrices.putAll(goodChangePrices);
+        _portfolioRealTimeInfo.changePricePercentages.putAll(goodChangePricePercentages);
+
         final File stockPricesFile = new File(directory + "portfolio-real-time-info.json");
         return _portfolioRealTimeInfo.save(stockPricesFile);
     }
@@ -2674,7 +2697,9 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         
         final Map<Code, Double> stockPrices = this.portfolioRealTimeInfo.stockPrices;
         final Map<Code, Currency> currencies = this.portfolioRealTimeInfo.currencies;
- 
+        final Map<Code, Double> changePrices = portfolioRealTimeInfo.changePrices;
+        final Map<Code, Double> changePricePercentages = portfolioRealTimeInfo.changePricePercentages;
+
         final Set<Code> buyCodes = this.getBuyCodes();
         final Set<Code> sellCodes = this.getSellCodes();
         
@@ -2705,6 +2730,21 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                             needSellRefresh = true;    
                         }
                     }
+                }
+                
+                final double changePrice = stock.getChangePrice();
+                final double changePricePercentage = stock.getChangePricePercentage();
+
+                Double oldChangePrice = changePrices.get(code);
+                changePrices.put(code, changePrice);
+                if (oldChangePrice == null || oldChangePrice != changePrice) {
+                    portfolioRealTimeInfo.changePricesDirty = true;
+                }
+
+                Double oldChangePricePercentage = changePricePercentages.get(code);
+                changePricePercentages.put(code, changePricePercentage);
+                if (oldChangePricePercentage == null || oldChangePricePercentage != changePricePercentage) {
+                    portfolioRealTimeInfo.changePricePercentagesDirty = true;
                 }
             } else if (sellCodes.contains(code)) {
                 if (currency != null) {

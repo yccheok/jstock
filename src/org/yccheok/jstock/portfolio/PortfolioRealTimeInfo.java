@@ -33,14 +33,12 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Type;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -59,12 +57,20 @@ public class PortfolioRealTimeInfo {
 
     public final ConcurrentHashMap<Code, Currency> currencies = new ConcurrentHashMap<>();
 
+    public final ConcurrentHashMap<Code, Double> changePrices = new ConcurrentHashMap<>();
+
+    public final ConcurrentHashMap<Code, Double> changePricePercentages = new ConcurrentHashMap<>();
+
     public long stockPricesTimestamp = 0;
     public long exchangeRatesTimestamp = 0;
 
     public transient volatile boolean stockPricesDirty = false;
     public transient volatile boolean exchangeRatesDirty = false;
     public transient volatile boolean currenciesDirty = false;
+    public transient volatile boolean changePricesDirty = false;
+    public transient volatile boolean changePricePercentagesDirty = false;
+    public transient volatile boolean stockPricesTimestampDirty = false;
+    public transient volatile boolean exchangeRatesTimestampDirty = false;
 
     private static final Log log = LogFactory.getLog(PortfolioRealTimeInfo.class);
 
@@ -79,10 +85,14 @@ public class PortfolioRealTimeInfo {
         stockPrices.clear();
         exchangeRates.clear();
         currencies.clear();
+        changePrices.clear();
+        changePricePercentages.clear();
 
         stockPrices.putAll(portfolioRealTimeInfo.stockPrices);
         exchangeRates.putAll(portfolioRealTimeInfo.exchangeRates);
         currencies.putAll(portfolioRealTimeInfo.currencies);
+        changePrices.putAll(portfolioRealTimeInfo.changePrices);
+        changePricePercentages.putAll(portfolioRealTimeInfo.changePricePercentages);
 
         stockPricesTimestamp = portfolioRealTimeInfo.stockPricesTimestamp;
         exchangeRatesTimestamp = portfolioRealTimeInfo.exchangeRatesTimestamp;
@@ -92,6 +102,10 @@ public class PortfolioRealTimeInfo {
         this.stockPricesDirty = portfolioRealTimeInfo.stockPricesDirty;
         this.exchangeRatesDirty = portfolioRealTimeInfo.exchangeRatesDirty;
         this.currenciesDirty = portfolioRealTimeInfo.currenciesDirty;
+        this.changePricesDirty = portfolioRealTimeInfo.changePricesDirty;
+        this.changePricePercentagesDirty = portfolioRealTimeInfo.changePricePercentagesDirty;
+        this.stockPricesTimestampDirty = portfolioRealTimeInfo.stockPricesTimestampDirty;
+        this.exchangeRatesTimestampDirty = portfolioRealTimeInfo.exchangeRatesTimestampDirty;
     }
 
     // http://stackoverflow.com/questions/16921012/gson-handles-case-when-synchronized-hashmap-as-class-member
@@ -103,42 +117,13 @@ public class PortfolioRealTimeInfo {
             return new ConcurrentHashMap<>();
         }
     }
-
-    // For debugging purpose
-    private String getString(File file) throws FileNotFoundException {
-        StringBuilder fileContents = new StringBuilder((int)file.length());
-        Scanner scanner = new Scanner(file);
-        String lineSeparator = ";";
-
-        try {
-            while (scanner.hasNextLine()) {
-                fileContents.append(scanner.nextLine()).append(lineSeparator);
-            }
-            return fileContents.toString();
-        } finally {
-            scanner.close();
-        }
-    }
-
+    
     public boolean load(File file) {
         assert(file != null);
 
         if (false == file.isFile()) {
             return false;
         }
-
-        final Gson gson = new GsonBuilder().
-            registerTypeAdapter(
-                new TypeToken<ConcurrentHashMap<Code, Double>>() {}.getType(),
-                new ConcurrentHashMapInstanceCreator<Code, Double>())
-            .registerTypeAdapter(
-                new TypeToken<ConcurrentHashMap<CurrencyPair, Double>>() {}.getType(),
-                new ConcurrentHashMapInstanceCreator<CurrencyPair, Double>())
-            .registerTypeAdapter(
-                new TypeToken<ConcurrentHashMap<Code, Currency>>() {}.getType(),
-                new ConcurrentHashMapInstanceCreator<Code, Currency>())
-            .create();
-
 
         PortfolioRealTimeInfo portfolioRealTimeInfo = null;
         
@@ -151,7 +136,9 @@ public class PortfolioRealTimeInfo {
         
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+
             try {
+                Gson gson = getReadGson();
                 portfolioRealTimeInfo = gson.fromJson(reader, PortfolioRealTimeInfo.class);
 
                 if (portfolioRealTimeInfo == null) {
@@ -225,9 +212,7 @@ public class PortfolioRealTimeInfo {
     }
 
     public boolean save(File file) {
-        GsonBuilder builder = new GsonBuilder();
-        builder.enableComplexMapKeySerialization();
-        Gson gson = builder.create();
+        Gson gson = getWriteGson();
         String string = gson.toJson(this);
 
         final ThreadSafeFileLock.Lock lock = ThreadSafeFileLock.getLock(file);
@@ -253,5 +238,27 @@ public class PortfolioRealTimeInfo {
         }
 
         return true;
+    }
+
+    public static Gson getReadGson() {
+        final Gson gson = new GsonBuilder().registerTypeAdapter(
+            new TypeToken<ConcurrentHashMap<Code, Double>>() {}.getType(),
+            new ConcurrentHashMapInstanceCreator<Code, Double>()
+        ).registerTypeAdapter(
+            new TypeToken<ConcurrentHashMap<CurrencyPair, Double>>() {}.getType(),
+            new ConcurrentHashMapInstanceCreator<CurrencyPair, Double>()
+        ).registerTypeAdapter(
+            new TypeToken<ConcurrentHashMap<Code, Currency>>() {}.getType(),
+            new ConcurrentHashMapInstanceCreator<Code, Currency>()
+        ).create();
+
+        return gson;
+    }
+
+    public static Gson getWriteGson() {
+        GsonBuilder builder = new GsonBuilder();
+        builder.enableComplexMapKeySerialization();
+        Gson gson = builder.create();
+        return gson;
     }
 }
