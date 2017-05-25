@@ -1417,6 +1417,13 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         sellPortfolioChartJDialog.setVisible(true);                                    
     }
     
+    private void showSellPortfolioTimeChartJDialog() {
+        final MainFrame m = MainFrame.getInstance();
+        final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModel = (SellPortfolioTreeTableModelEx)sellTreeTable.getTreeTableModel();
+        SellPortfolioTimeChartJDialog sellPortfolioTimeChartJDialog = new SellPortfolioTimeChartJDialog(m, false, sellPortfolioTreeTableModel, this.getDividendSummary());
+        sellPortfolioTimeChartJDialog.setVisible(true);                                    
+    }
+    
     private JPopupMenu getSellTreeTablePopupMenu() {                
         final List<Transaction> transactions = getSelectedTransactions(this.sellTreeTable);
 
@@ -1515,6 +1522,17 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         });
 
         popup.add(menuItem);        
+        
+        menuItem = new JMenuItem(GUIBundle.getString("PortfolioManagement_Evolution..."), this.getImageIcon("/images/16x16/graph.png"));
+        
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                PortfolioManagementJPanel.this.showSellPortfolioTimeChartJDialog();
+            }
+        });
+
+        popup.add(menuItem);
         
         if(isOnlyTreeTableRootBeingSelected(sellTreeTable) == false && (sellTreeTable.getSelectedRow() > 0)) {
             final JStock m = JStock.instance();
