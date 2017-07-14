@@ -54,6 +54,11 @@ class AnyHandler(webapp2.RequestHandler):
             'ackFindersFee': 'true'
         }
         
+        #obj = {
+        #    "key":"watchList",
+        #    "value":"[{\"instrumentId\":\"90b7618e-be49-483b-99f4-fe4720be2706\",\"symbol\":\"BABA\"},{\"instrumentId\":\"e3380443-1796-4e8a-a275-a48442fcb0e9\",\"symbol\":\"CAA\"},{\"instrumentId\":\"33f9801d-51f2-41a3-bca5-22ea6003f5ac\",\"symbol\":\"C\"},{\"instrumentId\":\"f889ac43-2403-4b4f-a824-b3afba3f51d6\",\"symbol\":\"CABO\"}]"
+        #}
+        
         self.response.headers['Content-Type'] = 'application/json'   
         self.response.out.write(json.dumps(obj))
         
