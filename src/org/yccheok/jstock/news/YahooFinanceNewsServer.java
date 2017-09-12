@@ -32,16 +32,36 @@ import it.sauronsoftware.feed4j.bean.FeedItem;
 import it.sauronsoftware.feed4j.FeedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.yccheok.jstock.engine.Code;
 
 import org.yccheok.jstock.engine.StockInfo;
+import org.yccheok.jstock.engine.yahoo.quote.QuoteResponse;
+import org.yccheok.jstock.engine.yahoo.quote.QuoteResponse_;
+import retrofit2.Call;
 
 
 public class YahooFinanceNewsServer implements NewsServer {
 
     @Override
     public List<FeedItem> getMessages(StockInfo stockInfo) {
+        final Code code = stockInfo.code;
+
+        String query = org.yccheok.jstock.engine.Utils.toYahooFormat(code.toString());
+
+        if (org.yccheok.jstock.engine.Utils.needToResolveUnderlyingCode(code)) {
+            Call<QuoteResponse> c = org.yccheok.jstock.engine.Utils.getYahooFinanceApi().quote(query);
+            try {
+                QuoteResponse quoteResponse = c.execute().body();
+                QuoteResponse_ quoteResponse_ = quoteResponse.getQuoteResponse();
+                List<org.yccheok.jstock.engine.yahoo.quote.Result> results = quoteResponse_.getResult();
+                query = results.get(0).getUnderlyingSymbol();
+            } catch (Exception e) {
+                log.error(null, e);
+            }
+        }
+
         // http://feeds.finance.yahoo.com/rss/2.0/headline?s=0005.HK&region=US&lang=en-US
-        final String feedUrl = "https://feeds.finance.yahoo.com/rss/2.0/headline?s=" + stockInfo.code + "&region=US&lang=en-US";
+        final String feedUrl = "https://feeds.finance.yahoo.com/rss/2.0/headline?s=" + query + "&region=US&lang=en-US";
         final List<FeedItem> messages = new ArrayList<>();
         final Set<String> titles = new HashSet<>();
             

@@ -740,7 +740,7 @@ public class Utils {
         for (int i = 0; i < size; i++) {
             final Deposit withdraw = cashSummary.get(i);
             final double amount = withdraw.getAmount();
-            if (definitelyLessThan(amount, 0.0)) {
+            if (definitelyLesserThan(amount, 0.0)) {
                 totalWidthdraw += amount;
             }
         }
@@ -778,7 +778,7 @@ public class Utils {
      * @param b second double value
      * @return true if the a is definitely lesser than b
      */
-    public static boolean definitelyLessThan(double a, double b)
+    public static boolean definitelyLesserThan(double a, double b)
     {
         return (b - a) > ( (Math.abs(a) < Math.abs(b) ? Math.abs(b) : Math.abs(a)) * EPSILON);
     }

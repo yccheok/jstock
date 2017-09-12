@@ -1,22 +1,3 @@
-/*
- * JStock - Free Stock Market Software
- * Copyright (C) 2016 Yan Cheng Cheok <yccheok@yahoo.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
-
 package org.yccheok.jstock.news;
 
 import org.yccheok.jstock.engine.Country;
@@ -111,6 +92,7 @@ public class NewsServerFactory {
         final List<NewsServer> netherlandsList = new CopyOnWriteArrayList<>();
         final List<NewsServer> newZealandList = new CopyOnWriteArrayList<>();
         final List<NewsServer> norwayList = new CopyOnWriteArrayList<>();
+        final List<NewsServer> polandList = new CopyOnWriteArrayList<>();
         final List<NewsServer> portugalList = new CopyOnWriteArrayList<>();
         final List<NewsServer> russiaList = new CopyOnWriteArrayList<>();
         final List<NewsServer> saudiArabiaList = new CopyOnWriteArrayList<>();
@@ -146,12 +128,14 @@ public class NewsServerFactory {
         denmarkList.add(new YahooFinanceNewsServer());
         denmarkList.add(new GoogleFinanceNewsServer());
         finlandList.add(new GoogleFinanceNewsServer());
+        finlandList.add(new YahooFinanceNewsServer());
         franceList.add(new YahooFinanceNewsServer());
         franceList.add(new GoogleFinanceNewsServer());
         germanyList.add(new YahooFinanceNewsServer());
         germanyList.add(new GoogleSearchNewsServer());
         hongkongList.add(new YahooFinanceNewsServer());
         hongkongList.add(new GoogleFinanceNewsServer());
+        indiaList.add(new YahooFinanceNewsServer());
         indiaList.add(new GoogleFinanceNewsServer());
         indonesiaList.add(new YahooFinanceNewsServer());
         indonesiaList.add(new GoogleFinanceNewsServer());
@@ -163,22 +147,23 @@ public class NewsServerFactory {
         koreaList.add(new YahooFinanceNewsServer());
         koreaList.add(new GoogleFinanceNewsServer());
         malaysiaList.add(new YahooFinanceNewsServer());
-        malaysiaList.add(new GoogleSearchNewsServer());
+        malaysiaList.add(new GoogleFinanceNewsServer());
         netherlandsList.add(new YahooFinanceNewsServer());
         netherlandsList.add(new GoogleFinanceNewsServer());
         newZealandList.add(new YahooFinanceNewsServer());
         newZealandList.add(new GoogleFinanceNewsServer());
         norwayList.add(new YahooFinanceNewsServer());
         norwayList.add(new GoogleSearchNewsServer());
+        polandList.add(new GoogleFinanceNewsServer());
         portugalList.add(new YahooFinanceNewsServer());
         portugalList.add(new GoogleFinanceNewsServer());
         russiaList.add(new GoogleFinanceNewsServer());
+        russiaList.add(new YahooFinanceNewsServer());
         saudiArabiaList.add(new GoogleFinanceNewsServer());
         singaporeList.add(new YahooFinanceNewsServer());
         singaporeList.add(new GoogleFinanceNewsServer());
         southAfricaList.add(new GoogleFinanceNewsServer());
-        spainList.add(new YahooFinanceNewsServer());
-        spainList.add(new GoogleSearchNewsServer());
+        spainList.add(new GoogleFinanceNewsServer());
         swedenList.add(new YahooFinanceNewsServer());
         swedenList.add(new GoogleFinanceNewsServer());
         switzerlandList.add(new YahooFinanceNewsServer());
@@ -218,6 +203,7 @@ public class NewsServerFactory {
         map.put(Country.Netherlands, netherlandsList);
         map.put(Country.NewZealand, newZealandList);
         map.put(Country.Norway, norwayList);
+        map.put(Country.Poland, polandList);
         map.put(Country.Portugal, portugalList);
         map.put(Country.Russia, russiaList);
         map.put(Country.SaudiArabia, saudiArabiaList);
