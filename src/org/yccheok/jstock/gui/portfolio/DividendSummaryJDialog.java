@@ -575,38 +575,8 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
                 final TransactionSummary transactionSummary = transactionSummaries.get(i);
                 final Code code = ((Transaction)transactionSummary.getChildAt(0)).getStockInfo().code;
                 Dividend latestDividend = org.yccheok.jstock.portfolio.Utils.getLatestDividend(dividendSummary, code);                
-
-                final Duration duration;
-
-                SimpleDate date = null;
-                
-                if (latestDividend == null) {
-                    for (int j = 0, ej = transactionSummary.getChildCount(); j < ej; j++) {
-                        Transaction transaction = (Transaction)transactionSummary.getChildAt(j);
-                        SimpleDate simpleDate = transaction.getContract().getDate();
-                        if (date == null) {
-                            date = simpleDate;
-                        } else {
-                            if (date.compareTo(simpleDate) > 0) {
-                                date = simpleDate;
-                            }
-                        }
-                    }
-                } else {
-                    date = latestDividend.date;
-                }
-                
-                Calendar c = date.getCalendar();
-                c.add(Calendar.DATE, 1);
-                SimpleDate startDate = new SimpleDate(c);
-                SimpleDate endDate = new SimpleDate();
-                if (startDate.compareTo(endDate) > 0) {
-                    this.setProgress(i + 1);
-                    continue;
-                }                
-                duration = new Duration(startDate, endDate);
-                
-                List<Dividend> suggestedDividends = new ArrayList<Dividend>();
+                                
+                List<Dividend> suggestedDividends = new ArrayList<>();
                 for (StockServerFactory stockServerFactory : Factories.INSTANCE.getStockServerFactories(code)) {
                     if (isCancelled()) {
                         break;
@@ -614,11 +584,14 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
                     
                     DividendServer dividendServer = stockServerFactory.getDividendServer();
                     if (dividendServer != null) {
-                        List<Dividend> dividends = dividendServer.getDividends(code, duration);
-                        for (Dividend dividend : dividends) {
-                            if (false == duration.isContains(dividend.date)) {
-                                continue;
+                        List<Dividend> dividends = dividendServer.getDividends(code);
+                        for (Dividend dividend : dividends) {                            
+                            if (latestDividend != null) {
+                                if (latestDividend.date.compareTo(dividend.date) >= 0) {
+                                    continue;
+                                }
                             }
+                            
                             double total = dividend.amount * quantityQuery.getBalance(code, dividend.date);
                             if (total == 0) {
                                 continue;
