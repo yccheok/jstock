@@ -53,7 +53,8 @@ public class Utils {
         GOOGLE_CODE_DATABASE_META,
         GOOGLE_CODE_DATABASE,
         MISSING_STOCK_CODE_SERVICE,
-        YAHOO_FINANCE_API
+        YAHOO_FINANCE_API,
+        IEX_API
     }
 
     private Utils() {
@@ -122,6 +123,7 @@ public class Utils {
         map.put(Type.GOOGLE_CODE_DATABASE, JSTOCK_STATIC_SERVER + "stocks_information/" + COUNTRY_TEMPLATE + "/google-code-database.zip");
         map.put(Type.MISSING_STOCK_CODE_SERVICE, JSTOCK_WEBAPP_SERVER + "missing-stock-code/");
         map.put(Type.YAHOO_FINANCE_API, "https://finance-yql.media.yahoo.com/v7/finance/");
+        map.put(Type.IEX_API, "https://api.iextrading.com/1.0/");
 
         zh_map.put(Type.CHAT_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/chat_server.txt");
         zh_map.put(Type.NTP_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/ntp_server.txt");
@@ -148,6 +150,7 @@ public class Utils {
         zh_map.put(Type.GOOGLE_CODE_DATABASE, JSTOCK_STATIC_SERVER + "stocks_information/" + COUNTRY_TEMPLATE + "/google-code-database.zip");
         zh_map.put(Type.MISSING_STOCK_CODE_SERVICE, JSTOCK_WEBAPP_SERVER + "missing-stock-code/");
         zh_map.put(Type.YAHOO_FINANCE_API, "https://finance-yql.media.yahoo.com/v7/finance/");
+        zh_map.put(Type.IEX_API, "https://api.iextrading.com/1.0/");
 
         zh_Hant_map.put(Type.CHAT_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/chat_server.txt");
         zh_Hant_map.put(Type.NTP_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/ntp_server.txt");
@@ -174,6 +177,7 @@ public class Utils {
         zh_Hant_map.put(Type.GOOGLE_CODE_DATABASE, JSTOCK_STATIC_SERVER + "stocks_information/" + COUNTRY_TEMPLATE + "/google-code-database.zip");
         zh_Hant_map.put(Type.MISSING_STOCK_CODE_SERVICE, JSTOCK_WEBAPP_SERVER + "missing-stock-code/");
         zh_Hant_map.put(Type.YAHOO_FINANCE_API, "https://finance-yql.media.yahoo.com/v7/finance/");
+        zh_Hant_map.put(Type.IEX_API, "https://api.iextrading.com/1.0/");
 
         assert(map.size() == Type.values().length);
         assert(zh_map.size() == Type.values().length);
