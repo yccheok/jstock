@@ -1,6 +1,10 @@
 ﻿This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.7.30 - 2017-11-15
+  Bugfix:  Due to licensing and legal issue, we will not support Malaysia stock 
+           market moving forward.
+           
 JStock 1.0.7.29 - 2017-10-10
   Bugfix:  History stock server fixed.
   Bugfix:  Fix auto dividend for US stock market.
