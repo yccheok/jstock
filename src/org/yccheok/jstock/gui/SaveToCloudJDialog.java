@@ -514,7 +514,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
     // We will ask user whether he want to continue to save to cloud, as we are
     // going to ignore his stock watchlist file(s). Returns true if user wants
     // to continue.
-    private boolean promptUserToContinue(final List<Country> countryWithWatchlistFilesBeingIgnored) {
+    private static boolean promptUserToContinue(final List<Country> countryWithWatchlistFilesBeingIgnored) {
         if (countryWithWatchlistFilesBeingIgnored.isEmpty()) {
             // No watchlist file(s) is ignored.
             return true;
@@ -537,13 +537,13 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         final int[] choice = new int[1];
         choice[0] = JOptionPane.NO_OPTION;
         if (SwingUtilities.isEventDispatchThread()) {
-            choice[0] = JOptionPane.showConfirmDialog(SaveToCloudJDialog.this, message, title, JOptionPane.YES_NO_OPTION);
+            choice[0] = JOptionPane.showConfirmDialog(JStock.instance(), message, title, JOptionPane.YES_NO_OPTION);
         } else {
             try {
                 SwingUtilities.invokeAndWait(new Runnable() {
                     @Override
                     public void run() {
-                        choice[0] = JOptionPane.showConfirmDialog(SaveToCloudJDialog.this, message, title, JOptionPane.YES_NO_OPTION);
+                        choice[0] = JOptionPane.showConfirmDialog(JStock.instance(), message, title, JOptionPane.YES_NO_OPTION);
                     }
                 });
             } catch (InterruptedException ex) {
@@ -586,7 +586,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
     }
     
     // filename can be null, to indicate temp file.
-    private File getJStockZipFile(final String filename) {
+    public static File getJStockZipFile(final String filename) {
         // Look for "user-defined-database.xml" for all countries.
         final List<File> files = getUserDefinedDatabaseFiles();
         final List<FileEx> fileExs = new ArrayList<>();

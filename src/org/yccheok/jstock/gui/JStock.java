@@ -115,7 +115,7 @@ public class JStock extends javax.swing.JFrame {
         initComponents();
 
         createLookAndFeelMenuItems();
-        createCountryMenuItems();
+        rebuildCountryMenuItems(true);
 
         createStockIndicatorEditor();
         createIndicatorScannerJPanel();
@@ -406,6 +406,7 @@ public class JStock extends javax.swing.JFrame {
         jMenuItem3 = new javax.swing.JMenuItem();
         jMenuItem16 = new javax.swing.JMenuItem();
         jMenuItem12 = new javax.swing.JMenuItem();
+        jMenuItem18 = new javax.swing.JMenuItem();
         jSeparator6 = new javax.swing.JPopupMenu.Separator();
         jMenuItem13 = new javax.swing.JMenuItem();
         jMenuItem14 = new javax.swing.JMenuItem();
@@ -738,6 +739,14 @@ public class JStock extends javax.swing.JFrame {
             }
         });
         jMenu2.add(jMenuItem12);
+
+        jMenuItem18.setText(bundle.getString("MainFrame_Export")); // NOI18N
+        jMenuItem18.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem18ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItem18);
         jMenu2.add(jSeparator6);
 
         jMenuItem13.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/smile2.png"))); // NOI18N
@@ -1674,6 +1683,20 @@ public class JStock extends javax.swing.JFrame {
     private void jMenu6MenuSelected(javax.swing.event.MenuEvent evt) {//GEN-FIRST:event_jMenu6MenuSelected
         initRecentCountryMenuItems();
     }//GEN-LAST:event_jMenu6MenuSelected
+
+    private void jMenuItem18ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem18ActionPerformed
+        File file = Utils.promptSaveZippedJFileChooser("jstock.zip");
+        
+        if (file == null) {
+            return;
+        }
+        
+        file = SaveToCloudJDialog.getJStockZipFile(file.getAbsolutePath());
+        
+        if (file != null) {
+            JOptionPane.showMessageDialog(null, MessagesBundle.getString("info_message_export_successfully"));
+        }
+    }//GEN-LAST:event_jMenuItem18ActionPerformed
     
     /**
      * Activate specified watchlist.
@@ -2166,7 +2189,13 @@ public class JStock extends javax.swing.JFrame {
         buttonGroup4 = new ButtonGroup();
         
         int index = 0;
+        
+        final Set<Country> countries = new HashSet<>(Utils.getSupportedStockMarketCountries());
         for (final Country country : jStockOptions.getRecentCountries()) {
+            if (false == countries.contains(country)) {
+                continue;
+            }
+            
             final JMenuItem mi = (JRadioButtonMenuItem) jMenu6.add(new JRadioButtonMenuItem(country.humanString, country.icon), index++);
 
             buttonGroup4.add(mi);
@@ -2187,9 +2216,15 @@ public class JStock extends javax.swing.JFrame {
         }
     }
     
-    public void createCountryMenuItems() {        
-        final java.util.List<Country> countries = Utils.getSupportedStockMarketCountries();
+    public void rebuildCountryMenuItems(boolean useCache) {        
+        final java.util.List<Country> countries = Utils.getSupportedStockMarketCountries(useCache);
 
+        jMenu6.removeAll();
+
+        for (Enumeration<AbstractButton> e = buttonGroup2.getElements(); e.hasMoreElements();) {
+            buttonGroup2.remove(e.nextElement());
+        }
+        
         Map<Continent, JMenu> menus = new EnumMap<>(Continent.class);
         for (final Continent continent : Continent.values()) {
             JMenu jMenu = new JMenu(continent.name());
@@ -2717,6 +2752,8 @@ public class JStock extends javax.swing.JFrame {
         Utils.updateFactoriesPriceSource();
         
         jStockOptions.setCountry(this.getBestCountryAfterDownloadFromCloud());
+
+        rebuildCountryMenuItems(false);
         
         /* These codes are very similar to clean up code during changing country.
          */
@@ -5166,6 +5203,7 @@ public class JStock extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem15;
     private javax.swing.JMenuItem jMenuItem16;
     private javax.swing.JMenuItem jMenuItem17;
+    private javax.swing.JMenuItem jMenuItem18;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;

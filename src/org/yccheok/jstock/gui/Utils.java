@@ -146,6 +146,8 @@ import org.yccheok.jstock.analysis.StockOperator;
 import org.yccheok.jstock.engine.*;
 import org.yccheok.jstock.internationalization.MessagesBundle;
 import org.yccheok.jstock.network.Utils.Type;
+import org.yccheok.jstock.portfolio.PortfolioInfo;
+import org.yccheok.jstock.watchlist.WatchlistInfo;
 
 /**
  *
@@ -2458,12 +2460,52 @@ public class Utils {
         return gson;
     }
     
+    public static List<Country> getSupportedStockMarketCountries(boolean useCache) {
+        if (false == useCache) {
+            supportedStockMarketCountries.clear();
+        }
+        return getSupportedStockMarketCountries();
+    }
+    
     public static List<Country> getSupportedStockMarketCountries() {
+        if (false == supportedStockMarketCountries.isEmpty()) {
+            return java.util.Collections.unmodifiableList(supportedStockMarketCountries);
+        }
+        
         java.util.List<Country> countries = new ArrayList<>(Arrays.asList(Country.values()));
         // Czech and Hungary are only for currency exchange purpose.
         countries.remove(Country.Czech);
         countries.remove(Country.Hungary);
-        return countries;
+        
+        List<WatchlistInfo> watchlistInfos = org.yccheok.jstock.watchlist.Utils.getWatchlistInfos();
+        
+        boolean removeMalaysia = true;
+        for (WatchlistInfo watchlistInfo : watchlistInfos) {
+            if (watchlistInfo.country == Country.Malaysia) {
+                removeMalaysia = false;
+                break;
+            }
+        }
+        
+        if (removeMalaysia) {
+            List<PortfolioInfo> portfolioInfos = org.yccheok.jstock.portfolio.Utils.getPortfolioInfos();
+        
+            for (PortfolioInfo portfolioInfo : portfolioInfos) {
+                if (portfolioInfo.country == Country.Malaysia) {
+                    removeMalaysia = false;
+                    break;
+                }
+            }
+        }
+        
+        if (removeMalaysia) {
+            countries.remove(Country.Malaysia);
+        }
+        
+        supportedStockMarketCountries.clear();
+        supportedStockMarketCountries.addAll(countries);
+        
+        return supportedStockMarketCountries;
     }
     
     public static Map<Country, Long> loadStockInfoDatabaseMeta(String json) {
@@ -2736,11 +2778,11 @@ public class Utils {
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7.29";
+    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7.30";
 
-    // 1.0.7.29
+    // 1.0.7.30
     // For About box comparision on latest version purpose.
-    private static final int APPLICATION_VERSION_ID = 1158;
+    private static final int APPLICATION_VERSION_ID = 1159;
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     
@@ -2767,5 +2809,7 @@ public class Utils {
     // http://stackoverflow.com/questions/1360113/is-java-regex-thread-safe
     private static final Pattern googleDocTitlePattern = Pattern.compile("jstock-" + getJStockUUID() +  "-checksum=([0-9]+)-date=([0-9]+)-version=([0-9]+)\\.zip", Pattern.CASE_INSENSITIVE);
         
+    private static final List<Country> supportedStockMarketCountries = new ArrayList<>();
+    
     private static final Log log = LogFactory.getLog(Utils.class);
 }

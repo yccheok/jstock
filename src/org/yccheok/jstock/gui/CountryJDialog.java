@@ -20,8 +20,6 @@
 package org.yccheok.jstock.gui;
 
 import java.awt.Component;
-import java.util.ArrayList;
-import java.util.Arrays;
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;

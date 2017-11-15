@@ -143,7 +143,7 @@ public class JStockOptions {
         this.alertSpeed = 5;
         this.looknFeel = null;
         this.alwaysOnTop = false;
-        this.country = Country.Malaysia;
+        this.country = Country.UnitedState;
         this.soundEnabled = false;
 
         this.normalTextForegroundColor = DEFAULT_NORMAL_TEXT_FOREGROUND_COLOR;
