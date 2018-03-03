@@ -17,6 +17,7 @@
   <jre>
     <path></path>
     <bundledJre64Bit>false</bundledJre64Bit>
+    <bundledJreAsFallback>false</bundledJreAsFallback>
     <minVersion>1.7.0</minVersion>
     <maxVersion></maxVersion>
     <jdkPreference>preferJre</jdkPreference>
@@ -25,15 +26,17 @@
     <maxHeapSize>512</maxHeapSize>
   </jre>
   <versionInfo>
-    <fileVersion>1.1.5.9</fileVersion>
-    <txtFileVersion>1.1.5.9</txtFileVersion>
+    <fileVersion>1.1.6.0</fileVersion>
+    <txtFileVersion>1.1.6.0</txtFileVersion>
     <fileDescription>JStock - Stock Market Software</fileDescription>
     <copyright>Yan Cheng Cheok &lt;yancheng.cheok@gmail.com&gt;</copyright>
-    <productVersion>1.1.5.9</productVersion>
-    <txtProductVersion>1.1.5.9</txtProductVersion>
+    <productVersion>1.1.6.0</productVersion>
+    <txtProductVersion>1.1.6.0</txtProductVersion>
     <productName>JStock - Stock Market Software</productName>
     <companyName>Yan Cheng Cheok &lt;yancheng.cheok@gmail.com&gt;</companyName>
     <internalName>jstock</internalName>
     <originalFilename>jstock.exe</originalFilename>
+    <trademarks></trademarks>
+    <language>ENGLISH_US</language>
   </versionInfo>
 </launch4jConfig>
