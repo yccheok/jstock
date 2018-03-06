@@ -1,6 +1,9 @@
 ﻿This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.7.32 - 2018-03-06
+  Bugfix:  Support new version of Android app, with note feature.
+  
 JStock 1.0.7.31 - 2018-03-03
   Bugfix:  Fix on broken URL.
   

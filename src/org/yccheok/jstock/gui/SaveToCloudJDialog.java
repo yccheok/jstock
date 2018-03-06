@@ -577,6 +577,8 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         } else if (name.equals("android")) {
             extensions.add(".csv");
             extensions.add(".json");
+        } else if (name.equals("databases")) {
+            extensions.add(".db");
         } else {
             assert(false);
             throw new java.lang.IllegalArgumentException(name);
@@ -636,6 +638,8 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
             }
         }
 
+        getFileEx(fileExs, "databases", getExtensions("databases"));
+        
         if (false == promptUserToContinue(countryWithWatchlistFilesBeingIgnored)) {
             return null;
         }

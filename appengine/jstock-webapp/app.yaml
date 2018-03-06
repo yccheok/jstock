@@ -2,14 +2,22 @@ application: jstock-webapp
 version: 1
 runtime: python27
 api_version: 1
-threadsafe: false
+threadsafe: true
 
+# max_idle_instances: Default: automatic
+# max_concurrent_requests: Default: 8, Maximum: 80
+# min_pending_latency: Default: 30ms
+#automatic_scaling:
+#  max_idle_instances: 1
+#  max_concurrent_requests: 80
+#  min_pending_latency: 3000ms
+  
 handlers:
 - url: /get-time\.py
-  script: get-time.py
+  script: get-time.app
   
 - url: /get-ip\.py
-  script: get-ip.py
+  script: get-ip.app
   
 - url: /missing-stock-code/.*
   script: missing-stock-code.app
@@ -18,3 +26,6 @@ handlers:
 - url: /slow/.*
   script: slow.app
   secure: always
+  
+- url: /image-search/.*
+  script: image-search.app  
