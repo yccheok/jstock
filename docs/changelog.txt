@@ -1,6 +1,10 @@
 ﻿This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.7.33 - 2018-06-06
+  Feature: Promote WeNote.
+  Bugfix:  Prepare to terminate DriveWealth service.
+
 JStock 1.0.7.32 - 2018-03-06
   Bugfix:  Support new version of Android app, with note feature.
   
