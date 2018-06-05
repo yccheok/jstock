@@ -39,13 +39,13 @@ and open the template in the editor.
 }
 
 #slogan-banner {
-    -fx-font-size: 14px;
-    -fx-background-color: #4285F4;
+    -fx-font-size: 18px;
+    -fx-background-color: #F06060;
     -fx-text-fill: #FFFFFF;
 }
 
-.blue-background {
-    -fx-background-color: #4285F4;
+.red-background {
+    -fx-background-color: #F06060;
 }
 
 #open-acc-link {
@@ -263,5 +263,5 @@ https://gist.github.com/maxd/63691840fc372f22f470
 
 #learn-more-link {
     -fx-accent: #FFFFFF;    /* white text on blue background */
-    -fx-font-size: 14px;
+    -fx-font-size: 18px;
 }

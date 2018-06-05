@@ -138,8 +138,9 @@ public class SellPortfolioChartJDialog extends javax.swing.JDialog {
         excludedStrings.add(GUIBundle.getString("SellPortfolioTreeTableModel_ClearingFee"));
         for(String cName : this.cNames) {
             if (isFeeCalculationEnabled == false) {
-                excludedStrings.contains(cName);
-                continue;
+                if (excludedStrings.contains(cName)) {
+                    continue;
+                }
             }
             this.jComboBox1.addItem(cName);
         }

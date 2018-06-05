@@ -414,6 +414,8 @@ public class JStock extends javax.swing.JFrame {
         jMenuItem5 = new javax.swing.JMenuItem();
         jMenu11 = new javax.swing.JMenu();
         jMenuItem17 = new javax.swing.JMenuItem();
+        jMenu12 = new javax.swing.JMenu();
+        jMenuItem19 = new javax.swing.JMenuItem();
 
         jComboBox1.setEditable(true);
         jComboBox1.setPreferredSize(new java.awt.Dimension(150, 24));
@@ -790,6 +792,20 @@ public class JStock extends javax.swing.JFrame {
         jMenu11.add(jMenuItem17);
 
         jMenuBar2.add(jMenu11);
+
+        jMenu12.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/wenote.png"))); // NOI18N
+        jMenu12.setText(bundle.getString("MainFrame_WeNote")); // NOI18N
+        jMenu12.setFont(jMenu12.getFont().deriveFont(jMenu12.getFont().getStyle() | java.awt.Font.BOLD));
+
+        jMenuItem19.setText(bundle.getString("MainFrame_DownloadWeNote")); // NOI18N
+        jMenuItem19.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem19ActionPerformed(evt);
+            }
+        });
+        jMenu12.add(jMenuItem19);
+
+        jMenuBar2.add(jMenu12);
 
         setJMenuBar(jMenuBar2);
 
@@ -1697,6 +1713,10 @@ public class JStock extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, MessagesBundle.getString("info_message_export_successfully"));
         }
     }//GEN-LAST:event_jMenuItem18ActionPerformed
+
+    private void jMenuItem19ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem19ActionPerformed
+        Utils.launchWebBrowser(org.yccheok.jstock.network.Utils.getURL(org.yccheok.jstock.network.Utils.Type.WENOTE_HTML));
+    }//GEN-LAST:event_jMenuItem19ActionPerformed
     
     /**
      * Activate specified watchlist.
@@ -5185,6 +5205,7 @@ public class JStock extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu10;
     private javax.swing.JMenu jMenu11;
+    private javax.swing.JMenu jMenu12;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
@@ -5204,6 +5225,7 @@ public class JStock extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem16;
     private javax.swing.JMenuItem jMenuItem17;
     private javax.swing.JMenuItem jMenuItem18;
+    private javax.swing.JMenuItem jMenuItem19;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;

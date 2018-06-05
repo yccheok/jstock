@@ -47,6 +47,7 @@ public class Utils {
         CONTRIBUTE_HTML,
         HELP_KEYBOARD_SHORTCUTS_HTML,
         ANDROID_HTML,
+        WENOTE_HTML,
         STOCK_INFO_DATABASE_META,
         ANDROID_FAQ,
         DRIVEWEALTH_LOG,
@@ -116,13 +117,14 @@ public class Utils {
         map.put(Type.CONTRIBUTE_HTML, "http://jstock.org/help_faq.html?utm_source=jstock&utm_medium=help_menu#contribution");
         map.put(Type.HELP_KEYBOARD_SHORTCUTS_HTML, "http://jstock.org/help_faq.html?utm_source=jstock&utm_medium=help_menu#keyboard-shortcuts");
         map.put(Type.ANDROID_HTML, "http://goo.gl/VAm6Mx");
+        map.put(Type.WENOTE_HTML, "http://bit.ly/2JcBKKv");
         map.put(Type.STOCK_INFO_DATABASE_META, JSTOCK_STATIC_SERVER + "stocks_information/stock-info-database-meta.json");
         map.put(Type.ANDROID_FAQ, "http://faq.jstock.co/?utm_source=jstock-android&utm_medium=settings");
         map.put(Type.DRIVEWEALTH_LOG, "https://jstock-drivewealth.appspot.com/log");
         map.put(Type.GOOGLE_CODE_DATABASE_META, JSTOCK_STATIC_SERVER + "stocks_information/google-code-database-meta.json");
         map.put(Type.GOOGLE_CODE_DATABASE, JSTOCK_STATIC_SERVER + "stocks_information/" + COUNTRY_TEMPLATE + "/google-code-database.zip");
         map.put(Type.MISSING_STOCK_CODE_SERVICE, JSTOCK_WEBAPP_SERVER + "missing-stock-code/");
-        map.put(Type.YAHOO_FINANCE_API, "https://finance-yql.media.yahoo.com/v7/finance/");
+        map.put(Type.YAHOO_FINANCE_API, "https://mobile-query.finance.yahoo.com/v6/finance/");
         map.put(Type.IEX_API, "https://api.iextrading.com/1.0/");
 
         zh_map.put(Type.CHAT_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/chat_server.txt");
@@ -143,13 +145,14 @@ public class Utils {
         zh_map.put(Type.CONTRIBUTE_HTML, "http://jstock.org/zh/help_faq.html?utm_source=jstock&utm_medium=help_menu#contribution");
         zh_map.put(Type.HELP_KEYBOARD_SHORTCUTS_HTML, "http://jstock.org/zh/help_faq.html?utm_source=jstock&utm_medium=help_menu#keyboard-shortcuts");
         zh_map.put(Type.ANDROID_HTML, "http://goo.gl/VAm6Mx");
+        zh_map.put(Type.WENOTE_HTML, "http://bit.ly/2JcBKKv");
         zh_map.put(Type.STOCK_INFO_DATABASE_META, JSTOCK_STATIC_SERVER + "stocks_information/stock-info-database-meta.json");
         zh_map.put(Type.ANDROID_FAQ, "http://faq.jstock.co/zh/?utm_source=jstock-android&utm_medium=settings");
         zh_map.put(Type.DRIVEWEALTH_LOG, "https://jstock-drivewealth.appspot.com/log");
         zh_map.put(Type.GOOGLE_CODE_DATABASE_META, JSTOCK_STATIC_SERVER + "stocks_information/google-code-database-meta.json");
         zh_map.put(Type.GOOGLE_CODE_DATABASE, JSTOCK_STATIC_SERVER + "stocks_information/" + COUNTRY_TEMPLATE + "/google-code-database.zip");
         zh_map.put(Type.MISSING_STOCK_CODE_SERVICE, JSTOCK_WEBAPP_SERVER + "missing-stock-code/");
-        zh_map.put(Type.YAHOO_FINANCE_API, "https://finance-yql.media.yahoo.com/v7/finance/");
+        zh_map.put(Type.YAHOO_FINANCE_API, "https://mobile-query.finance.yahoo.com/v6/finance/");
         zh_map.put(Type.IEX_API, "https://api.iextrading.com/1.0/");
 
         zh_Hant_map.put(Type.CHAT_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/chat_server.txt");
@@ -170,13 +173,14 @@ public class Utils {
         zh_Hant_map.put(Type.CONTRIBUTE_HTML, "http://jstock.org/zh/help_faq.html?utm_source=jstock&utm_medium=help_menu#contribution");
         zh_Hant_map.put(Type.HELP_KEYBOARD_SHORTCUTS_HTML, "http://jstock.org/zh/help_faq.html?utm_source=jstock&utm_medium=help_menu#keyboard-shortcuts");
         zh_Hant_map.put(Type.ANDROID_HTML, "http://goo.gl/VAm6Mx");
+        zh_Hant_map.put(Type.WENOTE_HTML, "http://bit.ly/2JcBKKv");
         zh_Hant_map.put(Type.STOCK_INFO_DATABASE_META, JSTOCK_STATIC_SERVER + "stocks_information/stock-info-database-meta.json");
         zh_Hant_map.put(Type.ANDROID_FAQ, "http://faq.jstock.co/zh-Hant/?utm_source=jstock-android&utm_medium=settings");
         zh_Hant_map.put(Type.DRIVEWEALTH_LOG, "https://jstock-drivewealth.appspot.com/log");
         zh_Hant_map.put(Type.GOOGLE_CODE_DATABASE_META, JSTOCK_STATIC_SERVER + "stocks_information/google-code-database-meta.json");
         zh_Hant_map.put(Type.GOOGLE_CODE_DATABASE, JSTOCK_STATIC_SERVER + "stocks_information/" + COUNTRY_TEMPLATE + "/google-code-database.zip");
         zh_Hant_map.put(Type.MISSING_STOCK_CODE_SERVICE, JSTOCK_WEBAPP_SERVER + "missing-stock-code/");
-        zh_Hant_map.put(Type.YAHOO_FINANCE_API, "https://finance-yql.media.yahoo.com/v7/finance/");
+        zh_Hant_map.put(Type.YAHOO_FINANCE_API, "https://mobile-query.finance.yahoo.com/v6/finance/");
         zh_Hant_map.put(Type.IEX_API, "https://api.iextrading.com/1.0/");
 
         assert(map.size() == Type.values().length);
