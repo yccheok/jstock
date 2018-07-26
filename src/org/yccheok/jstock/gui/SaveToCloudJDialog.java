@@ -23,6 +23,7 @@ import org.yccheok.jstock.engine.Pair;
 import com.google.api.client.auth.oauth2.Credential;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -44,6 +45,8 @@ import javax.swing.SwingWorker;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Country;
+import org.yccheok.jstock.file.UserDataDirectory;
+import org.yccheok.jstock.file.UserDataFile;
 import org.yccheok.jstock.gui.analysis.MemoryLogJDialog;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.internationalization.MessagesBundle;
@@ -60,8 +63,15 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         initComponents();
         
         // Hackish way to make Mac works.
-        pack();        
-        setSize(new java.awt.Dimension(420, 271));
+        pack();     
+        
+        Dimension dimension = JStock.instance().getUIOptions().getDimension(UIOptions.SAVE_TO_CLOUD_JDIALOG);
+        if (dimension != null) {
+            setSize(dimension);
+        } else {
+            setSize(new java.awt.Dimension(487, 313));
+        }
+                
         setLocationRelativeTo(null);
         
         this.credentialEx = credentialEx;
@@ -106,7 +116,6 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
         setTitle(bundle.getString("SaveToCloudJDialog_Title")); // NOI18N
-        setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosed(java.awt.event.WindowEvent evt) {
                 formWindowClosed(evt);
@@ -229,12 +238,13 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
-        setSize(new java.awt.Dimension(420, 271));
+        setSize(new java.awt.Dimension(487, 313));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         cancel();
+        JStock.instance().getUIOptions().setDimension(UIOptions.SAVE_TO_CLOUD_JDIALOG, getSize());
     }//GEN-LAST:event_formWindowClosed
 
     private void cancel() {
@@ -472,7 +482,7 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
             }
         }
         else {
-            if (name.equalsIgnoreCase("config" + File.separator + "options.xml")) {
+            if (name.equalsIgnoreCase(UserDataDirectory.Config.directory + File.separator + UserDataFile.OptionsXml.get())) {
                 // Special case. Skip it! We will handle it through insensitiveClone.
             } else if (name.contains("watchlist") && name.endsWith("realtimestock.csv")) {
                 // Some users add all stocks into a watchlist. Since the file
@@ -558,8 +568,11 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
     // When we perform XML to CSV migration, this function needs to be revised.
     private static List<String> getExtensions(String name) {
         List<String> extensions = new ArrayList<String>();
-        if (name.equals("config")) {
+        if (name.equals(UserDataDirectory.Config.directory)) {
             extensions.add(".xml");
+            // We ignore json file like "uioptions.json". We feel that different
+            // machines might have different display resolution. Hence, it makes
+            // more sense not to share UI configuration.
         } else if (name.equals("indicator")) {
             extensions.add(".xml");
         } else if (name.equals("logos")) {
@@ -611,23 +624,20 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
             // Delete temp file when program exits.
             tempJStockOptions.deleteOnExit();
             org.yccheok.jstock.gui.Utils.toXML(insensitiveJStockOptions, tempJStockOptions);
-            fileExs.add(FileEx.newInstance(tempJStockOptions, "config" + File.separator + "options.xml"));
+            fileExs.add(FileEx.newInstance(tempJStockOptions, UserDataDirectory.Config.directory + File.separator + UserDataFile.OptionsXml.get()));
         } catch (IOException ex) {
             // Should we return null? As the saved information is not complete.
             log.error(null, ex);
         }
 
         final List<Country> countryWithWatchlistFilesBeingIgnored = new ArrayList<>();
-        getFileEx(fileExs, "config", getExtensions("config"));
+        getFileEx(fileExs, UserDataDirectory.Config.directory, getExtensions(UserDataDirectory.Config.directory));
         getFileEx(fileExs, "indicator", getExtensions("indicator"));
         getFileEx(fileExs, "logos", getExtensions("logos"));
         getFileEx(fileExs, "android", getExtensions("android"));
         
         for (Country country : Country.values()) {
             getFileEx(fileExs, country + File.separator + "portfolios", getExtensions("portfolios"));
-            // For legacy usage. Shall be removed after a few more release
-            // later than 1.0.5k
-            getFileEx(fileExs, country + File.separator + "config", getExtensions("config"));
 
             LastErrorCode lastErrorCode = new LastErrorCode();
             getFileEx(fileExs, country + File.separator + "watchlist", getExtensions("watchlist"), lastErrorCode);

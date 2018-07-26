@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.CancellationException;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -68,12 +67,13 @@ import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.file.ThreadSafeFileLock;
+import org.yccheok.jstock.file.UserDataDirectory;
+import org.yccheok.jstock.file.UserDataFile;
 import org.yccheok.jstock.gui.news.StockNewsJFrame;
 
 import org.yccheok.jstock.gui.trading.TradingJPanel;
 import org.yccheok.jstock.gui.trading.TradingView;
 import org.yccheok.jstock.internationalization.DriveWealthBundle;
-import org.yccheok.jstock.trading.api.InstrumentManager;
 
 
 
@@ -120,13 +120,13 @@ public class JStock extends javax.swing.JFrame {
         createStockIndicatorEditor();
         createIndicatorScannerJPanel();
         createPortfolioManagementJPanel();
-        createTradingJPanel();
 
         createIconsAndToolTipTextForJTabbedPane();
 
         this.createSystemTrayIcon();
 
         this.initPreloadDatabase(false);
+        this.initUIOptions();
         this.initExtraDatas();
         this.initStatusBar();
         this.initMarketJPanel();
@@ -154,7 +154,6 @@ public class JStock extends javax.swing.JFrame {
         this.initLanguageMenuItemsSelection();        
         this.initJXLayerOnJComboBox();
         this.initKeyBindings();
-        this.initDriveWealthInstruments();
 
         // Turn to the last viewed page.
         final int lastSelectedPageIndex = this.getJStockOptions().getLastSelectedPageIndex();
@@ -1002,7 +1001,11 @@ public class JStock extends javax.swing.JFrame {
     public JStockOptions getJStockOptions() {
         return this.jStockOptions;
     }
-
+    
+    public UIOptions getUIOptions() {
+        return this.uiOptions;
+    }
+    
     /**
      * Returns the chart dialog options of this main frame.
      * @return the chart dialog options of this main frame
@@ -1025,6 +1028,7 @@ public class JStock extends javax.swing.JFrame {
         jStockOptions.setApplicationVersionID(Utils.getApplicationVersionID());
 
         this.saveJStockOptions();
+        this.saveUIOptions();
         this.saveGUIOptions();
         this.saveChartJDialogOptions();
         this.saveWatchlist();
@@ -1060,12 +1064,6 @@ public class JStock extends javax.swing.JFrame {
         isFormWindowClosedCalled = true;
         
         try {
-            ExecutorService _driveWealthInstrumentsPool = this.driveWealthInstrumentsPool;
-            this.driveWealthInstrumentsPool = null;
-            if (_driveWealthInstrumentsPool != null) {
-                _driveWealthInstrumentsPool.shutdownNow();
-            }
-
             ExecutorService _stockInfoDatabaseMetaPool = this.stockInfoDatabaseMetaPool;
             this.stockInfoDatabaseMetaPool = null;
             if (_stockInfoDatabaseMetaPool != null) {
@@ -1798,7 +1796,7 @@ public class JStock extends javax.swing.JFrame {
     }
 
     private static JStockOptions getJStockOptionsViaXML() {
-        final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "options.xml");
+        final File f = new File(UserDataDirectory.Config.get() + UserDataFile.OptionsXml.get());
         JStockOptions jStockOptions = Utils.fromXML(JStockOptions.class, f);
         if (jStockOptions == null) {
             // JStockOptions's file not found. Perhaps this is the first time we
@@ -2161,13 +2159,6 @@ public class JStock extends javax.swing.JFrame {
     // Drive Wealth integration tab
     public TradingJPanel getTradingJPanel() {
         return this.tradingJPanel;
-    }
-
-    private void createTradingJPanel() {
-        tradingJPanel = new TradingJPanel();
-        ImageIcon icon = new javax.swing.ImageIcon(getClass().getResource("/images/16x16/drivewealth_logo.png"));
-
-        jTabbedPane1.addTab(GUIBundle.getString("TradingJPanel_Title"), icon, tradingJPanel);
     }
 
     private void createStockIndicatorEditor() {
@@ -3425,16 +3416,6 @@ public class JStock extends javax.swing.JFrame {
             final int row = jTable1.getSelectedRow();
             final int modelIndex = jTable1.getRowSorter().convertRowIndexToModel(row);
             final Stock stock = ((StockTableModel)tableModel).getStock(modelIndex);
-            if (isDriveWealthCodes(stock.code)) {
-                menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_DriveWealthBuy..."), this.getImageIcon("/images/16x16/drivewealth_logo.png"));    
-                
-                menuItem.addActionListener((ActionEvent evt) -> {
-                    jTabbedPane1.setSelectedComponent(this.tradingJPanel);
-                    TradingView.getInstance().showBuyDialog(stock.code.toString());
-                });
-
-                popup.add(menuItem);
-            }
             
             popup.addSeparator();
         }                
@@ -3847,8 +3828,16 @@ public class JStock extends javax.swing.JFrame {
         this.portfolioManagementJPanel.initRealTimeStockMonitor();
     }
 
+    private void initUIOptions() {
+        File file = new File(UserDataDirectory.Config.get() + UserDataFile.UIOptionsJson.get());
+        this.uiOptions = Utils.fromJson(file, UIOptions.class);
+        if (this.uiOptions == null) {
+            this.uiOptions = new UIOptions();
+        }
+    }
+    
     private void initGUIOptions() {
-        final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "mainframe.xml");
+        final File f = new File(UserDataDirectory.Config.get() + UserDataFile.MainFrameXml.get());
         GUIOptions guiOptions = Utils.fromXML(GUIOptions.class, f);
 
         if (guiOptions == null)
@@ -3875,6 +3864,11 @@ public class JStock extends javax.swing.JFrame {
         JTableUtilities.setJTableOptions(jTable1, guiOptions.getJTableOptions(0));
     }
 
+    private void saveUIOptions() {
+        File file = new File(UserDataDirectory.Config.get() + UserDataFile.UIOptionsJson.get());
+        Utils.saveJson(file, this.uiOptions);
+    }
+    
     private void saveGUIOptions() {
         _saveGUIOptions();
         this.indicatorScannerJPanel.saveGUIOptions();
@@ -3882,7 +3876,7 @@ public class JStock extends javax.swing.JFrame {
     }
     
     private boolean _saveGUIOptions() {
-        if (Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config") == false)
+        if (Utils.createCompleteDirectoryHierarchyIfDoesNotExist(UserDataDirectory.Config.get()) == false)
         {
             return false;
         }
@@ -3899,7 +3893,7 @@ public class JStock extends javax.swing.JFrame {
         final GUIOptions guiOptions = new GUIOptions();
         guiOptions.addJTableOptions(jTableOptions);
         
-        File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "mainframe.xml");
+        File f = new File(UserDataDirectory.Config.get() + UserDataFile.MainFrameXml.get());
         return Utils.toXML(guiOptions, f);
     }
 
@@ -3907,7 +3901,7 @@ public class JStock extends javax.swing.JFrame {
      * Initialize chart dialog options.
      */
     private void initChartJDialogOptions() {
-        final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "chartjdialogoptions.xml");
+        final File f = new File(UserDataDirectory.Config.get() + UserDataFile.ChartJDialogOptionsXml.get());
         final ChartJDialogOptions tmp = Utils.fromXML(ChartJDialogOptions.class, f);
         if (tmp == null) {
             this.chartJDialogOptions = new ChartJDialogOptions();
@@ -4089,12 +4083,12 @@ public class JStock extends javax.swing.JFrame {
      * @return <tt>true</tt> if saving operation is success
      */
     private boolean saveChartJDialogOptions() {
-        if (Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config") == false)
+        if (Utils.createCompleteDirectoryHierarchyIfDoesNotExist(UserDataDirectory.Config.get()) == false)
         {
             return false;
         }
 
-        File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "chartjdialogoptions.xml");
+        File f = new File(UserDataDirectory.Config.get() + UserDataFile.ChartJDialogOptionsXml.get());
         return org.yccheok.jstock.gui.Utils.toXML(this.chartJDialogOptions, f);
     }
 
@@ -4103,12 +4097,12 @@ public class JStock extends javax.swing.JFrame {
      * @return <tt>true</tt> if saving operation is success
      */
     private boolean saveJStockOptions() {
-        if (Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config") == false)
+        if (Utils.createCompleteDirectoryHierarchyIfDoesNotExist(UserDataDirectory.Config.get()) == false)
         {
             return false;
         }
         
-        File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "options.xml");
+        File f = new File(UserDataDirectory.Config.get() + UserDataFile.OptionsXml.get());
         return org.yccheok.jstock.gui.Utils.toXML(this.jStockOptions, f);
     }
 
@@ -4201,57 +4195,6 @@ public class JStock extends javax.swing.JFrame {
         }
         
         this.indicatorPanel.initAjaxProvider();
-    }
-    
-    public boolean isDriveWealthCodes(Code code) {
-        return this.driveWealthCodes.contains(code);
-    }
-    
-    private void initDriveWealthInstruments() {  
-        Runnable runnable = () -> {
-            Set<Code> codes = Utils.loadDriveWealthCodes();
-            if (false == codes.isEmpty()) {
-                driveWealthCodes.clear();
-                driveWealthCodes.addAll(codes);
-            }
-        };
-        
-        Executor driveWealthInstrumentsPool = this.driveWealthInstrumentsPool;
-        if (driveWealthInstrumentsPool != null) {
-            driveWealthInstrumentsPool.execute(runnable);
-        }
-    }
-    
-    public void downloadDriveWealthInstruments() {        
-        Runnable runnable = () -> {
-            java.util.List<Map<String, String>> instruments = InstrumentManager.listAllInstruments();
-            if (instruments == null) {
-                return;
-            }
-            
-            Set<Code> codes = new HashSet<>();
-            
-            for (Map<String, String> instrument : instruments) {
-                if (instrument.containsKey("symbol")) {
-                    String s = instrument.get("symbol");
-                    if (false == Utils.isNullOrEmpty(s)) {
-                        Code code = Code.newInstance(s);
-                        codes.add(code);
-                    }
-                }
-            }
-            
-            if (false == codes.isEmpty()) {
-                driveWealthCodes.clear();
-                driveWealthCodes.addAll(codes);
-                Utils.saveDriveWealthCodes(driveWealthCodes);
-            }            
-        };
-        
-        Executor driveWealthInstrumentsPool = this.driveWealthInstrumentsPool;
-        if (driveWealthInstrumentsPool != null) {
-            driveWealthInstrumentsPool.execute(runnable);
-        }
     }
 
     private void initGoogleCodeDatabase() {
@@ -5128,6 +5071,7 @@ public class JStock extends javax.swing.JFrame {
 
     private LatestNewsTask latestNewsTask = null;
     private JStockOptions jStockOptions;
+    private UIOptions uiOptions;
     private ChartJDialogOptions chartJDialogOptions;
     
     private IndicatorPanel indicatorPanel;
@@ -5140,9 +5084,6 @@ public class JStock extends javax.swing.JFrame {
     private final ExecutorService systemTrayAlertPool = Executors.newFixedThreadPool(1);
     private volatile ExecutorService stockInfoDatabaseMetaPool = Executors.newFixedThreadPool(1);
     private volatile ExecutorService googleCodeDatabasePool = Executors.newFixedThreadPool(1);
-
-    private volatile ExecutorService driveWealthInstrumentsPool = Executors.newFixedThreadPool(1);
-    private final Set<Code> driveWealthCodes = ConcurrentHashMap.newKeySet();
     
     private final org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, RealTimeStockMonitor.Result> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
     private final org.yccheok.jstock.engine.Observer<RealTimeIndexMonitor, java.util.List<Market>> realTimeIndexMonitorObserver = this.getRealTimeIndexMonitorObserver();

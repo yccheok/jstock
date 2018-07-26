@@ -19,6 +19,7 @@
 
 package org.yccheok.jstock.gui;
 
+import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -66,11 +67,26 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         if (isFeeCalculationEnabled) {
             if (jStockOptions.getBrokingFirmSize() < 1) {
                 initComponentsWithoutBrokerageFirm();
+                
+                Dimension dimension = JStock.instance().getUIOptions().getDimension(UIOptions.NEW_SELL_TRANSACTION_JDIALOG_WITH_FEE);
+                if (dimension != null) {
+                    setSize(dimension);
+                }                
             } else {
                 initComponents();
+                
+                Dimension dimension = JStock.instance().getUIOptions().getDimension(UIOptions.NEW_SELL_TRANSACTION_JDIALOG_WITH_FEE_AND_BROKERAGE);
+                if (dimension != null) {
+                    setSize(dimension);
+                }                
             }
         } else {
             initComponentsWithFeeCalculationDisabled();
+            
+            Dimension dimension = JStock.instance().getUIOptions().getDimension(UIOptions.NEW_SELL_TRANSACTION_JDIALOG);
+            if (dimension != null) {
+                setSize(dimension);
+            }             
         }
         
         if (shouldAutoCalculateBrokerFee())
@@ -117,8 +133,12 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
         setTitle(bundle.getString("NewSellTransactionJDialog_Sell")); // NOI18N
-        setResizable(false);
-
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
+            }
+        });
+        
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("NewSellTransactionJDialog_Transaction"))); // NOI18N
 
         jTextField1.setEditable(false);
@@ -424,8 +444,12 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
         setTitle(bundle.getString("NewSellTransactionJDialog_Sell")); // NOI18N
-        setResizable(false);
-
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
+            }
+        });
+        
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("NewSellTransactionJDialog_Transaction"))); // NOI18N
 
         jTextField1.setEditable(false);
@@ -642,7 +666,11 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
         setTitle(bundle.getString("NewSellTransactionJDialog_Sell")); // NOI18N
-        setResizable(false);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
+            }
+        });
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("NewSellTransactionJDialog_Transaction"))); // NOI18N
 
@@ -1321,6 +1349,20 @@ public class NewSellTransactionJDialog extends javax.swing.JDialog {
     private void jFormattedTextField7KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jFormattedTextField7KeyTyped
         update();
     }//GEN-LAST:event_jFormattedTextField7KeyTyped
+
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+        final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
+        final boolean isFeeCalculationEnabled = jStockOptions.isFeeCalculationEnabled();        
+        if (isFeeCalculationEnabled) {
+            if (jStockOptions.getBrokingFirmSize() < 1) {
+                JStock.instance().getUIOptions().setDimension(UIOptions.NEW_SELL_TRANSACTION_JDIALOG_WITH_FEE, getSize());
+            } else {
+                JStock.instance().getUIOptions().setDimension(UIOptions.NEW_SELL_TRANSACTION_JDIALOG_WITH_FEE_AND_BROKERAGE, getSize());              
+            }
+        } else {
+            JStock.instance().getUIOptions().setDimension(UIOptions.NEW_SELL_TRANSACTION_JDIALOG, getSize());            
+        }  
+    }//GEN-LAST:event_formWindowClosed
     
     private void commitEdit() {
         try {

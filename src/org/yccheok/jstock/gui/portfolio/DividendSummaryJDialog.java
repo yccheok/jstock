@@ -20,6 +20,7 @@
 package org.yccheok.jstock.gui.portfolio;
 
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -32,7 +33,6 @@ import java.beans.PropertyChangeListener;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,15 +53,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.DividendServer;
-import org.yccheok.jstock.engine.Duration;
 import org.yccheok.jstock.engine.Factories;
-import org.yccheok.jstock.engine.SimpleDate;
 import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.engine.StockServerFactory;
 import org.yccheok.jstock.gui.Constants;
 import org.yccheok.jstock.gui.JTableUtilities;
 import org.yccheok.jstock.gui.JStock;
 import org.yccheok.jstock.gui.PortfolioManagementJPanel;
+import org.yccheok.jstock.gui.UIOptions;
 import org.yccheok.jstock.gui.table.StockInfoRenderer;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.internationalization.MessagesBundle;
@@ -90,8 +89,15 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
         initComponents();
       
         // Hackish way to make Mac works.
-        pack();        
-        setSize(new java.awt.Dimension(339, 373));
+        pack();    
+        
+        Dimension dimension = JStock.instance().getUIOptions().getDimension(UIOptions.DIVIDEND_SUMMARY_JDIALOG);
+        if (dimension != null) {
+            setSize(dimension);
+        } else {     
+            setSize(new java.awt.Dimension(416, 457));
+        }
+        
         setLocationRelativeTo(null);
         
         ((TableRowSorter)this.jTable1.getRowSorter()).setStringConverter(new TableStringConverter() {
@@ -157,10 +163,14 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
         setTitle(bundle.getString("DividendSummaryJDialog_DividendPayout")); // NOI18N
         setIconImage(null);
-        setResizable(false);
         addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 formMouseClicked(evt);
+            }
+        });
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
             }
         });
         getContentPane().setLayout(new java.awt.BorderLayout(5, 5));
@@ -280,7 +290,7 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
-        setSize(new java.awt.Dimension(339, 373));
+        setSize(new java.awt.Dimension(416, 457));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -371,6 +381,10 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
         autoDividendTask.execute();
         this.jButton5.setEnabled(false);
     }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+        JStock.instance().getUIOptions().setDimension(UIOptions.DIVIDEND_SUMMARY_JDIALOG, getSize());
+    }//GEN-LAST:event_formWindowClosed
 
     /**
      * Returns dividend represented by this dialog.

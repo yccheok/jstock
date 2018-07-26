@@ -85,12 +85,10 @@ import java.util.Date;
 import java.util.EnumMap;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
@@ -157,7 +155,46 @@ public class Utils {
     /** Creates a new instance of Utils */
     private Utils() {
     }
+
+    private static String toJson(Object object) {
+        GsonBuilder builder = new GsonBuilder();
+        final Gson gson = builder.create();
+        return gson.toJson(object);
+    }
+
+    private static <T extends Object> T fromJson(Reader reader, Class<T> classOfT) {
+        GsonBuilder builder = new GsonBuilder();
+        final Gson gson = builder.create();
+        return gson.fromJson(reader, classOfT);
+    }
+
+    public static boolean saveJson(File file, Object object) {
+        try {
+            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"))) {
+                writer.write(toJson(object));
+            }
+        } catch (IOException e){
+            log.error(null, e);
+            return false;
+        }
+        
+        return true;
+    }
     
+    public static <T extends Object> T fromJson(File file, Class<T> classOfT) {
+       try {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"))) {
+                return fromJson(reader, classOfT);
+            }
+        } catch (IOException e){
+            log.error(null, e);
+        } catch (com.google.gson.JsonSyntaxException e) {
+            log.error(null, e);
+        } 
+        
+        return null;
+    }
+        
     public static boolean isNullOrEmpty(String string) {
         return string == null || string.trim().isEmpty();
     }
@@ -1831,14 +1868,6 @@ public class Utils {
         return toXML(object, new File(filePath));
     }
 
-    private static String getDriveWealthDirectory() {
-        return Utils.getUserDataDirectory() + "drive-wealth" + File.separator;
-    }
-    
-    private static File getDriveWealthCodesFile() {
-        return new File(org.yccheok.jstock.gui.Utils.getDriveWealthDirectory() + "codes.json");
-    }
-
     public static File getStockInfoDatabaseMetaFile() {
         return new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "stock-info-database-meta.json");
     }
@@ -2452,10 +2481,10 @@ public class Utils {
     
     private static Gson getGsonForStockInfoDatabaseMeta() {
         final Gson gson = new GsonBuilder()
-                .registerTypeAdapter(
+            .registerTypeAdapter(
                 new TypeToken<EnumMap<Country, Long>>() {}.getType(),
-                new EnumMapInstanceCreator<Country, Long>(Country.class))                
-                .create();
+                new EnumMapInstanceCreator<Country, Long>(Country.class)
+            ).create();
         
         return gson;
     }
@@ -2524,57 +2553,6 @@ public class Utils {
         }
         
         return stockInfoDatabaseMeta;
-    }
-    
-    public static boolean saveDriveWealthCodes(Set<Code> codes) {
-        final Gson gson = new Gson();
-        String string = gson.toJson(codes);
-        
-        Utils.createCompleteDirectoryHierarchyIfDoesNotExist(Utils.getDriveWealthDirectory());
-        
-        try {            
-            //If the constructor throws an exception, the finally block will NOT execute
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(Utils.getDriveWealthCodesFile()), "UTF-8"));
-            try {
-                writer.write(string);
-            } finally {
-                writer.close();
-            }
-        } catch (IOException ex){
-            log.error(null, ex);
-            return false;
-        }
-        
-        return true;        
-    }
-
-    public static Set<Code> loadDriveWealthCodes() {
-        final Gson gson = new Gson();
-        Set<Code> codes = null;
-
-        try {
-            //If the constructor throws an exception, the finally block will NOT execute
-            //BufferedReader reader = new BufferedReader(new FileReader(file));
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(Utils.getDriveWealthCodesFile()), "UTF-8"));            
-            try {
-                codes = gson.fromJson(reader, new TypeToken<HashSet<Code>>(){}.getType());
-            } finally {
-                //no need to check for null
-                //any exceptions thrown here will be caught by 
-                //the outer catch block
-                reader.close();
-            }
-        } catch (IOException ex){
-            log.error(null, ex);
-        } catch (com.google.gson.JsonSyntaxException ex) {
-            log.error(null, ex);
-        }            
-
-        if (codes == null) {
-            return java.util.Collections.emptySet();
-        }
-        
-        return codes;
     }
     
     public static Map<Country, Long> loadStockInfoDatabaseMeta(File stockInfoDatabaseMetaFile) {
@@ -2778,11 +2756,11 @@ public class Utils {
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7.33";
+    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7.34";
 
-    // 1.0.7.33
+    // 1.0.7.34
     // For About box comparision on latest version purpose.
-    private static final int APPLICATION_VERSION_ID = 1162;
+    private static final int APPLICATION_VERSION_ID = 1163;
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     

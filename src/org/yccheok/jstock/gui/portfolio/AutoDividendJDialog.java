@@ -43,6 +43,8 @@ import javax.swing.text.NumberFormatter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Code;
+import org.yccheok.jstock.gui.JStock;
+import org.yccheok.jstock.gui.UIOptions;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.portfolio.DecimalPlace;
 import org.yccheok.jstock.portfolio.Dividend;
@@ -74,6 +76,7 @@ public class AutoDividendJDialog extends javax.swing.JDialog {
         for (Map.Entry<Code, List<Dividend>> entry : treeMap.entrySet()) {
             AutoDividendJPanel autoDividendJPanel = new AutoDividendJPanel(this, entry.getValue());
             autoDividendJPanels.add(autoDividendJPanel);
+            autoDividendJPanel.setAlignmentX(LEFT_ALIGNMENT);
             panel.add(autoDividendJPanel);    
             panel.add(Box.createRigidArea(new Dimension(0, 5)));
         }
@@ -81,6 +84,11 @@ public class AutoDividendJDialog extends javax.swing.JDialog {
         this.jScrollPane1.setViewportView(panel);
         
         updateTotalLabel();
+        
+        Dimension dimension = JStock.instance().getUIOptions().getDimension(UIOptions.AUTO_DIVIDEND_JDIALOG);
+        if (dimension != null) {
+            setSize(dimension);
+        }      
     }
 
     public void updateInstructionLabel() {
@@ -159,7 +167,11 @@ public class AutoDividendJDialog extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
         setTitle(bundle.getString("AutoDividendJDialog_Title")); // NOI18N
-        setResizable(false);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
+            }
+        });
         getContentPane().setLayout(new java.awt.BorderLayout(5, 5));
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/apply.png"))); // NOI18N
@@ -231,7 +243,7 @@ public class AutoDividendJDialog extends javax.swing.JDialog {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel2)
                     .addComponent(jFormattedTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(93, Short.MAX_VALUE))
+                .addContainerGap(186, Short.MAX_VALUE))
         );
 
         jPanel3Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jFormattedTextField1, jFormattedTextField2});
@@ -258,7 +270,8 @@ public class AutoDividendJDialog extends javax.swing.JDialog {
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        setBounds(0, 0, 301, 502);
+        setSize(new java.awt.Dimension(420, 499));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -283,6 +296,10 @@ public class AutoDividendJDialog extends javax.swing.JDialog {
     private void jFormattedTextField1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jFormattedTextField1KeyTyped
         update();
     }//GEN-LAST:event_jFormattedTextField1KeyTyped
+
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+        JStock.instance().getUIOptions().setDimension(UIOptions.AUTO_DIVIDEND_JDIALOG, getSize());
+    }//GEN-LAST:event_formWindowClosed
 
     public List<Dividend> getDividendsAfterPressingOK() {
         return this.dividendsPressingOK;

@@ -31,6 +31,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -50,6 +51,8 @@ import javax.swing.SwingWorker;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.file.ThreadSafeFileLock;
+import org.yccheok.jstock.file.UserDataDirectory;
+import org.yccheok.jstock.file.UserDataFile;
 import org.yccheok.jstock.gui.analysis.MemoryLogJDialog;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.internationalization.MessagesBundle;
@@ -74,7 +77,14 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
 
         // Hackish way to make Mac works.
         pack();        
-        setSize(new java.awt.Dimension(420, 243));
+        
+        Dimension dimension = JStock.instance().getUIOptions().getDimension(UIOptions.LOAD_FROM_CLOUD_JDIALOG);
+        if (dimension != null) {
+            setSize(dimension);
+        } else {
+            setSize(new java.awt.Dimension(487, 313));
+        }
+        
         setLocationRelativeTo(null);
 
         this.credentialEx = credentialEx;
@@ -114,7 +124,6 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
         setTitle(bundle.getString("LoadFromCloudJDialog_Title")); // NOI18N
-        setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosed(java.awt.event.WindowEvent evt) {
                 formWindowClosed(evt);
@@ -200,12 +209,13 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
-        setSize(new java.awt.Dimension(420, 243));
+        setSize(new java.awt.Dimension(487, 313));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         cancel();
+        JStock.instance().getUIOptions().setDimension(UIOptions.LOAD_FROM_CLOUD_JDIALOG, getSize());
     }//GEN-LAST:event_formWindowClosed
 
     private void cancel() {
@@ -401,7 +411,7 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
                     return null;
                 }
 
-                final File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "options.xml");
+                final File f = new File(UserDataDirectory.Config.get() + UserDataFile.OptionsXml.get());
                 final JStockOptions jStockOptions = Utils.fromXML(JStockOptions.class, f);
 
                 if (jStockOptions == null) {

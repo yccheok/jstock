@@ -19,6 +19,7 @@
 
 package org.yccheok.jstock.gui;
 
+import java.awt.Dimension;
 import java.awt.event.ItemEvent;
 
 /**
@@ -51,7 +52,14 @@ public class FairUsagePolicyJDialog extends javax.swing.JDialog {
         
         // Hackish way to make Mac works.
         pack();        
-        setSize(new java.awt.Dimension(333, 290));
+        
+        Dimension dimension = JStock.instance().getUIOptions().getDimension(UIOptions.FAIR_USAGE_POLICY_JDIALOG);
+        if (dimension != null) {
+            setSize(dimension);
+        } else {
+            setSize(new java.awt.Dimension(424, 377));    
+        }        
+        
         setLocationRelativeTo(null);
     }
 
@@ -79,7 +87,11 @@ public class FairUsagePolicyJDialog extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
         setTitle(bundle.getString("FairUsagePolicyJDialog_Title")); // NOI18N
-        setResizable(false);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
+            }
+        });
         getContentPane().setLayout(new java.awt.BorderLayout(5, 5));
 
         jXHeader1.setDescription(bundle.getString("FairUsagePolicyJDialog_Description")); // NOI18N
@@ -139,7 +151,7 @@ public class FairUsagePolicyJDialog extends javax.swing.JDialog {
                         .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel1)))
-                .addContainerGap(80, Short.MAX_VALUE))
+                .addContainerGap(60, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -153,12 +165,12 @@ public class FairUsagePolicyJDialog extends javax.swing.JDialog {
                     .addComponent(jRadioButton3)
                     .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1))
-                .addContainerGap(21, Short.MAX_VALUE))
+                .addContainerGap(20, Short.MAX_VALUE))
         );
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
-        setBounds(0, 0, 333, 290);
+        setBounds(0, 0, 424, 377);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -182,6 +194,10 @@ public class FairUsagePolicyJDialog extends javax.swing.JDialog {
     private void jRadioButton3ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jRadioButton3ItemStateChanged
         this.jSpinner1.setEnabled(evt.getStateChange() == ItemEvent.SELECTED);
     }//GEN-LAST:event_jRadioButton3ItemStateChanged
+
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+        JStock.instance().getUIOptions().setDimension(UIOptions.FAIR_USAGE_POLICY_JDIALOG, getSize());
+    }//GEN-LAST:event_formWindowClosed
 
     /**
      * @param args the command line arguments

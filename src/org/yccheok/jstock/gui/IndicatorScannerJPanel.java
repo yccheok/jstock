@@ -35,9 +35,10 @@ import org.yccheok.jstock.alert.GoogleMail;
 import org.yccheok.jstock.analysis.*;
 import org.yccheok.jstock.analysis.Indicator;
 import org.yccheok.jstock.engine.*;
+import org.yccheok.jstock.file.UserDataDirectory;
+import org.yccheok.jstock.file.UserDataFile;
 import org.yccheok.jstock.gui.trading.TradingView;
 import org.yccheok.jstock.internationalization.GUIBundle;
-import org.yccheok.jstock.internationalization.MessagesBundle;
 
 /**
  *
@@ -202,7 +203,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
      * Initialize GUI options of this indicator scanner panel.
      */
     public void initGUIOptions() {
-        File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "indicatorscannerjpanel.xml");
+        File f = new File(UserDataDirectory.Config.get() + UserDataFile.IndicatorScannerJPanelXml.get());
         GUIOptions guiOptions = org.yccheok.jstock.gui.Utils.fromXML(GUIOptions.class, f);
 
         if (guiOptions == null)
@@ -230,7 +231,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
 	}
 
     public boolean saveGUIOptions() {
-        if(Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config") == false)
+        if(Utils.createCompleteDirectoryHierarchyIfDoesNotExist(UserDataDirectory.Config.get()) == false)
         {
             return false;
         }
@@ -247,7 +248,7 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
         final GUIOptions guiOptions = new GUIOptions();
         guiOptions.addJTableOptions(jTableOptions);
 
-        File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "indicatorscannerjpanel.xml");
+        File f = new File(UserDataDirectory.Config.get() + UserDataFile.IndicatorScannerJPanelXml.get());
         return org.yccheok.jstock.gui.Utils.toXML(guiOptions, f);
     }
 
@@ -1159,15 +1160,6 @@ public class IndicatorScannerJPanel extends javax.swing.JPanel implements Change
             final IndicatorTableModel tableModel = (IndicatorTableModel)jTable1.getModel();
             final Indicator indicator = tableModel.getIndicator(modelIndex);
             final Stock stock = indicator.getStock();
-            if (JStock.instance().isDriveWealthCodes(stock.code)) {
-                menuItem = new JMenuItem(java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui").getString("MainFrame_DriveWealthBuy..."), this.getImageIcon("/images/16x16/drivewealth_logo.png"));    
-                
-                menuItem.addActionListener((ActionEvent evt) -> {
-                    TradingView.getInstance().showBuyDialog(stock.code.toString());
-                });
-
-                popup.add(menuItem);
-            }
         }
 
         return popup;

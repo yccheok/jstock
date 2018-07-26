@@ -98,27 +98,6 @@ public class Utils {
         return list.contains("realtimestock.csv");
     }
     
-    private static List<String> getXMLWatchlistNames(String baseDirectory, Country country, boolean oldData) {
-        List<String> watchlistNames = new ArrayList<String>();
-        final File file = oldData ?
-            new File(baseDirectory + country + File.separator + "config" + File.separator) :
-            new File(baseDirectory + country + File.separator + "watchlist" + File.separator);
-        
-        File[] children = file.listFiles();
-        if (children == null) {
-            // Either dir does not exist or is not a directory
-            return watchlistNames;
-        } else {
-            // Only seek for 1st level directory.
-            for (File child : children) {
-                if (isXMLWatchlistDirectory(child)) {
-                    watchlistNames.add(child.getName());
-                }
-            }
-        }
-        return watchlistNames;
-    }
-    
     public static List<String> getWatchlistNames() {
         final JStockOptions jStockOptions = JStock.instance().getJStockOptions();
         return getWatchlistNames(jStockOptions.getCountry());

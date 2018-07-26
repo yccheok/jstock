@@ -19,6 +19,7 @@
 
 package org.yccheok.jstock.gui.portfolio;
 
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -34,6 +35,7 @@ import javax.swing.table.TableCellEditor;
 import org.yccheok.jstock.gui.Constants;
 import org.yccheok.jstock.gui.JTableUtilities;
 import org.yccheok.jstock.gui.JStock;
+import org.yccheok.jstock.gui.UIOptions;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.portfolio.Commentable;
 import org.yccheok.jstock.portfolio.DecimalPlace;
@@ -55,8 +57,15 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
         initComponents();
         
         // Hackish way to make Mac works.
-        pack();        
-        setSize(new java.awt.Dimension(355, 412));
+        pack();      
+        
+        Dimension dimension = JStock.instance().getUIOptions().getDimension(UIOptions.DEPOSIT_SUMMARY_JDIALOG);
+        if (dimension != null) {
+            setSize(dimension);
+        } else {     
+            setSize(new java.awt.Dimension(355, 465));
+        }
+        
         setLocationRelativeTo(null);
     }
 
@@ -94,10 +103,14 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
         setTitle(bundle.getString("DepositSummaryJDialog_CashDepositAndWithdrawal")); // NOI18N
-        setResizable(false);
         addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 formMouseClicked(evt);
+            }
+        });
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
             }
         });
         getContentPane().setLayout(new java.awt.BorderLayout(5, 5));
@@ -227,7 +240,7 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        setSize(new java.awt.Dimension(355, 412));
+        setSize(new java.awt.Dimension(355, 465));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -307,6 +320,10 @@ public class DepositSummaryJDialog extends javax.swing.JDialog {
         jLabel3.setText(Utils.toCurrencyWithSymbol(DecimalPlace.Three, totalWithdraw));
         jLabel6.setText(Utils.toCurrencyWithSymbol(DecimalPlace.Three, total));
     }//GEN-LAST:event_jTable1PropertyChange
+
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+        JStock.instance().getUIOptions().setDimension(UIOptions.DEPOSIT_SUMMARY_JDIALOG, getSize());
+    }//GEN-LAST:event_formWindowClosed
 
     private void addNewDeposit() {
         final int modelIndex = ((DepositSummaryTableModel)this.jTable1.getModel()).addNewDeposit();

@@ -63,6 +63,8 @@ import org.yccheok.jstock.engine.currency.ExchangeRateMonitor;
 import org.yccheok.jstock.file.GUIBundleWrapper;
 import org.yccheok.jstock.file.Statement;
 import org.yccheok.jstock.file.Statements;
+import org.yccheok.jstock.file.UserDataDirectory;
+import org.yccheok.jstock.file.UserDataFile;
 import org.yccheok.jstock.gui.Utils.FileEx;
 import org.yccheok.jstock.gui.charting.InvestmentFlowChartJDialog;
 import org.yccheok.jstock.gui.portfolio.CommentJDialog;
@@ -2825,7 +2827,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
     
     private void initGUIOptions() {
-        File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "portfoliomanagementjpanel.xml");
+        File f = new File(UserDataDirectory.Config.get() + UserDataFile.PortfolioManagementJPanelXml.get());
         final GUIOptions guiOptions = Utils.fromXML(GUIOptions.class, f);
 
         if (guiOptions == null)
@@ -2873,7 +2875,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     }
 
     public boolean saveGUIOptions() {
-        if (Utils.createCompleteDirectoryHierarchyIfDoesNotExist(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config") == false)
+        if (Utils.createCompleteDirectoryHierarchyIfDoesNotExist(UserDataDirectory.Config.get()) == false)
         {
             return false;
         }
@@ -2900,7 +2902,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         guiOptions.addDividerLocation(jSplitPane1.getDividerLocation());
         
-        File f = new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "portfoliomanagementjpanel.xml");
+        File f = new File(UserDataDirectory.Config.get() + UserDataFile.PortfolioManagementJPanelXml.get());
         return org.yccheok.jstock.gui.Utils.toXML(guiOptions, f);
     }
 

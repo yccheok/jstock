@@ -57,6 +57,8 @@ import org.yccheok.jstock.engine.SimpleDate;
 import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.engine.currency.Currency;
+import org.yccheok.jstock.file.UserDataDirectory;
+import org.yccheok.jstock.file.UserDataFile;
 import org.yccheok.jstock.gui.Constants;
 import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.JStock;
@@ -269,12 +271,12 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
     }
 
     private void saveDimension() {
-        org.yccheok.jstock.gui.Utils.toXML(this.getSize(), org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "cashflowchartjdialog.xml");
+        org.yccheok.jstock.gui.Utils.toXML(this.getSize(), UserDataDirectory.Config.get() + UserDataFile.CashFlowChartJDialogXml.get());
     }
 
     private void loadDimension() {
         java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        Dimension dimension = org.yccheok.jstock.gui.Utils.fromXML(Dimension.class, org.yccheok.jstock.gui.Utils.getUserDataDirectory() + "config" + File.separator + "cashflowchartjdialog.xml");
+        Dimension dimension = org.yccheok.jstock.gui.Utils.fromXML(Dimension.class, UserDataDirectory.Config.get() + UserDataFile.CashFlowChartJDialogXml.get());
         if (dimension != null) {            
             setBounds((screenSize.width-(int)dimension.getWidth())/2, (screenSize.height-(int)dimension.getHeight())/2, (int)dimension.getWidth(), (int)dimension.getHeight());
         } else {
