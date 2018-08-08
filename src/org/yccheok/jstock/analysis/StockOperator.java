@@ -43,15 +43,7 @@ public class StockOperator extends AbstractOperator {
         BuyPrice,
         BuyQuantity,
         SellPrice,
-        SellQuantity,
-        SecondBuyPrice,
-        SecondBuyQuantity,
-        SecondSellPrice,
-        SecondSellQuantity,
-        ThirdBuyPrice,
-        ThridBuyQuantity,
-        ThridSellPrice,
-        ThirdSellQuantity
+        SellQuantity
     }
         
     /** Creates a new instance of StockOperator */
@@ -132,22 +124,6 @@ public class StockOperator extends AbstractOperator {
                 return new Double(stock.getSellPrice());
             case SellQuantity:
                 return new Integer(stock.getSellQuantity());
-            case SecondBuyPrice:
-                return new Double(stock.getSecondBuyPrice());
-            case SecondBuyQuantity:
-                return new Integer(stock.getSecondBuyQuantity());
-            case SecondSellPrice:
-                return new Double(stock.getSecondSellPrice());
-            case SecondSellQuantity:
-                return new Integer(stock.getSecondSellQuantity());
-            case ThirdBuyPrice:
-                return new Double(stock.getThirdBuyPrice());
-            case ThridBuyQuantity:
-                return new Integer(stock.getThirdBuyQuantity());
-            case ThridSellPrice:
-                return new Double(stock.getThirdSellPrice());
-            case ThirdSellQuantity:
-                return new Integer(stock.getThirdSellQuantity());
         }
         
         return null;

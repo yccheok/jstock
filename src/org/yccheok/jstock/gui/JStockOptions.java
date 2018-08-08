@@ -357,6 +357,8 @@ public class JStockOptions {
     
     private List<Country> recentCountries = new ArrayList<>();    
 
+    private long iexStockInfoDBMeta = 0;
+    
     // Will be used by LoadFromCloudDialog.
     public void insensitiveCopy(JStockOptions jStockOptions) {
         this.singleIndicatorAlert = jStockOptions.singleIndicatorAlert;
@@ -482,6 +484,8 @@ public class JStockOptions {
         this.useLargeFont = jStockOptions.useLargeFont;
         
         this.isDynamicChartVisible = jStockOptions.isDynamicChartVisible;
+        
+        //this.iexStockInfoDBMeta = jStockOptions.iexStockInfoDBMeta;
     }
 
     // User may not trust us to store their password in cloud server. To avoid
@@ -1587,4 +1591,18 @@ public class JStockOptions {
         
         recentCountries.add(country);
     }
+
+    /**
+     * @return the iexStockInfoDBMeta
+     */
+    public long getIEXStockInfoDBMeta() {
+        return iexStockInfoDBMeta;
+    }
+
+    /**
+     * @param iexStockInfoDBMeta the iexStockInfoDBMeta to set
+     */
+    public void setIEXStockInfoDBMeta(long iexStockInfoDBMeta) {
+        this.iexStockInfoDBMeta = iexStockInfoDBMeta;
+    }    
 }

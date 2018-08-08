@@ -135,7 +135,8 @@ public class JStock extends javax.swing.JFrame {
         this.initMyJXStatusBarCountryLabelMouseAdapter();
         this.initMyJXStatusBarImageLabelMouseAdapter();
         this.initStockInfoDatabaseMeta();
-        this.initGoogleCodeDatabase();
+        this.initGoogleCodeDatabaseRunnable();
+        this.initIEXStockInfoDatabaseRunnable();
         this.initDatabase(true);
         this.initAjaxProvider();
         this.initRealTimeIndexMonitor();
@@ -183,6 +184,8 @@ public class JStock extends javax.swing.JFrame {
         }
         
         installShutdownHook();
+        
+        BackwardCompatible.removeGoogleCodeDatabaseIfNecessary();
     }
 
     private void requestFocusOnJComboBox() {
@@ -1070,10 +1073,10 @@ public class JStock extends javax.swing.JFrame {
                 _stockInfoDatabaseMetaPool.shutdownNow();
             }
 
-            ExecutorService _googleCodeDatabasePool = this.googleCodeDatabasePool;
-            this.googleCodeDatabasePool = null;
-            if (_googleCodeDatabasePool != null) {
-                _googleCodeDatabasePool.shutdownNow();
+            ExecutorService _singleThreadExecutor = this.singleThreadExecutor;
+            this.singleThreadExecutor = null;
+            if (_singleThreadExecutor != null) {
+                _singleThreadExecutor.shutdownNow();
             }
 
             // Always be the first statement. As no matter what happen, we must
@@ -2833,6 +2836,7 @@ public class JStock extends javax.swing.JFrame {
         }
 
         org.yccheok.jstock.engine.Utils.clearGoogleCodeDatabaseCache();
+        org.yccheok.jstock.engine.Utils.clearAllIEXStockInfoDatabaseCaches();
         
         final Country oldCountry = jStockOptions.getCountry();
         
@@ -2864,7 +2868,7 @@ public class JStock extends javax.swing.JFrame {
         this.indicatorScannerJPanel.stop();
         this.indicatorScannerJPanel.clear();
 
-        this.initGoogleCodeDatabase();
+        this.initGoogleCodeDatabaseRunnable();
         this.initDatabase(true);
         this.initAjaxProvider();
         this.initRealTimeIndexMonitor();
@@ -3506,7 +3510,7 @@ public class JStock extends javax.swing.JFrame {
             String name = atom1.getValue().toString();
             
             // Symbol doesn't matter. Just provide a dummy value for it.
-            Stock stock = new Stock.Builder(code, Symbol.newInstance(code.toString())).name(name).build();
+            Stock stock = Stock.builder(code, Symbol.newInstance(code.toString())).name(name).build();
             stocks.add(stock);
         }
         return new StockNameDatabase(stocks);
@@ -3542,7 +3546,7 @@ public class JStock extends javax.swing.JFrame {
                 log.error(null, exp);
             }
             
-            Stock stock = new Stock.Builder(code, symbol).board(board).industry(industry).build();
+            Stock stock = Stock.builder(code, symbol).board(board).industry(industry).build();
             stocks.add(stock);
         }
         return new StockInfoDatabase(stocks);
@@ -4197,12 +4201,18 @@ public class JStock extends javax.swing.JFrame {
         this.indicatorPanel.initAjaxProvider();
     }
 
-    private void initGoogleCodeDatabase() {
+    private void initGoogleCodeDatabaseRunnable() {
         final Country country = jStockOptions.getCountry();
 
         if (org.yccheok.jstock.engine.Utils.isGoogleCodeDatabaseRequired(country)) {
-            this.googleCodeDatabasePool.submit(new GoogleCodeDatabaseRunnable(country));
+            this.singleThreadExecutor.submit(new GoogleCodeDatabaseRunnable(country));
         }    
+    }
+    
+    private void initIEXStockInfoDatabaseRunnable() {
+        if (IEXStockInfoDatabaseRunnable.needToBuild()) {
+            singleThreadExecutor.submit(new IEXStockInfoDatabaseRunnable());
+        }
     }
     
     private void initStockInfoDatabaseMeta() {
@@ -5083,7 +5093,7 @@ public class JStock extends javax.swing.JFrame {
     private final ExecutorService emailAlertPool = Executors.newFixedThreadPool(1);
     private final ExecutorService systemTrayAlertPool = Executors.newFixedThreadPool(1);
     private volatile ExecutorService stockInfoDatabaseMetaPool = Executors.newFixedThreadPool(1);
-    private volatile ExecutorService googleCodeDatabasePool = Executors.newFixedThreadPool(1);
+    private volatile ExecutorService singleThreadExecutor = Executors.newFixedThreadPool(1);
     
     private final org.yccheok.jstock.engine.Observer<RealTimeStockMonitor, RealTimeStockMonitor.Result> realTimeStockMonitorObserver = this.getRealTimeStockMonitorObserver();
     private final org.yccheok.jstock.engine.Observer<RealTimeIndexMonitor, java.util.List<Market>> realTimeIndexMonitorObserver = this.getRealTimeIndexMonitorObserver();

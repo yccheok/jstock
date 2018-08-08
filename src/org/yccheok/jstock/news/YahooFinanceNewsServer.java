@@ -46,7 +46,7 @@ public class YahooFinanceNewsServer implements NewsServer {
     public List<FeedItem> getMessages(StockInfo stockInfo) {
         final Code code = stockInfo.code;
 
-        String query = org.yccheok.jstock.engine.Utils.toYahooFormat(code.toString());
+        String query = org.yccheok.jstock.engine.Utils.toYahooFormat(code);
 
         if (org.yccheok.jstock.engine.Utils.needToResolveUnderlyingCode(code)) {
             Call<QuoteResponse> c = org.yccheok.jstock.engine.Utils.getYahooFinanceApi().quote(query);

@@ -583,11 +583,17 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
         public Map<Code, List<Dividend>> doInBackground() {
             final QuantityQuery quantityQuery = new QuantityQuery(DividendSummaryJDialog.this.transactionSummaries);
             Map<Code, List<Dividend>> result = new HashMap<Code, List<Dividend>>();
-            
-            for (int i = 0, ei = transactionSummaries.size(); i < ei && !isCancelled(); i++) {
+
+            int i = 0;
+            for (TransactionSummary transactionSummary : transactionSummaries) {
+                i++;
                 
-                final TransactionSummary transactionSummary = transactionSummaries.get(i);
-                final Code code = ((Transaction)transactionSummary.getChildAt(0)).getStockInfo().code;
+                if (isCancelled()) {
+                    break;                    
+                }
+                
+                final StockInfo stockInfo = ((Transaction)transactionSummary.getChildAt(0)).getStockInfo();
+                final Code code = stockInfo.code;
                 Dividend latestDividend = org.yccheok.jstock.portfolio.Utils.getLatestDividend(dividendSummary, code);                
                                 
                 List<Dividend> suggestedDividends = new ArrayList<>();
@@ -616,8 +622,8 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
                             if (shouldConvertPenceToPound) {
                                 total = total / 100.0;
                             }
-                            StockInfo betterStockInfo = JStock.instance().getStockInfoDatabase().codeToStockInfo(dividend.stockInfo.code);
-                            Dividend suggestedDividend = new Dividend(betterStockInfo == null ? dividend.stockInfo : betterStockInfo, total, dividend.date);
+
+                            Dividend suggestedDividend = new Dividend(stockInfo, total, dividend.date);
                             suggestedDividends.add(suggestedDividend);
                         }
                     }
@@ -627,7 +633,7 @@ public class DividendSummaryJDialog extends javax.swing.JDialog implements Prope
                     result.put(code, suggestedDividends);
                 }
                 
-                this.setProgress(i + 1);
+                this.setProgress(i);
             }
             return result;
         }

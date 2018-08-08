@@ -5,6 +5,7 @@
 package org.yccheok.jstock.gui;
 
 import java.io.File;
+import org.yccheok.jstock.engine.Country;
 
 /**
  *
@@ -50,5 +51,22 @@ public class BackwardCompatible {
             return true;            
         }
         return false;
+    }   
+    
+    public static void removeGoogleCodeDatabaseIfNecessary() {
+        final int versionCode = JStock.instance().getJStockOptions().getApplicationVersionID();
+
+        if (versionCode <= 0) {
+            // First time. Should be no previous old database.
+            return;
+        }
+
+        if (versionCode >= 1164) {
+            return;
+        }
+
+        new File(org.yccheok.jstock.gui.Utils.getUserDataDirectory() + SQLite.DATABASE_GOOGLE_CODE).delete();
+
+        JStock.instance().getJStockOptions().setGoogleCodeDatabaseMetaTimestamp(Country.Malaysia, 0);
     }    
 }

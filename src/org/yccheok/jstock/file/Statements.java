@@ -50,6 +50,7 @@ import org.yccheok.jstock.engine.Board;
 import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.Stock;
 import org.yccheok.jstock.engine.Industry;
+import org.yccheok.jstock.engine.Intraday;
 import org.yccheok.jstock.engine.StockHistoryServer;
 import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.engine.StockInfoDatabase;
@@ -242,6 +243,22 @@ public class Statements {
             s.metadatas.put("name", stock.getName());
             s.metadatas.put("board", stock.getBoard().name());
             s.metadatas.put("industry", stock.getIndustry().name());
+
+            // for History Summary Chart
+            s.metadatas.put("timeZone", server.getTimeZone().getID());
+
+            // for Intraday Chart, represent Open & Close time in epoch ms
+            String openTs = "";
+            String closeTs = "";
+            Intraday intraday = server.getIntraday();
+
+            if (intraday != null) {
+                openTs = Long.toString(intraday.open);
+                closeTs = Long.toString(intraday.close);
+            }
+
+            s.metadatas.put("intradayOpen", openTs);
+            s.metadatas.put("intradayClose", closeTs);
         }
         
         return s;

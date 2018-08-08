@@ -109,38 +109,6 @@ public class MutableStock {
         return stock.getSellQuantity();
     }
     
-    public double getSecondBuyPrice() {
-        return stock.getSecondBuyPrice();
-    }
-    
-    public int getSecondBuyQuantity() {
-        return stock.getSecondBuyQuantity();
-    }
-    
-    public double getSecondSellPrice() {
-        return stock.getSecondSellPrice();
-    }
-    
-    public int getSecondSellQuantity() {
-        return stock.getSecondSellQuantity();
-    }
-    
-    public double getThirdBuyPrice() {
-        return stock.getThirdBuyPrice();
-    }
-    
-    public int getThirdBuyQuantity() {
-        return stock.getThirdBuyQuantity();
-    }
-    
-    public double getThirdSellPrice() {
-        return stock.getThirdSellPrice();
-    }
-    
-    public int getThirdSellQuantity() {
-        return stock.getThirdSellQuantity();
-    }   
-    
     @Override
     public String toString() {
         return stock.toString();
@@ -197,14 +165,6 @@ public class MutableStock {
                 stock.getBuyQuantity(),
                 stock.getSellPrice(),
                 stock.getSellQuantity(),
-                stock.getSecondBuyPrice(),
-                stock.getSecondBuyQuantity(),
-                stock.getSecondSellPrice(),
-                stock.getSecondSellQuantity(),
-                stock.getThirdBuyPrice(),
-                stock.getThirdBuyQuantity(),
-                stock.getThirdSellPrice(),
-                stock.getThirdSellQuantity(),
                 stock.getTimestamp()
                 );
         
@@ -232,14 +192,6 @@ public class MutableStock {
                 stock.getBuyQuantity(),
                 stock.getSellPrice(),
                 stock.getSellQuantity(),
-                stock.getSecondBuyPrice(),
-                stock.getSecondBuyQuantity(),
-                stock.getSecondSellPrice(),
-                stock.getSecondSellQuantity(),
-                stock.getThirdBuyPrice(),
-                stock.getThirdBuyQuantity(),
-                stock.getThirdSellPrice(),
-                stock.getThirdSellQuantity(),
                 stock.getTimestamp()
                 );
 
@@ -267,14 +219,6 @@ public class MutableStock {
                 stock.getBuyQuantity(),
                 stock.getSellPrice(),
                 stock.getSellQuantity(),
-                stock.getSecondBuyPrice(),
-                stock.getSecondBuyQuantity(),
-                stock.getSecondSellPrice(),
-                stock.getSecondSellQuantity(),
-                stock.getThirdBuyPrice(),
-                stock.getThirdBuyQuantity(),
-                stock.getThirdSellPrice(),
-                stock.getThirdSellQuantity(),
                 stock.getTimestamp()
                 );
         
@@ -302,14 +246,6 @@ public class MutableStock {
                 stock.getBuyQuantity(),
                 stock.getSellPrice(),
                 stock.getSellQuantity(),
-                stock.getSecondBuyPrice(),
-                stock.getSecondBuyQuantity(),
-                stock.getSecondSellPrice(),
-                stock.getSecondSellQuantity(),
-                stock.getThirdBuyPrice(),
-                stock.getThirdBuyQuantity(),
-                stock.getThirdSellPrice(),
-                stock.getThirdSellQuantity(),
                 stock.getTimestamp()
                 );
         
@@ -337,14 +273,6 @@ public class MutableStock {
                 stock.getBuyQuantity(),
                 stock.getSellPrice(),
                 stock.getSellQuantity(),
-                stock.getSecondBuyPrice(),
-                stock.getSecondBuyQuantity(),
-                stock.getSecondSellPrice(),
-                stock.getSecondSellQuantity(),
-                stock.getThirdBuyPrice(),
-                stock.getThirdBuyQuantity(),
-                stock.getThirdSellPrice(),
-                stock.getThirdSellQuantity(),
                 stock.getTimestamp()
                 );
         
@@ -373,14 +301,6 @@ public class MutableStock {
                 stock.getBuyQuantity(),
                 stock.getSellPrice(),
                 stock.getSellQuantity(),
-                stock.getSecondBuyPrice(),
-                stock.getSecondBuyQuantity(),
-                stock.getSecondSellPrice(),
-                stock.getSecondSellQuantity(),
-                stock.getThirdBuyPrice(),
-                stock.getThirdBuyQuantity(),
-                stock.getThirdSellPrice(),
-                stock.getThirdSellQuantity(),
                 stock.getTimestamp()
                 );
         
@@ -408,14 +328,6 @@ public class MutableStock {
                 stock.getBuyQuantity(),
                 stock.getSellPrice(),
                 stock.getSellQuantity(),
-                stock.getSecondBuyPrice(),
-                stock.getSecondBuyQuantity(),
-                stock.getSecondSellPrice(),
-                stock.getSecondSellQuantity(),
-                stock.getThirdBuyPrice(),
-                stock.getThirdBuyQuantity(),
-                stock.getThirdSellPrice(),
-                stock.getThirdSellQuantity(),
                 stock.getTimestamp()
                 );
         
@@ -443,14 +355,6 @@ public class MutableStock {
                 stock.getBuyQuantity(),
                 stock.getSellPrice(),
                 stock.getSellQuantity(),
-                stock.getSecondBuyPrice(),
-                stock.getSecondBuyQuantity(),
-                stock.getSecondSellPrice(),
-                stock.getSecondSellQuantity(),
-                stock.getThirdBuyPrice(),
-                stock.getThirdBuyQuantity(),
-                stock.getThirdSellPrice(),
-                stock.getThirdSellQuantity(),
                 stock.getTimestamp()
                 );
         
@@ -478,14 +382,6 @@ public class MutableStock {
                 stock.getBuyQuantity(),
                 stock.getSellPrice(),
                 stock.getSellQuantity(),
-                stock.getSecondBuyPrice(),
-                stock.getSecondBuyQuantity(),
-                stock.getSecondSellPrice(),
-                stock.getSecondSellQuantity(),
-                stock.getThirdBuyPrice(),
-                stock.getThirdBuyQuantity(),
-                stock.getThirdSellPrice(),
-                stock.getThirdSellQuantity(),
                 stock.getTimestamp()
                 );
         
@@ -513,14 +409,6 @@ public class MutableStock {
                 stock.getBuyQuantity(),
                 stock.getSellPrice(),
                 stock.getSellQuantity(),
-                stock.getSecondBuyPrice(),
-                stock.getSecondBuyQuantity(),
-                stock.getSecondSellPrice(),
-                stock.getSecondSellQuantity(),
-                stock.getThirdBuyPrice(),
-                stock.getThirdBuyQuantity(),
-                stock.getThirdSellPrice(),
-                stock.getThirdSellQuantity(),
                 stock.getTimestamp()
                 );
         
@@ -548,14 +436,6 @@ public class MutableStock {
                 buyQuantity,
                 stock.getSellPrice(),
                 stock.getSellQuantity(),
-                stock.getSecondBuyPrice(),
-                stock.getSecondBuyQuantity(),
-                stock.getSecondSellPrice(),
-                stock.getSecondSellQuantity(),
-                stock.getThirdBuyPrice(),
-                stock.getThirdBuyQuantity(),
-                stock.getThirdSellPrice(),
-                stock.getThirdSellQuantity(),
                 stock.getTimestamp()
                 );
         
@@ -583,14 +463,6 @@ public class MutableStock {
                 stock.getBuyQuantity(),
                 sellPrice,
                 stock.getSellQuantity(),
-                stock.getSecondBuyPrice(),
-                stock.getSecondBuyQuantity(),
-                stock.getSecondSellPrice(),
-                stock.getSecondSellQuantity(),
-                stock.getThirdBuyPrice(),
-                stock.getThirdBuyQuantity(),
-                stock.getThirdSellPrice(),
-                stock.getThirdSellQuantity(),
                 stock.getTimestamp()
                 );
         
@@ -618,299 +490,11 @@ public class MutableStock {
                 stock.getBuyQuantity(),
                 stock.getSellPrice(),
                 sellQuantity,
-                stock.getSecondBuyPrice(),
-                stock.getSecondBuyQuantity(),
-                stock.getSecondSellPrice(),
-                stock.getSecondSellQuantity(),
-                stock.getThirdBuyPrice(),
-                stock.getThirdBuyQuantity(),
-                stock.getThirdSellPrice(),
-                stock.getThirdSellQuantity(),
                 stock.getTimestamp()
                 );
         
         this.stock = s;
     }
-    
-    public void setSecondBuyPrice(double secondBuyPrice) {
-        final Stock s = new Stock(
-                stock.code,
-                stock.symbol,
-                stock.getName(),
-                stock.getCurrency(),
-                stock.getBoard(),
-                stock.getIndustry(),
-                stock.getPrevPrice(),
-                stock.getOpenPrice(),
-                stock.getLastPrice(),
-                stock.getHighPrice(),
-                stock.getLowPrice(),
-                stock.getVolume(),
-                stock.getChangePrice(),
-                stock.getChangePricePercentage(),
-                stock.getLastVolume(),
-                stock.getBuyPrice(),
-                stock.getBuyQuantity(),
-                stock.getSellPrice(),
-                stock.getSellQuantity(),
-                secondBuyPrice,
-                stock.getSecondBuyQuantity(),
-                stock.getSecondSellPrice(),
-                stock.getSecondSellQuantity(),
-                stock.getThirdBuyPrice(),
-                stock.getThirdBuyQuantity(),
-                stock.getThirdSellPrice(),
-                stock.getThirdSellQuantity(),
-                stock.getTimestamp()
-                );
-        
-        this.stock = s;        
-    }
-    
-    public void setSecondBuyQuantity(int secondBuyQuantity) {
-        final Stock s = new Stock(
-                stock.code,
-                stock.symbol,
-                stock.getName(),
-                stock.getCurrency(),
-                stock.getBoard(),
-                stock.getIndustry(),
-                stock.getPrevPrice(),
-                stock.getOpenPrice(),
-                stock.getLastPrice(),
-                stock.getHighPrice(),
-                stock.getLowPrice(),
-                stock.getVolume(),
-                stock.getChangePrice(),
-                stock.getChangePricePercentage(),
-                stock.getLastVolume(),
-                stock.getBuyPrice(),
-                stock.getBuyQuantity(),
-                stock.getSellPrice(),
-                stock.getSellQuantity(),
-                stock.getSecondBuyPrice(),
-                secondBuyQuantity,
-                stock.getSecondSellPrice(),
-                stock.getSecondSellQuantity(),
-                stock.getThirdBuyPrice(),
-                stock.getThirdBuyQuantity(),
-                stock.getThirdSellPrice(),
-                stock.getThirdSellQuantity(),
-                stock.getTimestamp()
-                );
-        
-        this.stock = s;        
-    }
-    
-    public void setSecondSellPrice(double secondSellPrice) {
-        final Stock s = new Stock(
-                stock.code,
-                stock.symbol,
-                stock.getName(),
-                stock.getCurrency(),
-                stock.getBoard(),
-                stock.getIndustry(),
-                stock.getPrevPrice(),
-                stock.getOpenPrice(),
-                stock.getLastPrice(),
-                stock.getHighPrice(),
-                stock.getLowPrice(),
-                stock.getVolume(),
-                stock.getChangePrice(),
-                stock.getChangePricePercentage(),
-                stock.getLastVolume(),
-                stock.getBuyPrice(),
-                stock.getBuyQuantity(),
-                stock.getSellPrice(),
-                stock.getSellQuantity(),
-                stock.getSecondBuyPrice(),
-                stock.getSecondBuyQuantity(),
-                secondSellPrice,
-                stock.getSecondSellQuantity(),
-                stock.getThirdBuyPrice(),
-                stock.getThirdBuyQuantity(),
-                stock.getThirdSellPrice(),
-                stock.getThirdSellQuantity(),
-                stock.getTimestamp()
-                );
-        
-        this.stock = s;        
-    }
-    
-    public void setSecondSellQuantity(int secondSellQuantity) {
-        final Stock s = new Stock(
-                stock.code,
-                stock.symbol,
-                stock.getName(),
-                stock.getCurrency(),
-                stock.getBoard(),
-                stock.getIndustry(),
-                stock.getPrevPrice(),
-                stock.getOpenPrice(),
-                stock.getLastPrice(),
-                stock.getHighPrice(),
-                stock.getLowPrice(),
-                stock.getVolume(),
-                stock.getChangePrice(),
-                stock.getChangePricePercentage(),
-                stock.getLastVolume(),
-                stock.getBuyPrice(),
-                stock.getBuyQuantity(),
-                stock.getSellPrice(),
-                stock.getSellQuantity(),
-                stock.getSecondBuyPrice(),
-                stock.getSecondBuyQuantity(),
-                stock.getSecondSellPrice(),
-                secondSellQuantity,
-                stock.getThirdBuyPrice(),
-                stock.getThirdBuyQuantity(),
-                stock.getThirdSellPrice(),
-                stock.getThirdSellQuantity(),
-                stock.getTimestamp()
-                );
-        
-        this.stock = s;        
-    }
-    
-    public void setThirdBuyPrice(double thirdBuyPrice) {
-        final Stock s = new Stock(
-                stock.code,
-                stock.symbol,
-                stock.getName(),
-                stock.getCurrency(),
-                stock.getBoard(),
-                stock.getIndustry(),
-                stock.getPrevPrice(),
-                stock.getOpenPrice(),
-                stock.getLastPrice(),
-                stock.getHighPrice(),
-                stock.getLowPrice(),
-                stock.getVolume(),
-                stock.getChangePrice(),
-                stock.getChangePricePercentage(),
-                stock.getLastVolume(),
-                stock.getBuyPrice(),
-                stock.getBuyQuantity(),
-                stock.getSellPrice(),
-                stock.getSellQuantity(),
-                stock.getSecondBuyPrice(),
-                stock.getSecondBuyQuantity(),
-                stock.getSecondSellPrice(),
-                stock.getSecondSellQuantity(),
-                thirdBuyPrice,
-                stock.getThirdBuyQuantity(),
-                stock.getThirdSellPrice(),
-                stock.getThirdSellQuantity(),
-                stock.getTimestamp()
-                );
-        
-        this.stock = s;        
-    }
-    
-    public void setThirdBuyQuantity(int thirdBuyQuantity) {
-        final Stock s = new Stock(
-                stock.code,
-                stock.symbol,
-                stock.getName(),
-                stock.getCurrency(),
-                stock.getBoard(),
-                stock.getIndustry(),
-                stock.getPrevPrice(),
-                stock.getOpenPrice(),
-                stock.getLastPrice(),
-                stock.getHighPrice(),
-                stock.getLowPrice(),
-                stock.getVolume(),
-                stock.getChangePrice(),
-                stock.getChangePricePercentage(),
-                stock.getLastVolume(),
-                stock.getBuyPrice(),
-                stock.getBuyQuantity(),
-                stock.getSellPrice(),
-                stock.getSellQuantity(),
-                stock.getSecondBuyPrice(),
-                stock.getSecondBuyQuantity(),
-                stock.getSecondSellPrice(),
-                stock.getSecondSellQuantity(),
-                stock.getThirdBuyPrice(),
-                thirdBuyQuantity,
-                stock.getThirdSellPrice(),
-                stock.getThirdSellQuantity(),
-                stock.getTimestamp()
-                );
-        
-        this.stock = s;        
-    }
-    
-    public void setThirdSellPrice(double thirdSellPrice) {
-        final Stock s = new Stock(
-                stock.code,
-                stock.symbol,
-                stock.getName(),
-                stock.getCurrency(),
-                stock.getBoard(),
-                stock.getIndustry(),
-                stock.getPrevPrice(),
-                stock.getOpenPrice(),
-                stock.getLastPrice(),
-                stock.getHighPrice(),
-                stock.getLowPrice(),
-                stock.getVolume(),
-                stock.getChangePrice(),
-                stock.getChangePricePercentage(),
-                stock.getLastVolume(),
-                stock.getBuyPrice(),
-                stock.getBuyQuantity(),
-                stock.getSellPrice(),
-                stock.getSellQuantity(),
-                stock.getSecondBuyPrice(),
-                stock.getSecondBuyQuantity(),
-                stock.getSecondSellPrice(),
-                stock.getSecondSellQuantity(),
-                stock.getThirdBuyPrice(),
-                stock.getThirdBuyQuantity(),
-                thirdSellPrice,
-                stock.getThirdSellQuantity(),
-                stock.getTimestamp()
-                );
-        
-        this.stock = s;        
-    }
-    
-    public void setThirdSellQuantity(int thirdSellQuantity) {
-        final Stock s = new Stock(
-                stock.code,
-                stock.symbol,
-                stock.getName(),
-                stock.getCurrency(),
-                stock.getBoard(),
-                stock.getIndustry(),
-                stock.getPrevPrice(),
-                stock.getOpenPrice(),
-                stock.getLastPrice(),
-                stock.getHighPrice(),
-                stock.getLowPrice(),
-                stock.getVolume(),
-                stock.getChangePrice(),
-                stock.getChangePricePercentage(),
-                stock.getLastVolume(),
-                stock.getBuyPrice(),
-                stock.getBuyQuantity(),
-                stock.getSellPrice(),
-                stock.getSellQuantity(),
-                stock.getSecondBuyPrice(),
-                stock.getSecondBuyQuantity(),
-                stock.getSecondSellPrice(),
-                stock.getSecondSellQuantity(),
-                stock.getThirdBuyPrice(),
-                stock.getThirdBuyQuantity(),
-                stock.getThirdSellPrice(),
-                thirdSellQuantity,
-                stock.getTimestamp()
-                );
-        
-        this.stock = s;        
-    } 
-    
+
     private Stock stock;
 }
