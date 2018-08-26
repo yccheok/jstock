@@ -1,6 +1,9 @@
 ﻿This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.7.37 - 2018-08-27
+  Bugfix:  Fix stock history.
+  
 JStock 1.0.7.36 - 2018-08-15
   Feature: Fix on BRK.B stock.
 
