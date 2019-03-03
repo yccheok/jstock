@@ -3,4 +3,5 @@
     <application>jstock-android-static</application>
     <version>1</version>
     <threadsafe>true</threadsafe>
+    <runtime>java8</runtime>
 </appengine-web-app>
