@@ -212,9 +212,7 @@ public class Utils {
         // We would like to display what email this credential associated to.
         scopes.add("email");
         
-        scopes.add(DriveScopes.DRIVE_APPDATA);  
-        // Legacy. Shall be removed after a while...
-        scopes.add(DriveScopes.DRIVE);
+        scopes.add(DriveScopes.DRIVE_APPDATA);
         
         // load client secrets
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(Utils.JSON_FACTORY,

@@ -424,12 +424,6 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
                     return false;
                 }
 
-                // To serve legacy Android app.
-                if (false == Utils.saveToLegacyGoogleDrive(credentialEx.first, zipFile)) {
-                    publish(Status.newInstance(GUIBundle.getString("SaveToCloudJDialog_VerifyGoogleAccountFail"), Icons.ERROR));
-                    return false;
-                }
-
                 publish(Status.newInstance(GUIBundle.getString("SaveToCloudJDialog_Success"), Icons.OK));
 
                 return true;

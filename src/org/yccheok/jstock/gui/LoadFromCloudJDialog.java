@@ -352,15 +352,8 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
 
                 Utils.CloudFile cloudFile = Utils.loadFromGoogleDrive(credentialEx.first);
                 if (cloudFile == null) {
-                    // Perhaps we should load from legacy cloud server, and help
-                    // user to perform migration to Google Doc server.
-                    cloudFile = Utils.loadFromLegacyGoogleDrive(credentialEx.first);
-                    if (cloudFile == null) {                        
-                        publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_LoadingFromCloudFail"), Icons.ERROR));
-                        return null;
-                    } else {
-                        Utils.saveToGoogleDrive(credentialEx.first, cloudFile.file);
-                    }
+                    publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_LoadingFromCloudFail"), Icons.ERROR));
+                    return null;
                 }
                 /* Check for checksum. */
                 if (cloudFile.checksum != org.yccheok.jstock.analysis.Utils.getChecksum(cloudFile.file)) {

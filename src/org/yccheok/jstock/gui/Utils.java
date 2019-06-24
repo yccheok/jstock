@@ -1322,26 +1322,11 @@ public class Utils {
         return _loadFromGoogleDrive(credential, qString);
     }
 
-    // Legacy. Shall be removed after a while...
-    public static CloudFile loadFromLegacyGoogleDrive(Credential credential) {
-        // 25 is based on experiment. Might changed by Google in the future.
-        final String titleName = ("jstock-" + Utils.getJStockUUID() + "-checksum=").substring(0, 25);
-        final String qString = "title contains '" + titleName + "' and trashed = false and not 'appdata' in parents and 'me' in owners";
-        return _loadFromGoogleDrive(credential, qString);
-    }
-
     public static boolean saveToGoogleDrive(Credential credential, File file) {
         // 25 is based on experiment. Might changed by Google in the future.
         final String titleName = ("jstock-" + Utils.getJStockUUID() + "-checksum=").substring(0, 25);        
         final String qString = "title contains '" + titleName + "' and trashed = false and 'appdata' in parents and 'me' in owners";
         return _saveToGoogleDrive(credential, file, qString, "appdata");
-    }
-    
-    public static boolean saveToLegacyGoogleDrive(Credential credential, File file) {
-        // 25 is based on experiment. Might changed by Google in the future.
-        final String titleName = ("jstock-" + Utils.getJStockUUID() + "-checksum=").substring(0, 25);
-        final String qString = "title contains '" + titleName + "' and trashed = false and not 'appdata' in parents and 'me' in owners";
-        return _saveToGoogleDrive(credential, file, qString, null);
     }
     
     private static boolean _saveToGoogleDrive(Credential credential, File file, String qString, String folder) {
@@ -2756,11 +2741,11 @@ public class Utils {
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7.37";
+    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7.38";
 
-    // 1.0.7.37
+    // 1.0.7.38
     // For About box comparision on latest version purpose.
-    private static final int APPLICATION_VERSION_ID = 1166;
+    private static final int APPLICATION_VERSION_ID = 1167;
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     

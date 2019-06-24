@@ -335,6 +335,8 @@ public class JStockOptions {
 
     private Map<Country, Country> localCurrencyCountries = new EnumMap<Country, Country>(Country.class);
 
+    private Map<Country, Boolean> preferLongNames = new EnumMap<Country, Boolean>(Country.class);
+    
     @Deprecated
     private transient Map<Country, Boolean> penceToPoundConversionEnabled = new EnumMap<Country, Boolean>(Country.class);
     
@@ -474,6 +476,8 @@ public class JStockOptions {
         this.currencies = new EnumMap<Country, String>(jStockOptions.currencies);
         this.currencyExchangeEnable = new EnumMap<Country, Boolean>(jStockOptions.currencyExchangeEnable);
         this.localCurrencyCountries = new EnumMap<Country, Country>(jStockOptions.localCurrencyCountries);
+        this.preferLongNames = new EnumMap<Country, Boolean>(preferLongNames);
+        
         //this.penceToPoundConversionEnabled = new EnumMap<Country, Boolean>(jStockOptions.penceToPoundConversionEnabled);
         this.decimalPlaces = new EnumMap<Country, DecimalPlace>(jStockOptions.decimalPlaces);
         
@@ -668,6 +672,10 @@ public class JStockOptions {
             this.localCurrencyCountries = new EnumMap<Country, Country>(Country.class);
         }
 
+        if (this.preferLongNames == null) {
+            this.preferLongNames = new EnumMap<Country, Boolean>(Country.class);
+        }
+        
         //if (this.penceToPoundConversionEnabled == null) {
         //    this.penceToPoundConversionEnabled = new EnumMap<Country, Boolean>(Country.class);
         //}
@@ -1371,7 +1379,7 @@ public class JStockOptions {
         }
         return country;
     }
-
+        
     /**
      * Set the country of local currency used to purchase foreign stocks.
      * 
@@ -1384,6 +1392,19 @@ public class JStockOptions {
     }
 
 
+    public boolean isPreferLongName(Country country) {
+        Boolean prefer = this.preferLongNames.get(country);
+        if (prefer != null) {
+            return prefer;
+        }
+        // Default is true.
+        return true;
+    }
+    
+    public void setPreferLongName(Country country, boolean prefer) {
+        this.preferLongNames.put(country, prefer);
+    }
+    
     /**
      * @return the yellowInformationBoxOption
      */
