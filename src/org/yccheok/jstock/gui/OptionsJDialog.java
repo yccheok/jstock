@@ -100,6 +100,7 @@ public class OptionsJDialog extends javax.swing.JDialog implements JStockOptions
         final boolean oldIsCurrencyExchangeEnable = jStockOptions.isCurrencyExchangeEnable(country);
         final PriceSource oldPriceSource = jStockOptions.getPriceSource(country);
         final Country oldLocalCurrencyCountry = jStockOptions.getLocalCurrencyCountry(country);        
+        final boolean oldPreferLongName = jStockOptions.isPreferLongName(country);
         
         if (apply(jStockOptions) == false) {
             return;
@@ -108,7 +109,7 @@ public class OptionsJDialog extends javax.swing.JDialog implements JStockOptions
         if (oldPriceSource != jStockOptions.getPriceSource(jStockOptions.getCountry())) {
             JStock.instance().updatePriceSource(jStockOptions.getCountry(), jStockOptions.getPriceSource(jStockOptions.getCountry()));
         }
-        if (oldScanningSpeed != jStockOptions.getScanningSpeed()) {
+        if (oldPreferLongName != jStockOptions.isPreferLongName(country) || oldScanningSpeed != jStockOptions.getScanningSpeed()) {
             JStock.instance().refreshAllRealTimeStockMonitors();
             JStock.instance().refreshRealTimeIndexMonitor();
         }

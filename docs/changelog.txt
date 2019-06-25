@@ -1,6 +1,10 @@
 ﻿This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.7.39 - 2019-06-25
+  Feature: Introduce prefer long stock name.
+  Bugfix:  Remove old Google Drive API.
+  
 JStock 1.0.7.38 - 2019-06-25
   Feature: Introduce prefer long stock name.
   Bugfix:  Remove old Google Drive API.
