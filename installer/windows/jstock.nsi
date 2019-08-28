@@ -3,8 +3,8 @@
 ; Definitions for Java 1.7 Detection
 !define JRE_VERSION "1.8"
 ; The URLs are obtained from https://www.java.com/en/download/manual.jsp
-!define JRE_32_URL "http://javadl.oracle.com/webapps/download/AutoDL?BundleId=216432"
-!define JRE_64_URL "http://javadl.oracle.com/webapps/download/AutoDL?BundleId=216434"
+!define JRE_32_URL "https://javadl.oracle.com/webapps/download/AutoDL?BundleId=238727_478a62b7d4e34b78b671c754eaaf38ab"
+!define JRE_64_URL "https://javadl.oracle.com/webapps/download/AutoDL?BundleId=238729_478a62b7d4e34b78b671c754eaaf38ab"
 !define PRODUCT_NAME "JStock"
 ; The name of the installer
 Name ${PRODUCT_NAME}
