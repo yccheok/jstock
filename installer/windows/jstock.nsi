@@ -3,8 +3,8 @@
 ; Definitions for Java 1.7 Detection
 !define JRE_VERSION "1.8"
 ; The URLs are obtained from https://www.java.com/en/download/manual.jsp
-!define JRE_32_URL "http://javadl.oracle.com/webapps/download/AutoDL?BundleId=216432"
-!define JRE_64_URL "http://javadl.oracle.com/webapps/download/AutoDL?BundleId=216434"
+!define JRE_32_URL "https://github.com/yccheok/jstock/releases/download/jre-8u111-windows/jre-8u111-windows-i586.exe"
+!define JRE_64_URL "https://github.com/yccheok/jstock/releases/download/jre-8u111-windows/jre-8u111-windows-x64.exe"
 !define PRODUCT_NAME "JStock"
 ; The name of the installer
 Name ${PRODUCT_NAME}
@@ -12,7 +12,7 @@ Name ${PRODUCT_NAME}
 RequestExecutionLevel admin ;Workaround for Vista
 
 ; The file to write
-OutFile "jstock-1.0.7.39-setup.exe"
+OutFile "jstock-1.0.7.40-setup.exe"
 LicenseData "gpl-2.0.txt"
  
 ; The default installation directory
@@ -160,14 +160,14 @@ Function GetJRE
         # 64 bit code
         MessageBox MB_OK "${PRODUCT_NAME} uses 64-bit Java ${JRE_VERSION}, it will now \
                          be downloaded and installed"        
-        nsisdl::download /TIMEOUT=30000 ${JRE_64_URL} $2
+        inetc::get ${JRE_64_URL} $2
     ${Else}
         MessageBox MB_OK "${PRODUCT_NAME} uses 32-bit Java ${JRE_VERSION}, it will now \
                          be downloaded and installed"        
-        nsisdl::download /TIMEOUT=30000 ${JRE_32_URL} $2
+        inetc::get ${JRE_32_URL} $2
     ${EndIf}
     Pop $R0 ;Get the return value
-        StrCmp $R0 "success" +3
+        StrCmp $R0 "OK" +3
         MessageBox MB_OK "Download failed: $R0"
         Quit
     ExecWait $2
