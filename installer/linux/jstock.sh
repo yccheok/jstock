@@ -44,4 +44,12 @@ JSTOCK_BIN=`dirname "$PRG"`
 cd "${JSTOCK_BIN}"
 
 _VMOPTIONS="-Xms64m -Xmx512m"
-$_JAVA_EXEC $_VMOPTIONS -jar jstock.jar
+
+_JAVAFXPATH="/usr/share/openjfx/lib"
+if [[ (-d "$_JAVAFXPATH") && (-f "$_JAVAFXPATH/javafx.base.jar") ]] ; then
+    _JAVAFXOPTIONS="--module-path $_JAVAFXPATH --add-modules=javafx.base,javafx.controls,javafx.fxml,javafx.graphics,javafx.media,javafx.swing,javafx.web"
+else
+    _JAVAFXOPTIONS=""
+fi
+
+$_JAVA_EXEC $_VMOPTIONS $_JAVAFXOPTIONS -jar jstock.jar
