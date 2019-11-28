@@ -20,7 +20,6 @@
 package org.yccheok.jstock.alert;
 
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.util.Base64;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
 import java.io.ByteArrayOutputStream;
@@ -65,8 +64,8 @@ public class GoogleMail {
 
     private static Message createMessageWithEmail(MimeMessage email) throws MessagingException, IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        email.writeTo(baos);
-        String encodedEmail = Base64.encodeBase64URLSafeString(baos.toByteArray());
+        email.writeTo(baos);        
+        String encodedEmail = java.util.Base64.getUrlEncoder().encodeToString(baos.toByteArray());
         Message message = new Message();
         message.setRaw(encodedEmail);
         return message;
