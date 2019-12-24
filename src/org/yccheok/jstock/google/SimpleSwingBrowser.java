@@ -80,11 +80,6 @@ public class SimpleSwingBrowser extends JDialog {
         Platform.runLater(new Runnable() {
             @Override 
             public void run() {
- 
-                // Clear the session/cache/cookie in the JavaFX WebView
-                // http://stackoverflow.com/questions/23409138/clear-the-session-cache-cookie-in-the-javafx-webview
-                java.net.CookieHandler.setDefault(new java.net.CookieManager());
-                
                 final WebView view = new WebView();
                 engine = view.getEngine();
  
