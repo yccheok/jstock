@@ -1,6 +1,9 @@
 ﻿This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.7.44 - 2020-01-23
+  Bugfix:  Fix open from cloud and save to cloud.
+  
 JStock 1.0.7.43 - 2019-12-24
   Bugfix:  Fix open from cloud and save to cloud.
   

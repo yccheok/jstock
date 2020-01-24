@@ -2743,9 +2743,9 @@ public class Utils {
     ////////////////////////////////////////////////////////////////////////////
     private static final String ABOUT_BOX_VERSION_STRING = "1.0.7.43";
 
-    // 1.0.7.43
+    // 1.0.7.44
     // For About box comparision on latest version purpose.
-    private static final int APPLICATION_VERSION_ID = 1173;
+    private static final int APPLICATION_VERSION_ID = 1174;
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     

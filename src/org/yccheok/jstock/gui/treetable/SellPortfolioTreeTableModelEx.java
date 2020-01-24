@@ -65,6 +65,7 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
     static {
         final String[] tmp = {
             GUIBundle.getString("PortfolioManagementJPanel_Stock"),
+            GUIBundle.getString("PortfolioManagementJPanel_Code"),
             GUIBundle.getString("PortfolioManagementJPanel_Date"),
             GUIBundle.getString("PortfolioManagementJPanel_ReferenceDate"),
             GUIBundle.getString("PortfolioManagementJPanel_Units"),
@@ -85,6 +86,7 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
     // Types of the columns.
     private static final Class[] cTypes = {
         TreeTableModel.class,
+        Code.class,
         org.yccheok.jstock.engine.SimpleDate.class,
         org.yccheok.jstock.engine.SimpleDate.class,
         Double.class,
@@ -232,14 +234,14 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
                 case 0:
                     return GUIBundle.getString("PortfolioManagementJPanel_Sell");
         
-                case 6:
+                case 7:
                     if (isFeeCalculationEnabled) {
                         return new DoubleWrapper(decimalPlace, portfolio.getNetTotal(localCurrency));
                     } else {
                         return new DoubleWrapper(decimalPlace, portfolio.getTotal(localCurrency));
                     }
 
-                case 7:
+                case 8:
                     // Total purchase value.
                     if (isFeeCalculationEnabled) {
                         return new DoubleWrapper(decimalPlace, portfolio.getNetReferenceTotal(localCurrency));
@@ -247,7 +249,7 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
                         return new DoubleWrapper(decimalPlace, portfolio.getReferenceTotal(localCurrency));
                     }
 
-                case 8:
+                case 9:
                     if (isFeeCalculationEnabled) {
                         return new DoubleWrapper(decimalPlace, getNetGainLossValue(localCurrency));
                     } else {
@@ -255,23 +257,23 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
                     }
 
 
-                case 9:
+                case 10:
                     if (isFeeCalculationEnabled) {
                         return new DoubleWrapper(DecimalPlace.Two, getNetGainLossPercentage(localCurrency));
                     } else {
                         return new DoubleWrapper(DecimalPlace.Two, getGainLossPercentage(localCurrency));
                     }
     
-                case 10:
+                case 11:
                     return new DoubleWrapper(decimalPlace, portfolio.getBroker());
                     
-                case 11:
+                case 12:
                     return new DoubleWrapper(decimalPlace, portfolio.getClearingFee());
                     
-                case 12:
+                case 13:
                     return new DoubleWrapper(decimalPlace, portfolio.getStampDuty());
                     
-                case 13:
+                case 14:
                     return portfolio.getComment();
             }
         }
@@ -292,17 +294,20 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
             switch(column) {
                 case 0:
                     return ((Transaction)transactionSummary.getChildAt(0)).getStockInfo().symbol;
-                    
-                case 3:
-                    return transactionSummary.getQuantity();
+
+                case 1:
+                    return ((Transaction)transactionSummary.getChildAt(0)).getStockInfo().code;
                     
                 case 4:
-                    return new DoubleWrapper(decimalPlace, getSellingPrice(transactionSummary));
+                    return transactionSummary.getQuantity();
                     
                 case 5:
-                    return new DoubleWrapper(decimalPlace, getPurchasePrice(transactionSummary));
+                    return new DoubleWrapper(decimalPlace, getSellingPrice(transactionSummary));
                     
                 case 6:
+                    return new DoubleWrapper(decimalPlace, getPurchasePrice(transactionSummary));
+                    
+                case 7:
                     if (shouldConvertPenceToPound == false) {
                         if (isFeeCalculationEnabled) {
                             return DoubleWithCurrency.create(stockCurrency, decimalPlace, transactionSummary.getNetTotal());
@@ -317,7 +322,7 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
                         }
                     }
     
-                case 7:
+                case 8:
                     if (shouldConvertPenceToPound == false) {
                         if (isFeeCalculationEnabled) {
                             return DoubleWithCurrency.create(stockCurrency, decimalPlace, transactionSummary.getNetReferenceTotal());
@@ -332,7 +337,7 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
                         }
                     }
                        
-                case 8:
+                case 9:
                     if (shouldConvertPenceToPound == false) {
                         if (isFeeCalculationEnabled) {
                             return DoubleWithCurrency.create(stockCurrency, decimalPlace, getNetGainLossValue(transactionSummary));
@@ -347,23 +352,23 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
                         }
                     }
 
-                case 9:
+                case 10:
                     if (isFeeCalculationEnabled) {
                         return new DoubleWrapper(DecimalPlace.Two, getNetGainLossPercentage(transactionSummary));
                     } else {
                         return new DoubleWrapper(DecimalPlace.Two, getGainLossPercentage(transactionSummary));
                     }
                     
-                case 10:
+                case 11:
                     return new DoubleWrapper(decimalPlace, transactionSummary.getBroker());
                     
-                case 11:
+                case 12:
                     return new DoubleWrapper(decimalPlace, transactionSummary.getClearingFee());
                     
-                case 12:
+                case 13:
                     return new DoubleWrapper(decimalPlace, transactionSummary.getStampDuty());
                     
-                case 13:
+                case 14:
                     return transactionSummary.getComment();
             }
         }
@@ -384,21 +389,24 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
                     return (transaction).getStockInfo().symbol;
 
                 case 1:
+                    return (transaction).getStockInfo().code;
+                    
+                case 2:
                     return transaction.getDate();
 
-                case 2:
+                case 3:
                     return transaction.getReferenceDate();
                     
-                case 3:
+                case 4:
                     return transaction.getQuantity();
                     
-                case 4:
+                case 5:
                     return new DoubleWrapper(decimalPlace, transaction.getPrice());
                     
-                case 5:
+                case 6:
                     return new DoubleWrapper(decimalPlace, transaction.getReferencePrice());
                     
-                case 6:
+                case 7:
                     if (shouldConvertPenceToPound == false) {
                         if (isFeeCalculationEnabled) {
                             return DoubleWithCurrency.create(stockCurrency, decimalPlace, transaction.getNetTotal());
@@ -413,7 +421,7 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
                         }
                     }                    
 
-                case 7:
+                case 8:
                     if (shouldConvertPenceToPound == false) {
                         if (isFeeCalculationEnabled) {
                             return DoubleWithCurrency.create(stockCurrency, decimalPlace, transaction.getNetReferenceTotal());
@@ -428,7 +436,7 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
                         }
                     }
                     
-                case 8:
+                case 9:
                     if (shouldConvertPenceToPound == false) {
                         if (isFeeCalculationEnabled) {
                             return DoubleWithCurrency.create(stockCurrency, decimalPlace, getNetGainLossValue(transaction));
@@ -443,23 +451,23 @@ public class SellPortfolioTreeTableModelEx extends AbstractPortfolioTreeTableMod
                         }
                     }
                                         
-                case 9:
+                case 10:
                     if (isFeeCalculationEnabled) {
                         return new DoubleWrapper(DecimalPlace.Two, getNetGainLossPercentage(transaction));
                     } else {
                         return new DoubleWrapper(DecimalPlace.Two, getGainLossPercentage(transaction));
                     }
                     
-                case 10:
+                case 11:
                     return new DoubleWrapper(decimalPlace, transaction.getBroker());
                     
-                case 11:
+                case 12:
                     return new DoubleWrapper(decimalPlace, transaction.getClearingFee());
                     
-                case 12:
+                case 13:
                     return new DoubleWrapper(decimalPlace, transaction.getStampDuty());
                     
-                case 13:
+                case 14:
                     return transaction.getComment();
             }
         }
