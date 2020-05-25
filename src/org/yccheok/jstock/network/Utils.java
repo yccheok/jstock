@@ -49,8 +49,6 @@ public class Utils {
         ANDROID_HTML,
         WENOTE_HTML,
         STOCK_INFO_DATABASE_META,
-        ANDROID_FAQ,
-        DRIVEWEALTH_LOG,
         GOOGLE_CODE_DATABASE_META,
         GOOGLE_CODE_DATABASE,
         MISSING_STOCK_CODE_SERVICE,
@@ -120,8 +118,6 @@ public class Utils {
         map.put(Type.ANDROID_HTML, "http://goo.gl/VAm6Mx");
         map.put(Type.WENOTE_HTML, "http://bit.ly/2JcBKKv");
         map.put(Type.STOCK_INFO_DATABASE_META, JSTOCK_STATIC_SERVER + "stocks_information/stock-info-database-meta.json");
-        map.put(Type.ANDROID_FAQ, "http://faq.jstock.co/?utm_source=jstock-android&utm_medium=settings");
-        map.put(Type.DRIVEWEALTH_LOG, "https://jstock-drivewealth.appspot.com/log");
         map.put(Type.GOOGLE_CODE_DATABASE_META, JSTOCK_STATIC_SERVER + "stocks_information/google-code-database-meta.json");
         map.put(Type.GOOGLE_CODE_DATABASE, JSTOCK_STATIC_SERVER + "stocks_information/" + COUNTRY_TEMPLATE + "/google-code-database.zip");
         map.put(Type.MISSING_STOCK_CODE_SERVICE, JSTOCK_WEBAPP_SERVER + "missing-stock-code/");
@@ -149,8 +145,6 @@ public class Utils {
         zh_map.put(Type.ANDROID_HTML, "http://goo.gl/VAm6Mx");
         zh_map.put(Type.WENOTE_HTML, "http://bit.ly/2JcBKKv");
         zh_map.put(Type.STOCK_INFO_DATABASE_META, JSTOCK_STATIC_SERVER + "stocks_information/stock-info-database-meta.json");
-        zh_map.put(Type.ANDROID_FAQ, "http://faq.jstock.co/zh/?utm_source=jstock-android&utm_medium=settings");
-        zh_map.put(Type.DRIVEWEALTH_LOG, "https://jstock-drivewealth.appspot.com/log");
         zh_map.put(Type.GOOGLE_CODE_DATABASE_META, JSTOCK_STATIC_SERVER + "stocks_information/google-code-database-meta.json");
         zh_map.put(Type.GOOGLE_CODE_DATABASE, JSTOCK_STATIC_SERVER + "stocks_information/" + COUNTRY_TEMPLATE + "/google-code-database.zip");
         zh_map.put(Type.MISSING_STOCK_CODE_SERVICE, JSTOCK_WEBAPP_SERVER + "missing-stock-code/");
@@ -178,8 +172,6 @@ public class Utils {
         zh_Hant_map.put(Type.ANDROID_HTML, "http://goo.gl/VAm6Mx");
         zh_Hant_map.put(Type.WENOTE_HTML, "http://bit.ly/2JcBKKv");
         zh_Hant_map.put(Type.STOCK_INFO_DATABASE_META, JSTOCK_STATIC_SERVER + "stocks_information/stock-info-database-meta.json");
-        zh_Hant_map.put(Type.ANDROID_FAQ, "http://faq.jstock.co/zh-Hant/?utm_source=jstock-android&utm_medium=settings");
-        zh_Hant_map.put(Type.DRIVEWEALTH_LOG, "https://jstock-drivewealth.appspot.com/log");
         zh_Hant_map.put(Type.GOOGLE_CODE_DATABASE_META, JSTOCK_STATIC_SERVER + "stocks_information/google-code-database-meta.json");
         zh_Hant_map.put(Type.GOOGLE_CODE_DATABASE, JSTOCK_STATIC_SERVER + "stocks_information/" + COUNTRY_TEMPLATE + "/google-code-database.zip");
         zh_Hant_map.put(Type.MISSING_STOCK_CODE_SERVICE, JSTOCK_WEBAPP_SERVER + "missing-stock-code/");
