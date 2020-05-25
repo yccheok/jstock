@@ -2487,9 +2487,10 @@ public class Utils {
         }
         
         java.util.List<Country> countries = new ArrayList<>(Arrays.asList(Country.values()));
-        // Czech and Hungary are only for currency exchange purpose.
+        // Czech, Hungary, Mexico are only for currency exchange purpose.
         countries.remove(Country.Czech);
         countries.remove(Country.Hungary);
+        countries.remove(Country.Mexico);
         
         List<WatchlistInfo> watchlistInfos = org.yccheok.jstock.watchlist.Utils.getWatchlistInfos();
         
@@ -2741,11 +2742,11 @@ public class Utils {
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7.44";
+    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7.45";
 
-    // 1.0.7.44
+    // 1.0.7.45
     // For About box comparision on latest version purpose.
-    private static final int APPLICATION_VERSION_ID = 1174;
+    private static final int APPLICATION_VERSION_ID = 1175;
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     

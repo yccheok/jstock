@@ -61,6 +61,7 @@ public enum Continent {
         map.put(Country.Japan, Asia);
         map.put(Country.Korea, Asia);
         map.put(Country.Malaysia, Asia);
+        map.put(Country.Mexico, America);
         map.put(Country.Netherlands, Europe);
         map.put(Country.NewZealand, Australia);
         map.put(Country.Norway, Europe);
