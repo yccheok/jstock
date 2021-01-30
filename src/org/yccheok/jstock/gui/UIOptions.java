@@ -47,6 +47,8 @@ public class UIOptions {
     
     public static final String FAIR_USAGE_POLICY_JDIALOG = "FAIR_USAGE_POLICY_JDIALOG";
     
+    public static final String RENAME_STOCK_JDIALOG = "RENAME_STOCK_JDIALOG";
+    
     private final Map<String, Dimension> sizes = new HashMap<>();
     
     public void setDimension(String key, Dimension dimension) {

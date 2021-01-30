@@ -1773,10 +1773,20 @@ public class Utils {
         return "<html><head></head><body>" + plainText + "</body></html>";
     }
 
+    private static XStream getXStream() {
+        XStream xStream = new XStream();
+        // Avoid "Security framework of XStream not initialized, XStream is probably vulnerable." warning.
+        XStream.setupDefaultSecurity(xStream);
+        xStream.allowTypesByWildcard(new String[] {
+            "org.yccheok.jstock.**"
+        });
+        return xStream;
+    }
+    
     @SuppressWarnings("unchecked")
     public static <A> A fromXML(Class c, Reader reader) {
         // Don't ever try to use DomDriver. They are VERY slow.
-        XStream xStream = new XStream();
+        XStream xStream = getXStream();
 
         try {
             Object object = xStream.fromXML(reader);
@@ -1797,7 +1807,7 @@ public class Utils {
     @SuppressWarnings("unchecked")
     public static <A> A fromXML(Class<A> c, File file) {
         // Don't ever try to use DomDriver. They are VERY slow.
-        XStream xStream = new XStream();
+        XStream xStream = getXStream();
         InputStream inputStream = null;
         Reader reader = null;
 
@@ -1828,7 +1838,7 @@ public class Utils {
     }
 
     public static boolean toXML(Object object, File file) {
-        XStream xStream = new XStream();
+        XStream xStream = getXStream();
         OutputStream outputStream = null;
         Writer writer = null;
 
@@ -2742,11 +2752,11 @@ public class Utils {
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7.45";
+    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7.46";
 
-    // 1.0.7.45
+    // 1.0.7.46
     // For About box comparision on latest version purpose.
-    private static final int APPLICATION_VERSION_ID = 1175;
+    private static final int APPLICATION_VERSION_ID = 1176;
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     

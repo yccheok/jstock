@@ -3,8 +3,8 @@
 ; Definitions for Java 1.7 Detection
 !define JRE_VERSION "1.8"
 ; The URLs are obtained from https://www.java.com/en/download/manual.jsp
-!define JRE_32_URL "https://github.com/yccheok/jstock/releases/download/jre-8u111-windows/jre-8u111-windows-i586.exe"
-!define JRE_64_URL "https://github.com/yccheok/jstock/releases/download/jre-8u111-windows/jre-8u111-windows-x64.exe"
+!define JRE_32_URL "https://github.com/yccheok/jstock/releases/download/jdk-8u251-windows/jdk-8u251-windows-i586.exe"
+!define JRE_64_URL "https://github.com/yccheok/jstock/releases/download/jdk-8u251-windows/jdk-8u251-windows-x64.exe"
 !define PRODUCT_NAME "JStock"
 ; The name of the installer
 Name ${PRODUCT_NAME}
@@ -12,7 +12,7 @@ Name ${PRODUCT_NAME}
 RequestExecutionLevel admin ;Workaround for Vista
 
 ; The file to write
-OutFile "jstock-1.0.7.44-setup.exe"
+OutFile "jstock-1.0.7.46-setup.exe"
 LicenseData "gpl-2.0.txt"
  
 ; The default installation directory

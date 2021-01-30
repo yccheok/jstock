@@ -176,9 +176,20 @@ public class Contract {
                 .referenceBroker(referenceBroker)
                 .referenceClearingFee(referenceClearingFee)
                 .referenceStampDuty(referenceStampDuty)
+                .referenceDate(referenceDate)
                 .build();
     }
 
+    public Contract deriveWithStockInfo(StockInfo stockInfo) {
+        ContractBuilder builder = new ContractBuilder(stockInfo, date);
+        return builder.type(type).quantity(quantity).price(price).referencePrice(referencePrice)
+                .referenceBroker(referenceBroker)
+                .referenceClearingFee(referenceClearingFee)
+                .referenceStampDuty(referenceStampDuty)
+                .referenceDate(referenceDate)
+                .build();
+    }
+    
     /**
      * Derives a contract with new price from this contract.
      * 
@@ -191,9 +202,10 @@ public class Contract {
                 .referenceBroker(referenceBroker)
                 .referenceClearingFee(referenceClearingFee)
                 .referenceStampDuty(referenceStampDuty)
+                .referenceDate(referenceDate)
                 .build();
     }
-
+    
     public Contract(Contract contract) {
         stockInfo = contract.stockInfo;
         date = contract.date;

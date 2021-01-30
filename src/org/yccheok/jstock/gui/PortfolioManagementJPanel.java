@@ -73,6 +73,7 @@ import org.yccheok.jstock.gui.portfolio.DepositSummaryTableModel;
 import org.yccheok.jstock.gui.portfolio.DividendSummaryBarChartJDialog;
 import org.yccheok.jstock.gui.portfolio.DividendSummaryJDialog;
 import org.yccheok.jstock.gui.portfolio.DividendSummaryTableModel;
+import org.yccheok.jstock.gui.portfolio.RenameStockJDialog;
 import org.yccheok.jstock.gui.portfolio.SplitJDialog;
 import org.yccheok.jstock.gui.portfolio.ToolTipHighlighter;
 import org.yccheok.jstock.gui.treetable.AbstractPortfolioTreeTableModelEx;
@@ -1269,6 +1270,13 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         }
     }
 
+    private void showRenameStockJDialog(StockInfo originalStockInfo) {
+        final JStock mainFrame = JStock.instance();
+        RenameStockJDialog renameStockJDialog = new RenameStockJDialog(mainFrame, true, originalStockInfo, this);
+        renameStockJDialog.setLocationRelativeTo(this);
+        renameStockJDialog.setVisible(true);
+    }
+        
     private void showSplitOrMergeJDialog(StockInfo stockInfo) {
         final JStock mainFrame = JStock.instance();
         SplitJDialog splitOrMergeJDialog = new SplitJDialog(mainFrame, true, stockInfo);
@@ -1553,6 +1561,23 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
             
             popup.add(menuItem);
 
+            final List<StockInfo> selectedSellStockInfos = getSelectedStockInfos(sellTreeTable);
+            
+            if (selectedSellStockInfos.size() == 1) {
+                popup.addSeparator();
+                
+                menuItem = new JMenuItem(GUIBundle.getString("PortfolioManagement_Rename..."), null);
+
+                menuItem.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent evt) {
+                        PortfolioManagementJPanel.this.showRenameStockJDialog(selectedSellStockInfos.get(0));
+                    }
+                });
+
+                popup.add(menuItem);
+            }
+            
             popup.addSeparator();
             
             menuItem = new JMenuItem(GUIBundle.getString("PortfolioManagement_Delete"), this.getImageIcon("/images/16x16/editdelete.png"));
@@ -1761,6 +1786,23 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
                         
             popup.add(menuItem);
 
+            final List<StockInfo> selectedBuyStockInfos = getSelectedStockInfos(buyTreeTable);
+            
+            if (selectedBuyStockInfos.size() == 1) {
+                popup.addSeparator();
+                
+                menuItem = new JMenuItem(GUIBundle.getString("PortfolioManagement_Rename..."), null);
+
+                menuItem.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent evt) {
+                        PortfolioManagementJPanel.this.showRenameStockJDialog(selectedBuyStockInfos.get(0));
+                    }
+                });
+
+                popup.add(menuItem);
+            }
+            
             popup.addSeparator();
             
             menuItem = new JMenuItem(GUIBundle.getString("PortfolioManagement_Delete"), this.getImageIcon("/images/16x16/editdelete.png"));
@@ -1777,7 +1819,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         
         return popup;
     }
-
+    
     private void editSellTransaction(Transaction newTransaction, Transaction oldTransaction) {
         assert(newTransaction.getType() == Contract.Type.Sell);
         assert(oldTransaction.getType() == Contract.Type.Sell);
@@ -1864,6 +1906,40 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
         return portfolioTreeTableModel.getTransactionSize();
     }
 
+    public boolean rename(StockInfo newStockInfo, StockInfo oldStockInfo) {
+        final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModelEx = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
+        final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModelEx = (SellPortfolioTreeTableModelEx)sellTreeTable.getTreeTableModel();
+
+        if (!buyPortfolioTreeTableModelEx.isRenameOk(newStockInfo)) {
+            final String output = MessageFormat.format(MessagesBundle.getString("warning_message_unable_to_rename_buy_template"), newStockInfo.code.toString());
+            JOptionPane.showMessageDialog(this, output, MessagesBundle.getString("warning_title_unable_to_rename"), JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
+        
+        if (!sellPortfolioTreeTableModelEx.isRenameOk(newStockInfo)) {
+            final String output = MessageFormat.format(MessagesBundle.getString("warning_message_unable_to_rename_sell_template"), newStockInfo.code.toString());
+            JOptionPane.showMessageDialog(this, output, MessagesBundle.getString("warning_title_unable_to_rename"), JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
+                
+        if (!this.dividendSummary.isRenameOk(newStockInfo)) {
+            final String output = MessageFormat.format(MessagesBundle.getString("warning_message_unable_to_rename_dividend_template"), newStockInfo.code.toString());
+            JOptionPane.showMessageDialog(this, output, MessagesBundle.getString("warning_title_unable_to_rename"), JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
+        
+        buyPortfolioTreeTableModelEx.rename(newStockInfo, oldStockInfo);
+        
+        sellPortfolioTreeTableModelEx.rename(newStockInfo, oldStockInfo);
+        
+        this.dividendSummary.rename(newStockInfo, oldStockInfo);
+
+        updateRealTimeStockMonitorAccordingToPortfolioTreeTableModels();  
+        updateExchangeRateMonitorAccordingToPortfolioTreeTableModels();
+        
+        return true;
+    }
+    
     private TransactionSummary addBuyTransaction(Transaction transaction) {
         assert(transaction.getType() == Contract.Type.Buy);
         

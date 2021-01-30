@@ -20,7 +20,9 @@ package org.yccheok.jstock.portfolio;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.Stock;
+import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.engine.currency.Currency;
 
 /**
@@ -76,6 +78,33 @@ public class DividendSummary extends AbstractSummary<Dividend> {
         return tmp;
     }
 
+    public boolean isRenameOk(StockInfo newStockInfo) {
+        final Code newCode = newStockInfo.code;
+        final int size = size();
+        
+        for (int i = 0; i < size; i++) {
+            final Dividend dividend = this.get(i);
+            if (dividend.stockInfo.code.equals(newCode)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    public void rename(StockInfo newStockInfo, StockInfo oldStockInfo) {        
+        final Code oldCode = oldStockInfo.code;
+        final int size = size();
+                
+        for (int i = 0; i < size; i++) {
+            final Dividend dividend = this.get(i);
+            if (dividend.stockInfo.code.equals(oldCode)) {
+                final Dividend newDividend = dividend.setStockInfo(newStockInfo);
+                this.remove(i);
+                this.add(i, newDividend);
+            }
+        }
+    }
+    
     @Override
     protected Object readResolve() {
         super.readResolve();

@@ -85,6 +85,13 @@ public class Transaction extends DefaultSortableMutableTreeTableNode implements 
                 calculatdClearingFee);
     }
 
+    public Transaction deriveWithStockInfo(StockInfo stockInfo) {
+        return new Transaction(contract.deriveWithStockInfo(stockInfo),
+                calculatedBroker, 
+                calculatedStampDuty,
+                calculatdClearingFee);
+    }
+    
     /**
      * Derives a transaction with new price from this transaction.
      * 

@@ -23,6 +23,8 @@ import java.util.List;
 import javax.swing.tree.TreePath;
 import org.jdesktop.swingx.treetable.TreeTableNode;
 import org.yccheok.jstock.engine.Code;
+import org.yccheok.jstock.engine.StockInfo;
+import org.yccheok.jstock.portfolio.Dividend;
 import org.yccheok.jstock.portfolio.Portfolio;
 import org.yccheok.jstock.portfolio.Transaction;
 import org.yccheok.jstock.portfolio.TransactionSummary;
@@ -163,5 +165,56 @@ public abstract class AbstractPortfolioTreeTableModelEx extends SortableTreeTabl
         fireTreeTableNodeChanged(getRoot());
         
         return transactionSummary;
+    }
+    
+    public boolean isRenameOk(StockInfo newStockInfo) {
+        final Portfolio portfolio = (Portfolio)this.getRoot();
+        
+        final int size = portfolio.getChildCount();
+        
+        final Code newCode = newStockInfo.code;        
+        
+        for (int i = 0; i < size; i++) {
+            TransactionSummary t = (TransactionSummary)portfolio.getChildAt(i);
+            
+            final Code code = ((Transaction)t.getChildAt(0)).getStockInfo().code;
+                    
+            if (code.equals(newCode)) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+        
+    public void rename(StockInfo newStockInfo, StockInfo oldStockInfo) {
+        final Portfolio portfolio = (Portfolio)this.getRoot();
+        
+        final int size = portfolio.getChildCount();
+        
+        final Code oldCode = oldStockInfo.code;        
+        
+        TransactionSummary transactionSummary = null;
+        
+        for (int i = 0; i < size; i++) {
+            TransactionSummary t = (TransactionSummary)portfolio.getChildAt(i);
+            
+            final Code code = ((Transaction)t.getChildAt(0)).getStockInfo().code;
+                    
+            if (code.equals(oldCode)) {
+                transactionSummary = t;
+                break;
+            }
+        }
+        
+        if (transactionSummary == null) {
+            return;
+        }
+        
+        for (int i = 0, ei = transactionSummary.getChildCount(); i < ei; i++) {
+            Transaction oldTransaction = (Transaction)transactionSummary.getChildAt(i);
+            Transaction newTransaction = oldTransaction.deriveWithStockInfo(newStockInfo);
+            editTransaction(newTransaction, oldTransaction);
+        }
     }
 }
