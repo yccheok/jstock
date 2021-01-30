@@ -1,6 +1,9 @@
 ﻿This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.7.47 - 2021-01-31
+  Bugfix:  Fix "open from cloud" for macOS.
+           
 JStock 1.0.7.46 - 2021-01-30
   Feature: Added stock rename. Change stock code or stock symbol in buy 
            portfolio, sell portfolio and dividend.

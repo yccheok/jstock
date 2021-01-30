@@ -83,6 +83,10 @@ public class SimpleSwingBrowser extends JDialog {
                 final WebView view = new WebView();
                 engine = view.getEngine();
  
+                // https://stackoverflow.com/questions/41952734/javafx-webview-font-issue-on-mac
+                // https://stackoverflow.com/questions/65964552/bad-display-for-javafx-webview-under-macos
+                engine.setUserAgent(engine.getUserAgent().replace("Macintosh; ", ""));
+                
                 engine.titleProperty().addListener(new ChangeListener<String>() {
                     @Override
                     public void changed(ObservableValue<? extends String> observable, String oldValue, final String newValue) {
