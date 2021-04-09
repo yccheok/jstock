@@ -1,6 +1,9 @@
 ﻿This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.7.48 - 2021-04-09
+  Feature: Able to launch cloud login page in external browser.
+  
 JStock 1.0.7.47 - 2021-01-31
   Bugfix:  Fix "open from cloud" for macOS.
            

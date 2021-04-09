@@ -20,11 +20,18 @@
 package org.yccheok.jstock.google;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -37,21 +44,51 @@ import javafx.scene.Scene;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javax.swing.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.gui.JStock;
 import org.yccheok.jstock.internationalization.MessagesBundle;
   
 public class SimpleSwingBrowser extends JDialog {
  
+    private static final Log log = LogFactory.getLog(SimpleSwingBrowser.class);
+    
     private final JFXPanel jfxPanel = new JFXPanel();
     private WebEngine engine;
     private String loadedURL = null;
     private final JPanel panel = new JPanel(new BorderLayout());
- 
+    private String url;
+    
     public SimpleSwingBrowser() {
         super(JStock.instance(), JDialog.ModalityType.APPLICATION_MODAL);
         initComponents();
+        initMenu();
     }
 
+    private void initMenu() {
+        JMenuBar jMenuBar = new javax.swing.JMenuBar();
+        JMenu jMenu = new javax.swing.JMenu();
+        JMenuItem jMenuItem = new javax.swing.JMenuItem();
+        
+        jMenu.add(jMenuItem);
+        jMenuBar.add(jMenu);
+
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui");
+        jMenu.setText(bundle.getString("SimpleSwingBrowser_File"));
+        jMenuItem.setText(bundle.getString("SimpleSwingBrowser_OpenInBrowser"));
+
+        jMenuItem.addActionListener((ActionEvent e) -> {
+            if (url != null && Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                try {
+                    Desktop.getDesktop().browse(new URI(url));
+                } catch (URISyntaxException | IOException ex) {
+                    log.error(null, ex);
+                }
+            }
+        });
+        
+        setJMenuBar(jMenuBar);
+    }
     
     private void initComponents() {
         createScene();
@@ -137,6 +174,8 @@ public class SimpleSwingBrowser extends JDialog {
     }
  
     public void loadURL(final String url) {
+        this.url = url;
+        
         Platform.runLater(new Runnable() {
             @Override 
             public void run() {
