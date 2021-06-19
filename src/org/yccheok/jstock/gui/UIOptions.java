@@ -42,6 +42,7 @@ public class UIOptions {
     public static final String DEPOSIT_SUMMARY_JDIALOG = "DEPOSIT_SUMMARY_JDIALOG";
     
     public static final String DIVIDEND_SUMMARY_JDIALOG = "DIVIDEND_SUMMARY_JDIALOG";
+    public static final String DIVIDEND_SUMMARY_BAR_CHART_JDIALOG = "DIVIDEND_SUMMARY_BAR_CHART_JDIALOG";
     
     public static final String AUTO_DIVIDEND_JDIALOG = "AUTO_DIVIDEND_JDIALOG";
     

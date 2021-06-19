@@ -1778,7 +1778,8 @@ public class Utils {
         // Avoid "Security framework of XStream not initialized, XStream is probably vulnerable." warning.
         XStream.setupDefaultSecurity(xStream);
         xStream.allowTypesByWildcard(new String[] {
-            "org.yccheok.jstock.**"
+            "org.yccheok.jstock.**",
+            "java.awt.Dimension"
         });
         return xStream;
     }
@@ -2752,11 +2753,11 @@ public class Utils {
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7.49";
+    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7.50";
 
-    // 1.0.7.49
+    // 1.0.7.50
     // For About box comparision on latest version purpose.
-    private static final int APPLICATION_VERSION_ID = 1179;
+    private static final int APPLICATION_VERSION_ID = 1180;
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     

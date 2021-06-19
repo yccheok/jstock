@@ -27,11 +27,17 @@ import com.google.api.client.extensions.java6.auth.oauth2.VerificationCodeReceiv
 import com.google.api.client.repackaged.com.google.common.base.Preconditions;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.oauth2.model.Userinfoplus;
+import java.awt.Desktop;
 import java.io.IOException;
+import java.net.URI;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.engine.Pair;
+import static org.yccheok.jstock.gui.trading.GUIUtils.openURLInBrowser;
+import org.yccheok.jstock.internationalization.GUIBundle;
+import org.yccheok.jstock.internationalization.MessagesBundle;
 
 /**
  *
@@ -159,50 +165,87 @@ public class MyAuthorizationCodeInstalledApp {
 
             @Override
             public void run() {
-                SimpleSwingBrowser _browser = new SimpleSwingBrowser();
-                
-                _browser.setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-                _browser.addWindowListener(new java.awt.event.WindowAdapter() {
-                    @Override
-                    public void windowClosed(java.awt.event.WindowEvent evt) {
-                        performRedirectUri();
-                    }
-                    
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent evt) {                        
-                        SimpleSwingBrowser _browser = browser;
-                        if (_browser != null) {
-                            _browser.setVisible(false);
-                            try {
-                                // Possible cause random exception
-                                // java.lang.NullPointerException
-                                //     at javafx.embed.swing.JFXPanel.getInputMethodRequests(JFXPanel.java:810)
-                                //
-                                // If such exception happens, there's no chance to execute windowClosed.
-                                _browser.dispose();
-                            } catch (Exception ex) {
-                                performRedirectUri();
-                                log.error(null, ex);
-                            }
-                            browser = null;
-                        }
-                    }
-                    @Override
-                    public void windowDeiconified(java.awt.event.WindowEvent evt) {
-                    }
-                    @Override
-                    public void windowIconified(java.awt.event.WindowEvent evt) {
-                    }
-                });
-                
-                browser = _browser;
-                _browser.loadURL(url);
-                _browser.setVisible(true);
+               if (!launchJavaFxBrowser(url)) {
+                   launchDesktopBrowser(url);
+               }
            }     
        });       
        
     }
 
+    private void launchDesktopBrowser(String url) {
+        try {
+            if (openURLInBrowser(url)) {
+                // Show dialog, to prevent performRedirectUri from being executed
+                // immediately.
+                JOptionPane.showMessageDialog(
+                        null, 
+                        MessagesBundle.getString("info_message_press_ok_after_browser_is_closed"),
+                        GUIBundle.getString("MainFrame_Application_Title"),
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+            } else {
+                JOptionPane.showMessageDialog(
+                        null, 
+                        MessagesBundle.getString("error_message_fail_to_launch_browser"), 
+                        MessagesBundle.getString("error_title_fail_to_launch_browser"),
+                        JOptionPane.ERROR_MESSAGE
+                );
+            }
+        } finally {
+            performRedirectUri();
+        }
+    }
+    
+    private boolean launchJavaFxBrowser(String url) {
+        try {
+            SimpleSwingBrowser _browser = new SimpleSwingBrowser();
+
+           _browser.setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+           _browser.addWindowListener(new java.awt.event.WindowAdapter() {
+               @Override
+               public void windowClosed(java.awt.event.WindowEvent evt) {
+                   performRedirectUri();
+               }
+
+               @Override
+               public void windowClosing(java.awt.event.WindowEvent evt) {                        
+                   SimpleSwingBrowser _browser = browser;
+                   if (_browser != null) {
+                       _browser.setVisible(false);
+                       try {
+                           // Possible cause random exception
+                           // java.lang.NullPointerException
+                           //     at javafx.embed.swing.JFXPanel.getInputMethodRequests(JFXPanel.java:810)
+                           //
+                           // If such exception happens, there's no chance to execute windowClosed.
+                           _browser.dispose();
+                       } catch (Exception ex) {
+                           performRedirectUri();
+                           log.error(null, ex);
+                       }
+                       browser = null;
+                   }
+               }
+               @Override
+               public void windowDeiconified(java.awt.event.WindowEvent evt) {
+               }
+               @Override
+               public void windowIconified(java.awt.event.WindowEvent evt) {
+               }
+           });
+
+           browser = _browser;
+           _browser.loadURL(url);
+           _browser.setVisible(true);
+        } catch (Exception e) {
+            log.error(null, e);
+            return false;
+        }
+        
+        return true;
+    }
+    
     private void performRedirectUri() {
         String uri = redirectUri;
 

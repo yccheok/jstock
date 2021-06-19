@@ -47,6 +47,7 @@ import javax.swing.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.yccheok.jstock.gui.JStock;
+import static org.yccheok.jstock.gui.trading.GUIUtils.openURLInBrowser;
 import org.yccheok.jstock.internationalization.MessagesBundle;
   
 public class SimpleSwingBrowser extends JDialog {
@@ -78,12 +79,8 @@ public class SimpleSwingBrowser extends JDialog {
         jMenuItem.setText(bundle.getString("SimpleSwingBrowser_OpenInBrowser"));
 
         jMenuItem.addActionListener((ActionEvent e) -> {
-            if (url != null && Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-                try {
-                    Desktop.getDesktop().browse(new URI(url));
-                } catch (URISyntaxException | IOException ex) {
-                    log.error(null, ex);
-                }
+            if (url != null) {
+                openURLInBrowser(url);
             }
         });
         

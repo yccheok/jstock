@@ -19,6 +19,7 @@
 
 package org.yccheok.jstock.gui.portfolio;
 
+import java.awt.Dimension;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
@@ -42,6 +43,7 @@ import org.yccheok.jstock.engine.Code;
 import org.yccheok.jstock.engine.StockInfo;
 import org.yccheok.jstock.gui.JStockOptions;
 import org.yccheok.jstock.gui.JStock;
+import org.yccheok.jstock.gui.UIOptions;
 import org.yccheok.jstock.internationalization.GUIBundle;
 import org.yccheok.jstock.portfolio.Dividend;
 import org.yccheok.jstock.portfolio.DividendSummary;
@@ -55,7 +57,14 @@ public class DividendSummaryBarChartJDialog extends javax.swing.JDialog {
     /** Creates new form DividendSummaryBarChartJDialog */
     public DividendSummaryBarChartJDialog(java.awt.Dialog parent, boolean modal, DividendSummary dividendSummary) {
         super(parent, modal);
+        
         initComponents();
+        
+        Dimension dimension = JStock.instance().getUIOptions().getDimension(UIOptions.DIVIDEND_SUMMARY_BAR_CHART_JDIALOG);
+        if (dimension != null) {
+            setSize(dimension);
+        }
+        
         /* Sequence is important.
          * (1) Initialize dividendSummary.
          * (2) Initialize combo box.
@@ -71,7 +80,14 @@ public class DividendSummaryBarChartJDialog extends javax.swing.JDialog {
     /** Creates new form DividendSummaryBarChartJDialog */
     public DividendSummaryBarChartJDialog(java.awt.Frame parent, boolean modal, DividendSummary dividendSummary) {
         super(parent, modal);
+        
         initComponents();
+        
+        Dimension dimension = JStock.instance().getUIOptions().getDimension(UIOptions.DIVIDEND_SUMMARY_BAR_CHART_JDIALOG);
+        if (dimension != null) {
+            setSize(dimension);
+        }
+        
         /* Sequence is important.
          * (1) Initialize dividendSummary.
          * (2) Initialize combo box.
@@ -215,6 +231,11 @@ public class DividendSummaryBarChartJDialog extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
         setTitle(bundle.getString("DividendSummaryBarChartJDialog_DividendByYear")); // NOI18N
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
+            }
+        });
 
         jPanel1.setLayout(new java.awt.BorderLayout(5, 5));
 
@@ -228,13 +249,17 @@ public class DividendSummaryBarChartJDialog extends javax.swing.JDialog {
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-700)/2, (screenSize.height-500)/2, 700, 500);
+        setSize(new java.awt.Dimension(700, 500));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
         this.chartPanel.setChart(this.createBarChart(this.createDataset()));
     }//GEN-LAST:event_jComboBox1ActionPerformed
+
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+        JStock.instance().getUIOptions().setDimension(UIOptions.DIVIDEND_SUMMARY_BAR_CHART_JDIALOG, getSize());
+    }//GEN-LAST:event_formWindowClosed
 
     private final List<StockInfo> stockInfos = new ArrayList<StockInfo>();
     private final ChartPanel chartPanel;
