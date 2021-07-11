@@ -201,7 +201,7 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
 
         jPanel1.add(jPanel4, java.awt.BorderLayout.NORTH);
 
-        jSplitPane1.setDividerLocation(250);
+        jSplitPane1.setDividerLocation(0.75);
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/yccheok/jstock/data/gui"); // NOI18N
