@@ -7,23 +7,21 @@
 # line and change the path accordingly.
 #JAVA_HOME=/usr/lib/java
 
-_JAVA_EXEC="java"
 if [ -n $JAVA_HOME ] ; then
-    _TMP="$JAVA_HOME/bin/java"
-    if [ -f "$_TMP" ] ; then
-        if [ -x "$_TMP" ] ; then
-            _JAVA_EXEC="$_TMP"
-        else
-            echo "Warning: $_TMP is not executable"
-        fi
-    else
-        echo "Warning: $_TMP does not exist"
-    fi
+_JAVA_EXEC=`type -p java`
+else
+_JAVA_EXEC="$JAVA_HOME/java"
 fi
-if ! which "$_JAVA_EXEC" >/dev/null ; then
-    echo "Error: No Java Runtime Environment found"
-    echo "Please set the environment variable JAVA_HOME to the root directory of your SUN Java installation, e.g. by editing the 7th line in this launcher script."
-    exit 1
+
+if [ ! -e "$_JAVA_EXEC" ] ; then
+echo "Error: No Java Runtime Environment found"
+echo "Please set the environment variable JAVA_HOME to the root directory of your SUN Java installation, e.g. by editing the 7th line in this launcher script."
+exit 1
+fi
+
+if [ ! -x "$_JAVA_EXEC" ] ; then
+echo "Warning: $_JAVA_EXEC is not executable"
+exit 1
 fi
 
 #
