@@ -123,7 +123,7 @@ public class Utils {
         map.put(Type.MISSING_STOCK_CODE_SERVICE, JSTOCK_WEBAPP_SERVER + "missing-stock-code/");
         map.put(Type.YAHOO_FINANCE_API, "https://mobile-query.finance.yahoo.com/v6/finance/");
         map.put(Type.YAHOO_FINANCE_CHART_API_V8, "https://query1.finance.yahoo.com/v8/finance/chart/");
-        map.put(Type.IEX_API, "https://api.iextrading.com/1.0/");
+        map.put(Type.IEX_API, "https://iex.jstock.co/stable/");
 
         zh_map.put(Type.CHAT_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/chat_server.txt");
         zh_map.put(Type.NTP_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/ntp_server.txt");
@@ -150,7 +150,7 @@ public class Utils {
         zh_map.put(Type.MISSING_STOCK_CODE_SERVICE, JSTOCK_WEBAPP_SERVER + "missing-stock-code/");
         zh_map.put(Type.YAHOO_FINANCE_API, "https://mobile-query.finance.yahoo.com/v6/finance/");
         zh_map.put(Type.YAHOO_FINANCE_CHART_API_V8, "https://query1.finance.yahoo.com/v8/finance/chart/");
-        zh_map.put(Type.IEX_API, "https://api.iextrading.com/1.0/");
+        zh_map.put(Type.IEX_API, "https://iex.jstock.co/stable/");
 
         zh_Hant_map.put(Type.CHAT_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/chat_server.txt");
         zh_Hant_map.put(Type.NTP_SERVER_TXT, JSTOCK_STATIC_SERVER + "servers_information/ntp_server.txt");
@@ -177,7 +177,7 @@ public class Utils {
         zh_Hant_map.put(Type.MISSING_STOCK_CODE_SERVICE, JSTOCK_WEBAPP_SERVER + "missing-stock-code/");
         zh_Hant_map.put(Type.YAHOO_FINANCE_API, "https://mobile-query.finance.yahoo.com/v6/finance/");
         zh_Hant_map.put(Type.YAHOO_FINANCE_CHART_API_V8, "https://query1.finance.yahoo.com/v8/finance/chart/");
-        zh_Hant_map.put(Type.IEX_API, "https://api.iextrading.com/1.0/");
+        zh_Hant_map.put(Type.IEX_API, "https://iex.jstock.co/stable/");
 
         assert(map.size() == Type.values().length);
         assert(zh_map.size() == Type.values().length);

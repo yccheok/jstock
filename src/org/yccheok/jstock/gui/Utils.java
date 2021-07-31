@@ -73,6 +73,9 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.security.GeneralSecurityException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
@@ -80,6 +83,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.EnumMap;
@@ -95,6 +99,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -2640,6 +2646,47 @@ public class Utils {
         return otherDayLastUpdateTimeFormat.get();
     }
     
+    public static String decrypt_android(String source)
+    {
+        try {
+            return Utils.decrypt_android(Utils.getJStockUUIDAsKey(), source);
+        } catch (Exception e) {
+            log.error(null, e);
+            return null;
+        }
+    }
+
+    // Make it public for Legacy usage only.
+    // http://stackoverflow.com/questions/29574587/is-aes-cbc-pkcs5padding-encryption-decryption-algorithm-and-sha-1-hashing-algo
+    public static String decrypt_android(byte[] key, String encrypted) throws GeneralSecurityException {
+        // Argument validation.
+        if (key == null || key.length != 16) {
+            throw new IllegalArgumentException("Invalid key size.");
+        }
+
+        // Setup AES tool.
+        SecretKeySpec secretKeySpec = new SecretKeySpec(key, "AES");
+        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+        cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
+
+        // Do the job with AES tool.
+        byte[] binary = Base64.getDecoder().decode(encrypted);
+        byte[] original = cipher.doFinal(binary);
+        return new String(original, Charset.forName("UTF-8"));
+    }
+
+    // Make it public for Legacy usage only.
+    public static byte[] getKey(String string) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+        MessageDigest sha = MessageDigest.getInstance("SHA-1");
+        byte[] key = sha.digest(string.getBytes("UTF-8"));
+        key = Arrays.copyOf(key, 16);
+        return key;
+    }
+
+    private static byte[] getJStockUUIDAsKey() throws UnsupportedEncodingException, NoSuchAlgorithmException {
+        return getKey(Utils.getJStockUUID());
+    }
+    
     private static class EnumMapInstanceCreator<K extends Enum<K>, V> implements
             InstanceCreator<EnumMap<K, V>> {
         private final Class<K> enumClazz;
@@ -2753,11 +2800,11 @@ public class Utils {
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7.50";
+    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7.51";
 
-    // 1.0.7.50
+    // 1.0.7.51
     // For About box comparision on latest version purpose.
-    private static final int APPLICATION_VERSION_ID = 1180;
+    private static final int APPLICATION_VERSION_ID = 1181;
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     
