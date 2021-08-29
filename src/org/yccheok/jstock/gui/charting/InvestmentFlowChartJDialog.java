@@ -21,7 +21,6 @@ package org.yccheok.jstock.gui.charting;
 
 import java.awt.Dimension;
 import java.awt.event.ComponentEvent;
-import java.io.File;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -35,6 +34,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.swing.ComboBoxModel;
+import javax.swing.SwingUtilities;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jfree.chart.ChartFactory;
@@ -582,6 +582,12 @@ public class InvestmentFlowChartJDialog extends javax.swing.JDialog implements O
 
     @Override
     public void update(RealTimeStockMonitor subject,RealTimeStockMonitor.Result result) {
+        SwingUtilities.invokeLater(() -> {
+            _update(subject, result);
+        });
+    }
+    
+    private void _update(RealTimeStockMonitor subject,RealTimeStockMonitor.Result result) {    
         for (Stock stock : result.stocks) {
             this.codeToPrice.put(stock.code, stock.getLastPrice());
             this.lookUpCodes.remove(stock.code);
