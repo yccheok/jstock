@@ -1318,7 +1318,7 @@ public class ChartJDialog extends javax.swing.JFrame implements WindowListener {
         XYPlot plot = new XYPlot(priceDataset, timeAxis, rangeAxis1, null);
 
         XYItemRenderer renderer1 = new XYLineAndShapeRenderer(true, false);
-        renderer1.setBaseToolTipGenerator(
+        renderer1.setDefaultToolTipGenerator(
             new StandardXYToolTipGenerator(
                 StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
                 new SimpleDateFormat("d-MMM-yyyy"), new DecimalFormat("0.00#")
@@ -1333,7 +1333,7 @@ public class ChartJDialog extends javax.swing.JFrame implements WindowListener {
         plot.mapDatasetToRangeAxis(1, 1);
 
         XYBarRenderer renderer2 = new XYBarRenderer(0.20);
-        renderer2.setBaseToolTipGenerator(
+        renderer2.setDefaultToolTipGenerator(
             new StandardXYToolTipGenerator(
                 StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
                 new SimpleDateFormat("d-MMM-yyyy"), new DecimalFormat("0,000.00")
@@ -1600,7 +1600,7 @@ public class ChartJDialog extends javax.swing.JFrame implements WindowListener {
                 XYPlot plot = new XYPlot(dataset, timeAxis, rangeAxis1, null);
 
                 XYItemRenderer renderer1 = new XYLineAndShapeRenderer(true, false);
-                renderer1.setBaseToolTipGenerator(
+                renderer1.setDefaultToolTipGenerator(
                     new StandardXYToolTipGenerator(
                         StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
                         new SimpleDateFormat("d-MMM-yyyy"), new DecimalFormat("0.00#")
@@ -1683,7 +1683,7 @@ public class ChartJDialog extends javax.swing.JFrame implements WindowListener {
                 XYPlot plot = new XYPlot(dataset, timeAxis, rangeAxis1, null);
 
                 XYItemRenderer renderer1 = new XYLineAndShapeRenderer(true, false);
-                renderer1.setBaseToolTipGenerator(
+                renderer1.setDefaultToolTipGenerator(
                     new StandardXYToolTipGenerator(
                         StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
                         new SimpleDateFormat("d-MMM-yyyy"), new DecimalFormat("0.00#")
@@ -1764,7 +1764,7 @@ public class ChartJDialog extends javax.swing.JFrame implements WindowListener {
                 XYPlot plot = new XYPlot(dataset, timeAxis, rangeAxis1, null);
 
                 XYItemRenderer renderer1 = new XYLineAndShapeRenderer(true, false);
-                renderer1.setBaseToolTipGenerator(
+                renderer1.setDefaultToolTipGenerator(
                     new StandardXYToolTipGenerator(
                         StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
                         new SimpleDateFormat("d-MMM-yyyy"), new DecimalFormat("0.00#")
@@ -1851,7 +1851,7 @@ public class ChartJDialog extends javax.swing.JFrame implements WindowListener {
                 XYPlot plot = new XYPlot(macdChartResult.outMACD, timeAxis, rangeAxis1, null);
 
                 XYItemRenderer renderer1 = new XYLineAndShapeRenderer(true, false);
-                renderer1.setBaseToolTipGenerator(
+                renderer1.setDefaultToolTipGenerator(
                     new StandardXYToolTipGenerator(
                         StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
                         new SimpleDateFormat("d-MMM-yyyy"), new DecimalFormat("0.00#")
@@ -1863,7 +1863,7 @@ public class ChartJDialog extends javax.swing.JFrame implements WindowListener {
                 // MACD SIGNAL!
                 plot.setDataset(1, macdChartResult.outMACDSignal);
                 XYItemRenderer renderer2 = new XYLineAndShapeRenderer(true, false);
-                renderer2.setBaseToolTipGenerator(
+                renderer2.setDefaultToolTipGenerator(
                     new StandardXYToolTipGenerator(
                         StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
                         new SimpleDateFormat("d-MMM-yyyy"), new DecimalFormat("0.00#")
@@ -1878,7 +1878,7 @@ public class ChartJDialog extends javax.swing.JFrame implements WindowListener {
 
                 XYBarRenderer renderer3 = new XYBarRenderer(0.20);
                 
-                renderer3.setBaseToolTipGenerator(
+                renderer3.setDefaultToolTipGenerator(
                     new StandardXYToolTipGenerator(
                         StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
                         new SimpleDateFormat("d-MMM-yyyy"), new DecimalFormat("0,000.00")

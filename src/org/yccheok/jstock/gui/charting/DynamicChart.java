@@ -79,7 +79,7 @@ public class DynamicChart {
         plot.getDomainAxis().setVisible(false);
 
         XYItemRenderer renderer1 = plot.getRenderer();
-        renderer1.setBaseToolTipGenerator(
+        renderer1.setDefaultToolTipGenerator(
             new StandardXYToolTipGenerator(
                 StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
                 new SimpleDateFormat("h:mm:ss a"), new DecimalFormat("0.00#")
@@ -119,7 +119,7 @@ public class DynamicChart {
         rangeAxis1.setNumberFormatOverride(format);
         
         XYItemRenderer renderer1 = plot.getRenderer();
-        renderer1.setBaseToolTipGenerator(
+        renderer1.setDefaultToolTipGenerator(
             new StandardXYToolTipGenerator(
                 StandardXYToolTipGenerator.DEFAULT_TOOL_TIP_FORMAT,
                 new SimpleDateFormat("h:mm:ss a"), new DecimalFormat("0.00#")
