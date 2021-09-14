@@ -1,5 +1,8 @@
 ﻿This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
+
+JStock 1.0.7.54 - 2021-09-14
+  Bugfix:  More intelligent stock search for US stocks.
   
 JStock 1.0.7.53 - 2021-08-29
   Bugfix:  Fix charting in Windows 10 with HDPI.

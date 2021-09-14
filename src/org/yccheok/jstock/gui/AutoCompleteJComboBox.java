@@ -94,7 +94,6 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
         }
 
         this.ajaxYahooSearchEngineMonitor.attach(getYahooMonitorObserver());
-        this.ajaxGoogleSearchEngineMonitor.attach(getGoogleMonitorObserver());
         
         this.addActionListener(getActionListener());
 
@@ -184,6 +183,81 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
         log.info("Reassign key adapter to combo box");        
     }
 
+     private void injectWithGreedyIEXSQLiteResultIfPossible(List<StockInfo> stockInfos, Set<Code> codes, String string) {
+        if (JStock.instance().getJStockOptions().getCountry() != Country.UnitedState) {
+            return;
+        }
+
+        final int size = stockInfos.size();
+
+        if (size >= TRANSACTION_MAX_SIZE) {
+            return;
+        }
+
+        //
+        // Can we enhance search using local SQLite from IEX, by searching via Symbol.
+        //
+        if (stockInfos.isEmpty()) {
+            // Perhaps we should consider escape percentage sign in string.
+            // https://stackoverflow.com/questions/23318708/how-to-escape-a-sign-in-sqlite/45861206
+
+            // Name in IEX means symbol in JStock. We use double percentage sign for greedy purpose.
+            List<StockInfo> tmpStockInfos = IEXStockInfoSQLiteOpenHelper.INSTANCE.findViaName("%" + string + "%", TRANSACTION_MAX_SIZE);
+            for (StockInfo tmpStockInfo : tmpStockInfos) {
+                if (!codes.contains(tmpStockInfo.code)) {
+                    stockInfos.add(tmpStockInfo);
+                    codes.add(tmpStockInfo.code);
+                }
+            }
+        }
+    }
+
+    private void injectWithIEXSQLiteResultIfPossible(List<StockInfo> stockInfos, Set<Code> codes, String string) {
+        if (JStock.instance().getJStockOptions().getCountry() != Country.UnitedState) {
+            return;
+        }
+
+        final int size = stockInfos.size();
+
+        if (size >= TRANSACTION_MAX_SIZE) {
+            return;
+        }
+
+        //
+        // Can we enhance search using local SQLite from IEX, by searching via Code.
+        //
+        {
+            // Perhaps we should consider escape percentage sign in string.
+            // https://stackoverflow.com/questions/23318708/how-to-escape-a-sign-in-sqlite/45861206
+
+            // Symbol in IEX means code in JStock.
+            List<StockInfo> tmpStockInfos = IEXStockInfoSQLiteOpenHelper.INSTANCE.findViaSymbol(string + "%", TRANSACTION_MAX_SIZE - size);
+            for (StockInfo tmpStockInfo : tmpStockInfos) {
+                if (!codes.contains(tmpStockInfo.code)) {
+                    stockInfos.add(tmpStockInfo);
+                    codes.add(tmpStockInfo.code);
+                }
+            }
+        }
+
+        //
+        // Can we enhance search using local SQLite from IEX, by searching via Symbol.
+        //
+        if (stockInfos.isEmpty()) {
+            // Perhaps we should consider escape percentage sign in string.
+            // https://stackoverflow.com/questions/23318708/how-to-escape-a-sign-in-sqlite/45861206
+
+            // Name in IEX means symbol in JStock.
+            List<StockInfo> tmpStockInfos = IEXStockInfoSQLiteOpenHelper.INSTANCE.findViaName(string + "%", TRANSACTION_MAX_SIZE);
+            for (StockInfo tmpStockInfo : tmpStockInfos) {
+                if (!codes.contains(tmpStockInfo.code)) {
+                    stockInfos.add(tmpStockInfo);
+                    codes.add(tmpStockInfo.code);
+                }
+            }
+        }
+    }
+    
     private DocumentListener getDocumentListener() {
         return new DocumentListener() {
             private volatile boolean ignore = false;
@@ -266,36 +340,42 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
                 AutoCompleteJComboBox.this.hidePopup();
                 AutoCompleteJComboBox.this.removeAllItems();
                 
-                boolean shouldShowPopup = false;
+                final List<StockInfo> stockInfos = new ArrayList<>();
+                final Set<Code> codes = new HashSet<>();
+                
+                // STEP 1: Look for local SQLITE.
+
+                // For US only.
+                injectWithIEXSQLiteResultIfPossible(stockInfos, codes, string);
+
+                // STEP 2: Look for more stocks from local CSV.
                 
                 if (AutoCompleteJComboBox.this.stockInfoDatabase != null) {
-                    java.util.List<StockInfo> stockInfos = 
+                    final List<StockInfo> tmpStockInfos = 
                             greedyEnabled ?
                             stockInfoDatabase.greedySearchStockInfos(string) :
                             stockInfoDatabase.searchStockInfos(string);
 
-                    sortStockInfosIfPossible(stockInfos);
+                    for (StockInfo tmpStockInfo : tmpStockInfos) {
+                        if (!codes.contains(tmpStockInfo.code)) {
+                            stockInfos.add(tmpStockInfo);
+                            codes.add(tmpStockInfo.code);
+                        }
+                    }
                     
-                    if (stockInfos.isEmpty() == false) {
-                        // Change to offline mode before adding any item.
-                        changeMode(Mode.Offline);
-                    }
+                    // For India only.
+                    sortStockInfosIfPossible(stockInfos);
 
-                    for (StockInfo stockInfo : stockInfos) {
-                        AutoCompleteJComboBox.this.addItem(stockInfo);
-                        shouldShowPopup = true;
-                    }
-
-                    if (shouldShowPopup) {
-                        AutoCompleteJComboBox.this.showPopup();
-                        //AutoCompleteJComboBox.this.requestFocusInWindow();
-                    }
-                    else {
-
-                    }   // if (shouldShowPopup)
                 }   // if (AutoCompleteJComboBox.this.stockInfoDatabase != null)
 
-                if (shouldShowPopup == false) {
+                
+                // STEP 3: Perform greedy search from local SQLite if no result.
+
+                if (stockInfos.isEmpty()) {
+                    injectWithGreedyIEXSQLiteResultIfPossible(stockInfos, codes, string);
+                }
+                    
+                if (stockInfos.isEmpty()) {
                     // OK. We found nothing from offline database. Let's
                     // ask help from online database.
                     // We are busy contacting server right now.
@@ -307,7 +387,26 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
                     
                     canRemoveAllItems = true;
                     ajaxYahooSearchEngineMonitor.clearAndPut(string);
-                    ajaxGoogleSearchEngineMonitor.clearAndPut(string);
+                } else {
+                     Collections.sort(stockInfos, (s0, s1) -> s0.code.toString().compareTo(s1.code.toString()));
+
+                    //
+                    // Control the size of list.
+                    //
+                    final int size = stockInfos.size();
+                    if (size > TRANSACTION_MAX_SIZE) {
+                        // Avoid android.os.TransactionTooLargeException.
+                        stockInfos.subList(TRANSACTION_MAX_SIZE, size).clear();
+                    }
+                    
+                    // Change to offline mode before adding any item.
+                    changeMode(Mode.Offline);
+                        
+                    for (StockInfo stockInfo : stockInfos) {
+                        AutoCompleteJComboBox.this.addItem(stockInfo);
+                    }
+                    
+                    AutoCompleteJComboBox.this.showPopup();
                 }
                 
                 // When we are in windows look n feel, the text will always be selected. We do not want that.
@@ -538,101 +637,7 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
             this.removeAllItems();
         }
     }
-
-    private Observer<AjaxGoogleSearchEngineMonitor, MatchSetType> getGoogleMonitorObserver() {
-        return new Observer<AjaxGoogleSearchEngineMonitor, MatchSetType>() {
-
-            @Override
-            public void update(final AjaxGoogleSearchEngineMonitor subject, MatchSetType arg) {
-                // Can we further enhance our search result?
-                if (arg.Match.isEmpty()) {
-                    StockInfo stockInfo = ajaxStockInfoSearchEngine.search(arg.Query);
-                    if (stockInfo != null) {
-                        MatchType matchType = new MatchType(stockInfo.code.toString().toUpperCase(), stockInfo.symbol.toString(), null, null);
-                        List<MatchType> matchTypes = new ArrayList<>();
-                        matchTypes.add(matchType);
-                        MatchSetType matchSetType = MatchSetType.newInstance(arg.Query, matchTypes);
-                        // Overwrite!
-                        arg = matchSetType;
-                    }
-                }
-
-                final MatchSetType _arg = arg;
-                
-                if (SwingUtilities.isEventDispatchThread()) {
-                    _update(subject, _arg);
-                } else {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            _update(subject, _arg);
-                        }
-                    });
-                }
-            }
-            
-            public void _update(AjaxGoogleSearchEngineMonitor subject, MatchSetType arg)  {
-                final String string = AutoCompleteJComboBox.this.getEditor().getItem().toString().trim();
-                if (string.isEmpty() || false == string.equalsIgnoreCase(arg.Query)) {
-                    return;
-                }
-
-                // We are no longer busy.
-                busySubject.notify(AutoCompleteJComboBox.this, false);
-
-                // During _update operation, there will be a lot of ListDataListeners
-                // trying to modify the content of our text field. We will not allow
-                // them to do so.
-                //
-                // Without setReadOnly(true), when we type the first character "w", IME
-                // will suggest ... However, when we call removeAllItems and addItem,
-                // JComboBox will "commit" this suggestion to JComboBox's text field.
-                // Hence, if we continue to type second character "m", the string displayed
-                // at JComboBox's text field will be ...
-                //
-                AutoCompleteJComboBox.this.jComboBoxEditor.setReadOnly(true);
-
-                // Must hide popup. If not, the pop up windows will not be
-                // resized. But this causes flickering. :(
-                boolean isPopupHide = false;
-                if (canRemoveAllItems) {
-                    canRemoveAllItems = false;
-                    
-                    isPopupHide = true;
-                    AutoCompleteJComboBox.this.hidePopup();
-                    AutoCompleteJComboBox.this.removeAllItems();
-                    
-                    codes.clear();
-                }  
-
-                if (arg.Match.isEmpty() == false) {
-                    // Change to online mode before adding any item.
-                    changeMode(Mode.Online);
-                }
-
-                for (MatchType match : arg.Match) {
-                    if (codes.contains(match.getCode().toString())) {
-                        continue;
-                    }
-
-                    if (!isPopupHide) {
-                        isPopupHide = true;
-                        AutoCompleteJComboBox.this.hidePopup();
-                    }
-                    
-                    codes.add(match.getCode().toString());
-                    AutoCompleteJComboBox.this.addItem(match);
-                }
-                if (isPopupHide && AutoCompleteJComboBox.this.getItemCount() > 0) {
-                    AutoCompleteJComboBox.this.showPopup();
-                }
-
-                // Restore.
-                AutoCompleteJComboBox.this.jComboBoxEditor.setReadOnly(false);
-            }            
-        };
-    }
-    
+   
     private Observer<AjaxYahooSearchEngineMonitor, ResultSetType> getYahooMonitorObserver() {
         return new Observer<AjaxYahooSearchEngineMonitor, ResultSetType>() {
             @Override
@@ -647,6 +652,20 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
                         // Overwrite!
                         arg = ResultSetType.newInstance(arg.Query, resultTypes);
                     }
+                }
+
+
+                // Make it a mutable data structure so that we can sort and sublist.
+                final List<ResultType> resultTypes = new ArrayList<>();
+                resultTypes.addAll(arg.Result);
+                arg = ResultSetType.newInstance(arg.Query, resultTypes);
+
+                Collections.sort(arg.Result, (r0, r1) -> r0.symbol.toString().compareTo(r1.symbol.toString()));
+                
+                final int size = arg.Result.size();
+                if (size > TRANSACTION_MAX_SIZE) {
+                    // Avoid android.os.TransactionTooLargeException.
+                    arg.Result.subList(TRANSACTION_MAX_SIZE, size).clear();
                 }
 
                 final ResultSetType _arg = arg;
@@ -773,7 +792,6 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
      */
     public void stop() {
         ajaxYahooSearchEngineMonitor.stop();
-        ajaxGoogleSearchEngineMonitor.stop();
     }
     
     private void sortStockInfosIfPossible(List<StockInfo> stockInfos) {
@@ -834,7 +852,6 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
 
     // Online database.
     private final AjaxYahooSearchEngineMonitor ajaxYahooSearchEngineMonitor = new AjaxYahooSearchEngineMonitor();
-    private final AjaxGoogleSearchEngineMonitor ajaxGoogleSearchEngineMonitor = new AjaxGoogleSearchEngineMonitor();
     private final AjaxStockInfoSearchEngine ajaxStockInfoSearchEngine = new AjaxStockInfoSearchEngine();
     
     /***************************************************************************
@@ -896,6 +913,8 @@ public class AutoCompleteJComboBox extends JComboBox implements JComboBoxPopupAd
         }
         return dim;
     }
+    
+    private static final int TRANSACTION_MAX_SIZE = 100;
     
     /**
      * Set the popup Width.
