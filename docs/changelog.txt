@@ -1,6 +1,11 @@
 ﻿This file summarizes changes in JStock releases.
 Numbers in parentheses refer to SourceForge.net tracker item numbers (#XXXXX)
 
+JStock 1.0.7.56 - 2022-01-24
+  Feature: Able to open news from the external web browser.
+  Bugfix:  Ensure watchlist names and portfolio names are sorted.
+  Bugfix:  Print more logging messages when open from cloud failed.
+  
 JStock 1.0.7.55 - 2021-11-16
   Bugfix:  Fix on US stocks.
   

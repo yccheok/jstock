@@ -101,9 +101,9 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
         jButton2 = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
+        jLabel5 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jLabel7 = new javax.swing.JLabel();
@@ -154,14 +154,6 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jLabel3.setForeground(new java.awt.Color(0, 0, 255));
-        jLabel3.setText(" ");
-        jLabel3.setToolTipText("");
-        jPanel4.add(jLabel3);
-
-        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/spinner.gif"))); // NOI18N
-        jPanel4.add(jLabel4);
-
         jLabel5.setText(bundle.getString("WizardDownloadlIndicatorJPanel_ViewLog")); // NOI18N
         jLabel5.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -175,6 +167,14 @@ public class SaveToCloudJDialog extends javax.swing.JDialog {
             }
         });
         jPanel4.add(jLabel5);
+
+        jLabel3.setForeground(new java.awt.Color(0, 0, 255));
+        jLabel3.setText(" ");
+        jLabel3.setToolTipText("");
+        jPanel4.add(jLabel3);
+
+        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/spinner.gif"))); // NOI18N
+        jPanel4.add(jLabel4);
 
         jPanel1.add(jPanel4, java.awt.BorderLayout.SOUTH);
 

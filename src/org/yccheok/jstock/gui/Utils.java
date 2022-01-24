@@ -633,18 +633,20 @@ public class Utils {
     }
 
     public static void launchWebBrowser(String address) {
+        try {
+            URL url = new URL(address);
+            launchWebBrowser(url);
+        } catch (MalformedURLException ex) {
+            return;
+        }
+    }
+
+    public static void launchWebBrowser(URL url) {
         if (Desktop.isDesktopSupported())
         {
             final Desktop desktop = Desktop.getDesktop();
             if (desktop.isSupported(Desktop.Action.BROWSE))
             {
-                URL url = null;
-                String string = address;
-                try {
-                    url = new URL(string);
-                } catch (MalformedURLException ex) {
-                    return;
-                }
                 try {
                     desktop.browse(url.toURI());
                 }
@@ -655,7 +657,7 @@ public class Utils {
             }
         }
     }
-
+        
     public static void launchWebBrowser(javax.swing.event.HyperlinkEvent evt) {
         if (HyperlinkEvent.EventType.ACTIVATED.equals(evt.getEventType())) {
             URL url = evt.getURL();
@@ -2800,11 +2802,11 @@ public class Utils {
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7.55";
+    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7.56";
 
-    // 1.0.7.55
+    // 1.0.7.56
     // For About box comparision on latest version purpose.
-    private static final int APPLICATION_VERSION_ID = 1185;
+    private static final int APPLICATION_VERSION_ID = 1186;
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     

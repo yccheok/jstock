@@ -114,9 +114,9 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
         jButton2 = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
+        jLabel5 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jButton3 = new javax.swing.JButton();
@@ -140,7 +140,6 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/apply.png"))); // NOI18N
         jButton1.setText(bundle.getString("LoadFromCloudJDialog_OK")); // NOI18N
-        jButton1.setOpaque(false);
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -163,13 +162,6 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jLabel3.setForeground(new java.awt.Color(255, 0, 0));
-        jLabel3.setText(bundle.getString("LoadFromCloudJDialog_WarningAllYourDataWillBeOverwriteByCloudData")); // NOI18N
-        jPanel4.add(jLabel3);
-
-        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/spinner.gif"))); // NOI18N
-        jPanel4.add(jLabel4);
-
         jLabel5.setText(bundle.getString("WizardDownloadlIndicatorJPanel_ViewLog")); // NOI18N
         jLabel5.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -183,6 +175,13 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
             }
         });
         jPanel4.add(jLabel5);
+
+        jLabel3.setForeground(new java.awt.Color(255, 0, 0));
+        jLabel3.setText(bundle.getString("LoadFromCloudJDialog_WarningAllYourDataWillBeOverwriteByCloudData")); // NOI18N
+        jPanel4.add(jLabel3);
+
+        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/16x16/spinner.gif"))); // NOI18N
+        jPanel4.add(jLabel4);
 
         jPanel1.add(jPanel4, java.awt.BorderLayout.SOUTH);
 
@@ -400,7 +399,8 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
                 }
                 
                 if (false == status) {
-                    publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_ExtractingDataFail"), Icons.ERROR));
+                    final String message = MessageFormat.format(GUIBundle.getString("LoadFromCloudJDialog_ExtractingDataFail_template"), cloudFile.file);
+                    publish(Status.newInstance(message, Icons.ERROR));
                     return null;
                 }
 
@@ -408,7 +408,8 @@ public class LoadFromCloudJDialog extends javax.swing.JDialog {
                 final JStockOptions jStockOptions = Utils.fromXML(JStockOptions.class, f);
 
                 if (jStockOptions == null) {
-                    publish(Status.newInstance(GUIBundle.getString("LoadFromCloudJDialog_ExtractingDataFail"), Icons.ERROR));
+                    final String message = MessageFormat.format(GUIBundle.getString("LoadFromCloudJDialog_ExtractingDataFail_template"), f);
+                    publish(Status.newInstance(message, Icons.ERROR));
                     return null;
                 }
 

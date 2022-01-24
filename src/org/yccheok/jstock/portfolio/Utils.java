@@ -25,6 +25,7 @@ import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import org.apache.commons.logging.Log;
@@ -656,6 +657,9 @@ public class Utils {
                 }
             }
         }
+        
+        Collections.sort(portfolioNames);
+        
         return portfolioNames;
     }
     

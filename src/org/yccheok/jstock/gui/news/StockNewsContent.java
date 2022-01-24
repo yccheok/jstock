@@ -36,9 +36,16 @@ import javafx.scene.control.SingleSelectionModel;
 import javafx.event.EventHandler;
 import javafx.beans.value.ObservableValue; 
 import javafx.event.ActionEvent;
+import javafx.geometry.Insets;
+import javafx.scene.control.Button;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.util.Duration;
+import org.yccheok.jstock.internationalization.GUIBundle;
 
 
 public class StockNewsContent {
@@ -66,7 +73,23 @@ public class StockNewsContent {
         tab.setGraphic(progressIn);
         
         final WebView webView = new WebView();
-        tab.setContent(webView);
+                
+        Image image = new Image(getClass().getResource("/images/32x32/browser.png").toString());
+        ImageView imageView = new ImageView(image);
+        Button button = new Button(GUIBundle.getString("SimpleSwingBrowser_OpenInBrowser"), imageView);
+        button.setOnAction(event -> {
+            org.yccheok.jstock.gui.Utils.launchWebBrowser(link);
+        });
+        
+        HBox hbox = new HBox();
+        hbox.setPadding(new Insets(8, 8, 8, 8));
+        hbox.getChildren().addAll(button);
+          
+        BorderPane borderPane = new BorderPane();
+        borderPane.setTop(hbox);
+        borderPane.setCenter(webView);
+        
+        tab.setContent(borderPane);
         
         tab.setOnCloseRequest(new EventHandler<javafx.event.Event>() {
             public void handle(javafx.event.Event e) {

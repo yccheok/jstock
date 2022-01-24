@@ -24,6 +24,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.yccheok.jstock.engine.Country;
 import org.yccheok.jstock.gui.JStockOptions;
@@ -123,6 +124,9 @@ public class Utils {
                 }
             }
         }
+        
+        Collections.sort(watchlistNames);
+        
         return watchlistNames;
     }
 
