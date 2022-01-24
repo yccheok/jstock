@@ -1,3 +1,3 @@
 id=ltsgi4R41y6x9GucPlNn5ls5HPDzKBIgRezXRcuYF/AjqV9XZCmyDJ9wl+KWaTed
-news_id=16/11/2021
+news_id=24/01/2022
 news_url=https://raw.githubusercontent.com/yccheok/jstock/master/appengine/jstock-static/war/news_information/index.html
