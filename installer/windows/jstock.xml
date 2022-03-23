@@ -27,11 +27,11 @@
     <opt>-Dsun.java2d.dpiaware=false</opt>
   </jre>
   <versionInfo>
-    <fileVersion>1.1.8.6</fileVersion>
-    <txtFileVersion>1.1.8.6</txtFileVersion>
+    <fileVersion>1.1.8.7</fileVersion>
+    <txtFileVersion>1.1.8.7</txtFileVersion>
     <fileDescription>JStock - Stock Market Software</fileDescription>
     <copyright>Yan Cheng Cheok &lt;yancheng.cheok@gmail.com&gt;</copyright>
-    <productVersion>1.1.8.6</productVersion>
+    <productVersion>1.1.8.7</productVersion>
     <txtProductVersion>1.1.8.6</txtProductVersion>
     <productName>JStock - Stock Market Software</productName>
     <companyName>Yan Cheng Cheok &lt;yancheng.cheok@gmail.com&gt;</companyName>
