@@ -1909,24 +1909,6 @@ public class PortfolioManagementJPanel extends javax.swing.JPanel {
     public boolean rename(StockInfo newStockInfo, StockInfo oldStockInfo) {
         final BuyPortfolioTreeTableModelEx buyPortfolioTreeTableModelEx = (BuyPortfolioTreeTableModelEx)buyTreeTable.getTreeTableModel();
         final SellPortfolioTreeTableModelEx sellPortfolioTreeTableModelEx = (SellPortfolioTreeTableModelEx)sellTreeTable.getTreeTableModel();
-
-        if (!buyPortfolioTreeTableModelEx.isRenameOk(newStockInfo)) {
-            final String output = MessageFormat.format(MessagesBundle.getString("warning_message_unable_to_rename_buy_template"), newStockInfo.code.toString());
-            JOptionPane.showMessageDialog(this, output, MessagesBundle.getString("warning_title_unable_to_rename"), JOptionPane.WARNING_MESSAGE);
-            return false;
-        }
-        
-        if (!sellPortfolioTreeTableModelEx.isRenameOk(newStockInfo)) {
-            final String output = MessageFormat.format(MessagesBundle.getString("warning_message_unable_to_rename_sell_template"), newStockInfo.code.toString());
-            JOptionPane.showMessageDialog(this, output, MessagesBundle.getString("warning_title_unable_to_rename"), JOptionPane.WARNING_MESSAGE);
-            return false;
-        }
-                
-        if (!this.dividendSummary.isRenameOk(newStockInfo)) {
-            final String output = MessageFormat.format(MessagesBundle.getString("warning_message_unable_to_rename_dividend_template"), newStockInfo.code.toString());
-            JOptionPane.showMessageDialog(this, output, MessagesBundle.getString("warning_title_unable_to_rename"), JOptionPane.WARNING_MESSAGE);
-            return false;
-        }
         
         buyPortfolioTreeTableModelEx.rename(newStockInfo, oldStockInfo);
         

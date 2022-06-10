@@ -314,6 +314,10 @@ public class RenameStockJDialog extends javax.swing.JDialog {
         final StockInfo newStockInfo = StockInfo.newInstance(Code.newInstance(newCodeAsString), Symbol.newInstance(newSymbolAsString));
         final StockInfo oldStockInfo = StockInfo.newInstance(Code.newInstance(oldCodeAsString), Symbol.newInstance(oldSymbolAsString));
         
+        if (newStockInfo.equals(oldStockInfo)) {
+            return;
+        }
+        
         if (!this.portfolioManagementJPanel.rename(newStockInfo, oldStockInfo)) {
             return;
         }

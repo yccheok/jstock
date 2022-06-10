@@ -166,26 +166,6 @@ public abstract class AbstractPortfolioTreeTableModelEx extends SortableTreeTabl
         
         return transactionSummary;
     }
-    
-    public boolean isRenameOk(StockInfo newStockInfo) {
-        final Portfolio portfolio = (Portfolio)this.getRoot();
-        
-        final int size = portfolio.getChildCount();
-        
-        final Code newCode = newStockInfo.code;        
-        
-        for (int i = 0; i < size; i++) {
-            TransactionSummary t = (TransactionSummary)portfolio.getChildAt(i);
-            
-            final Code code = ((Transaction)t.getChildAt(0)).getStockInfo().code;
-                    
-            if (code.equals(newCode)) {
-                return false;
-            }
-        }
-        
-        return true;
-    }
         
     public void rename(StockInfo newStockInfo, StockInfo oldStockInfo) {
         final Portfolio portfolio = (Portfolio)this.getRoot();

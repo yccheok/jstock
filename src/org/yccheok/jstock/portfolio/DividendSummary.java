@@ -77,19 +77,6 @@ public class DividendSummary extends AbstractSummary<Dividend> {
         }
         return tmp;
     }
-
-    public boolean isRenameOk(StockInfo newStockInfo) {
-        final Code newCode = newStockInfo.code;
-        final int size = size();
-        
-        for (int i = 0; i < size; i++) {
-            final Dividend dividend = this.get(i);
-            if (dividend.stockInfo.code.equals(newCode)) {
-                return false;
-            }
-        }
-        return true;
-    }
     
     public void rename(StockInfo newStockInfo, StockInfo oldStockInfo) {        
         final Code oldCode = oldStockInfo.code;
