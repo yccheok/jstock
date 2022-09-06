@@ -2405,10 +2405,12 @@ public class Utils {
                     // return new ArrayList<String>();
                 }            
             }
+            
             final List<StringBuilder> tmps = stringBuilders;
-            stringBuilders = new ArrayList<StringBuilder>();
 
             if (tmps == null) {
+                stringBuilders = new ArrayList<StringBuilder>();
+                            
                 // This will be the first converted character.
                 for (Character character : set) {
                     final StringBuilder me = new StringBuilder();
@@ -2416,12 +2418,24 @@ public class Utils {
                     stringBuilders.add(me);
                 }
             } else {
-                for (Character character : set) {
-                    for (StringBuilder tmp : tmps) {
-                        final StringBuilder me = new StringBuilder();
-                        me.append(tmp);
-                        me.append(character);
-                        stringBuilders.add(me);
+                if (!set.isEmpty()) {
+                    stringBuilders = new ArrayList<StringBuilder>();
+                    
+                    for (Character character : set) {
+                        if (tmps.isEmpty()) {
+                            // This happens when 1st character of input string invalid.
+                            
+                            final StringBuilder me = new StringBuilder();
+                            me.append(character);
+                            stringBuilders.add(me);
+                        } else {
+                            for (StringBuilder tmp : tmps) {
+                                final StringBuilder me = new StringBuilder();
+                                me.append(tmp);
+                                me.append(character);
+                                stringBuilders.add(me);
+                            }
+                        }
                     }
                 }
             }
@@ -2802,11 +2816,11 @@ public class Utils {
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7.58";
+    private static final String ABOUT_BOX_VERSION_STRING = "1.0.7.59";
 
-    // 1.0.7.58
+    // 1.0.7.59
     // For About box comparision on latest version purpose.
-    private static final int APPLICATION_VERSION_ID = 1188;
+    private static final int APPLICATION_VERSION_ID = 1189;
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     
