@@ -444,7 +444,7 @@ public class JStock extends javax.swing.JFrame {
                 formWindowDeiconified(evt);
             }
             public void windowIconified(java.awt.event.WindowEvent evt) {
-                formWindowIconified(evt);
+                //formWindowIconified(evt);
             }
         });
         getContentPane().setLayout(new java.awt.BorderLayout(5, 5));
@@ -1147,7 +1147,7 @@ public class JStock extends javax.swing.JFrame {
 
         if (Utils.isWindows())
         {
-            this.setVisible(false);
+            //this.setVisible(false);
         }
     }//GEN-LAST:event_formWindowIconified
 
