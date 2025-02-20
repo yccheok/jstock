@@ -47,7 +47,7 @@ _VMOPTIONS="-Xms64m -Xmx512m"
 
 _JAVAFXPATH="/usr/share/openjfx/lib"
 if [[ (-d "$_JAVAFXPATH") && (-f "$_JAVAFXPATH/javafx.base.jar") ]] ; then
-    _JAVAFXOPTIONS="--module-path $_JAVAFXPATH --add-modules=javafx.base,javafx.controls,javafx.fxml,javafx.graphics,javafx.media,javafx.swing,javafx.web"
+    _JAVAFXOPTIONS="--module-path $_JAVAFXPATH --add-modules=javafx.base,javafx.controls,javafx.fxml,javafx.graphics,javafx.media,javafx.swing,javafx.web --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED --add-opens java.base/java.text=ALL-UNNAMED --add-opens java.desktop/java.awt.font=ALL-UNNAMED"
 else
     _JAVAFXOPTIONS=""
 fi
